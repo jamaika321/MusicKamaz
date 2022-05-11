@@ -85,8 +85,8 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.diskModeOn() ?: MutableStateFlow(true)
     }
 
-    val isUsbModeOn: SharedFlow<Boolean> by lazy {
-        service.value?.usbModeOn() ?: MutableStateFlow(true)
+    val isUsbModeOn: StateFlow<Boolean> by lazy {
+        service.value?.usbModeOn() ?: MutableStateFlow(false)
     }
 
     val isDeviceNotConnectFromBt: StateFlow<Boolean> by lazy {

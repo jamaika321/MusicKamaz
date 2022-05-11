@@ -42,7 +42,7 @@ class MainListMusicFragment
     ) = FragmentMainListMusicBinding.inflate(inflater, container, false)
 
     override fun initVars() {
-        Toast.makeText(context, arguments?.get("source").toString(), Toast.LENGTH_SHORT).show()
+//        Toast.makeText(context, arguments?.get("source").toString(), Toast.LENGTH_SHORT).show()
         startListAllMusic()
 
     }
@@ -66,7 +66,18 @@ class MainListMusicFragment
     }
 
     private fun  startListAllMusic(){
-        parentFragmentManager.beginTransaction().replace(R.id.fragment, TrackFragment()).addToBackStack("TrackFragment").commit()
+        val trackFrag = TrackFragment()
+        setFragmentResultListener("sourceEnum") { key , bundle ->
+            when (bundle.getInt("bundleKey")){
+                2 -> trackFrag.arguments = bundleOf("bundleKey" to "2")
+                3 -> trackFrag.arguments = bundleOf("bundleKey" to "3")
+            }
+        }
+        parentFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment, trackFrag)
+            .addToBackStack("TrackFragment")
+            .commit()
     }
 
     private fun startFolderListFragment(){
