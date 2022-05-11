@@ -1,0 +1,55 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/viewPlayPause"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/repeat"
+        style="@style/controlButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/rotate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf=" parent"
+        app:srcCompat="@drawable/ic_rotate_music" />
+
+    <ImageView
+        android:id="@+id/rotate"
+        style="@style/controlButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/play_pause"
+        app:layout_constraintStart_toEndOf="@id/repeat"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_shuffle_music" />
+
+    <ImageView
+        android:id="@+id/play_pause"
+        style="@style/controlButtonBigBlue"
+        app:layout_constraintBottom_toBottomOf="@+id/rotate"
+        app:layout_constraintEnd_toStartOf="@+id/add_to_folder"
+        app:layout_constraintStart_toEndOf="@id/rotate"
+        app:layout_constraintTop_toTopOf="@+id/rotate"
+        app:srcCompat="@drawable/ic_play_white" />
+
+    <ImageView
+        android:id="@+id/add_to_folder"
+        style="@style/controlButton"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/like"
+        app:layout_constraintStart_toEndOf="@id/play_pause"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_plus_music" />
+
+    <ImageView
+        android:id="@+id/like"
+        style="@style/controlButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/add_to_folder"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_like_false" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginTop= "@dimen/marginTop"
+    android:background="@drawable/ic_back_item"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp"
+    android:padding="20dp">
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/micro_picture"
+        android:layout_width="80dp"
+        android:layout_height="0dp"
+        android:src="@drawable/korj"
+        android:elevation="@dimen/margin"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/music_name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:src="@drawable/korj"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </ImageView>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/music_name"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:autoSizeTextType="uniform"
+        app:layout_constraintBottom_toTopOf="@+id/artist_name"
+        app:layout_constraintEnd_toStartOf="@+id/like"
+        app:layout_constraintHorizontal_weight="3"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toEndOf="@+id/micro_picture"
+        app:layout_constraintTop_toTopOf="@+id/micro_picture"
+        android:layout_marginStart="20dp"/>
+
+    <TextView
+        android:id="@+id/artist_name"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:autoSizeTextType="uniform"
+        android:textColor="@color/text_item_grey"
+        app:layout_constraintBottom_toBottomOf="@+id/micro_picture"
+        app:layout_constraintStart_toStartOf="@id/music_name"
+        app:layout_constraintTop_toBottomOf="@+id/music_name"
+        app:layout_constraintEnd_toEndOf="@id/music_name" />
+
+    <ImageView
+        style="@style/controlButton"
+        android:id="@+id/like"
+        android:src="@drawable/ic_like_false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/settings"
+        app:layout_constraintStart_toEndOf="@+id/music_name"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/settings"
+        style="@style/controlButton"
+        android:layout_marginStart="@dimen/margin"
+        android:src="@drawable/ic_three_point"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/like"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+

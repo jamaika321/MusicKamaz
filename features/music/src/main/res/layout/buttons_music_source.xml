@@ -1,0 +1,72 @@
+
+
+
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/view_change_source"
+    android:orientation="horizontal"
+    android:layout_marginTop="@dimen/marginTop"
+    android:layout_marginBottom="@dimen/marginTop"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/aux"
+        style="@style/Button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_bt"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf=" parent"
+        android:text="AUX"
+        android:textColor="@color/white"
+        android:layout_marginStart="@dimen/marginTop"
+        android:layout_marginEnd="@dimen/marginTop"
+        android:gravity="center"
+       />
+
+    <TextView
+        android:id="@+id/btn_bt"
+        style="@style/Button"
+        android:layout_marginStart="@dimen/marginTop"
+        android:layout_marginEnd="@dimen/marginTop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/disk"
+        app:layout_constraintStart_toEndOf="@id/aux"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="BT"
+        android:gravity="center"
+        android:textColor="@color/white"
+        />
+    <TextView
+        android:id="@+id/disk"
+        style="@style/Button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/usb"
+        app:layout_constraintStart_toEndOf="@id/btn_bt"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="@dimen/marginTop"
+        android:layout_marginEnd="@dimen/marginTop"
+        android:text="DISK"
+        android:gravity="center"
+        android:textColor="@color/white"
+       />
+
+    <TextView
+        android:id="@+id/usb"
+        style="@style/Button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/disk"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="@dimen/marginTop"
+        android:layout_marginEnd="@dimen/marginTop"
+        android:text="USB"
+        android:gravity="center"
+        android:textColor="@color/white"
+         />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

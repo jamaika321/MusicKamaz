@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/main_graph"
+    app:startDestination="@id/musicFragment">
+
+    <fragment
+        android:id="@+id/musicFragment"
+        android:name="ru.kamaz.music.ui.one_song_fragment.MusicFragment"
+        android:label="MusicFragment" />
+    <fragment
+        android:id="@+id/trackFragment"
+        android:name="ru.kamaz.music.ui.all_musiclist.TrackFragment"
+        android:label="TrackFragment" />
+    <fragment
+        android:id="@+id/btFragment"
+        android:name="ru.kamaz.music.ui.bt.BtFragment"
+        android:label="BtFragment" />
+    <dialog
+        android:id="@+id/fragment_dialog"
+        android:name="ru.kamaz.music.ui.dialog_windows.DialogBtSettings"
+        android:label="DialogBtSettings" />
+    <fragment
+        android:id="@+id/mainListMusicFragment"
+        android:name="ru.kamaz.music.ui.list_music.MainListMusicFragment"
+        android:label="MainListMusicFragment" />
+    <dialog
+        android:id="@+id/dialogAddPlaylistFragment"
+        android:name="ru.kamaz.music.ui.category.dialog.DialogAddPlaylistFragment"
+        android:label="DialogAddPlaylistFragment" />
+
+
+</navigation>

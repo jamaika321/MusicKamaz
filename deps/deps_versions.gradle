@@ -1,0 +1,106 @@
+ext {
+    kotlinCoroutinesVersion = '1.4.2'
+    mockitoVersion = '2.25.0'
+    jUnitVersion = '4.12'
+    jUnitAndroidXVersion = '1.1.1'
+    espressoCoreVersion = '3.2.0'
+    roomVersion = '2.2.5'
+    retrofitVersion = '2.7.0'
+    retrofitGsonConverterVersion = '2.6.0'
+    retrofitCoroutinesAdapterVersion = '0.9.2'
+    okHttpVersion = '3.12.8'
+    okHttpLoggingInterceptorVersion = '3.12.8'
+    constraintLayoutVersion = '2.0.4'
+    circularProgressBarVersion = '3.0.3'
+    daggerVersion = '2.27'
+    recyclerViewVersion = '1.1.0'
+    speedViewVersion = '1.5.3'
+    materialVersion = '1.2.0'
+    simpleRatingBarVersion = '1.5.0'
+    bottomNavigationViewExVersion = '2.0.4'
+    circleImageViewVersion = '3.1.0'
+    mpAndroidChartVersion = 'v3.1.0'
+    lifecycleVersion = '2.3.1'
+    navigationVersion = '2.3.4'
+    activityKtxVersion = '1.2.2'
+    fragmentKtxVersion = '1.3.2'
+
+    //Lifecycle
+//    lifecycleExtensions = "android.arch.lifecycle:extensions:$lifecycleVersion"
+//    lifecycleCompiler = "android.arch.lifecycle:compiler:$lifecycleVersion"
+    lifecycleViewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
+    lifecycleViewModelSavedState = "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion"
+
+    //Dagger
+    dagger = "com.google.dagger:dagger:$daggerVersion"
+    daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
+
+    //Coroutines
+    kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
+    kotlinCoroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion"
+
+    //JUnit
+    jUnit = "junit:junit:$jUnitVersion"
+    jUnitAndroidX = "androidx.test.ext:junit:$jUnitAndroidXVersion"
+
+    //Espresso
+    espressoCore = "androidx.test.espresso:espresso-core:$espressoCoreVersion"
+
+    //Mockito
+    mockitoAndroid = "org.mockito:mockito-android:$mockitoVersion"
+    mockitoCore = "org.mockito:mockito-core:$mockitoVersion"
+
+    //Room
+    roomRuntime = "androidx.room:room-runtime:$roomVersion"
+    roomCompiler =  "androidx.room:room-compiler:$roomVersion"
+    roomKtx = "androidx.room:room-ktx:$roomVersion"
+
+    //Retrofit
+    retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    retrofitGsonConverter = "com.squareup.retrofit2:converter-gson:$retrofitGsonConverterVersion"
+    retrofitCoroutinesAdapter = "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:$retrofitCoroutinesAdapterVersion"
+
+    //okHttp
+    okHttp = "com.squareup.okhttp3:okhttp:$okHttpVersion"
+    okHttpLoggingInterceptor = "com.squareup.okhttp3:logging-interceptor:$okHttpLoggingInterceptorVersion"
+
+    //ConstraintLayout
+    constraintLayout = "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+
+    //RecyclerView
+    recyclerView = "androidx.recyclerview:recyclerview:$recyclerViewVersion"
+
+    //Material
+    material = "com.google.android.material:material:$materialVersion"
+
+    //CanTranslator
+    canTranslator = files("$rootDir/libs/CanTranslator.aar")
+    canTranslatorCore = files("$rootDir/libs/CanTranslatorCore.aar")
+
+    //TWManager
+    twManager = files("$rootDir/libs/twmanager.aar")
+    twManagerCore = files("$rootDir/libs/twmanager_core.aar")
+
+    //Coagent
+    coagent = files("$rootDir/libs/coagentproxy.jar")
+
+    xtlibrary = files("$rootDir/libs/xtlibrary.jar")
+
+    //Navigation Component
+    navigationFragment = "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
+    navigationUi = "androidx.navigation:navigation-ui-ktx:$navigationVersion"
+
+    //Activity kotlin
+    activityKtx = "androidx.activity:activity-ktx:$activityKtxVersion"
+
+    //Fragment kotlin
+    fragmentKtx = "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
+
+    //Other
+    circularProgressBar = "com.mikhaellopez:circularprogressbar:$circularProgressBarVersion"
+    speedView = "com.github.anastr:speedviewlib:$speedViewVersion"
+    simpleRatingBar = "com.github.ome450901:SimpleRatingBar:$simpleRatingBarVersion"
+    bottomNavigationViewEx = "com.github.ittianyu:BottomNavigationViewEx:$bottomNavigationViewExVersion"
+    circleImageView = "de.hdodenhof:circleimageview:$circleImageViewVersion"
+    mpAndroidChart = "com.github.PhilJay:MPAndroidChart:$mpAndroidChartVersion"
+}

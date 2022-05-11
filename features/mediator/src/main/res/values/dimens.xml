@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+Refer to App Widget Documentation for margin information
+http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
+    -->
+    <dimen name="seek_bar_thickness">10dp</dimen>
+    <dimen name="seek_bar_thumb_size">30dp</dimen>
+    <dimen name="widget_margin">0dp</dimen>
+    <dimen name="margin">52dp</dimen>
+    <dimen name="marginTop">18dp</dimen>
+    <dimen name="control_btn_padding">22dp</dimen>
+
+
+</resources>

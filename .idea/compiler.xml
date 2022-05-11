@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="1.7">
+      <module name="MusicKamaz.app" target="1.8" />
+      <module name="MusicKamaz.entities.data" target="1.8" />
+      <module name="MusicKamaz.entities.presentation" target="1.8" />
+      <module name="MusicKamaz.features.mediator" target="1.8" />
+      <module name="MusicKamaz.features.music" target="1.8" />
+      <module name="MusicKamaz.features.widget" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

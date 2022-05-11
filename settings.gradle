@@ -1,0 +1,9 @@
+include ':features:mediator'
+include ':features:widget'
+include ':features:music_api'
+include ':features:music'
+include ':app'
+include ':entities:core'
+include ':entities:data'
+include ':entities:presentation'
+rootProject.name = "MusicKamaz"

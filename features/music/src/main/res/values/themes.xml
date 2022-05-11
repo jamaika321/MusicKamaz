@@ -1,0 +1,103 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+
+    <style name="ToggleButtonSource" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:backgroundTint">@drawable/toggle_selector_source</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+
+    <style name="ToggleButtonMedia" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@drawable/toggle_selector_media</item>
+        <item name="iconGravity">textStart</item>
+        <item name="android:layout_weight">1</item>
+        <item name="shapeAppearance">@style/Animation.Design.BottomSheetDialog</item>
+    </style>
+
+    <style name="Theme.Music" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Theme.MusicBismillah" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@android:color/black</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:textViewStyle">@style/fontText</item>
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name= "fontText" parent="@android:style/TextAppearance.Small">
+        <item name="android:fontFamily">@font/font</item>
+    </style>
+
+    <style name="test" parent="">
+        <item name="appWidgetBackgroundColor">@color/light_blue_600</item>
+        <item name="appWidgetTextColor">@color/light_blue_50</item>
+    </style>
+
+    <style name="controlButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">@dimen/control_btn_padding</item>
+        <item name="android:background">@drawable/ic_btn_background</item>
+    </style>
+    <style name="Button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:padding">@dimen/control_btn_padding</item>
+        <item name="android:background">@drawable/back_item</item>
+    </style>
+
+    <style name="ButtonCategoryOff">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:padding">@dimen/control_btn_padding</item>
+        <item name="android:background">@drawable/back_category_music_off</item>
+    </style>
+    <style name="ButtonCategoryOn">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:padding">@dimen/control_btn_padding</item>
+        <item name="android:background">@drawable/back_category_music_on</item>
+    </style>
+
+    <style name="ButtonOn">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:padding">@dimen/control_btn_padding</item>
+        <item name="android:background">@drawable/back_item_on</item>
+    </style>
+
+    <style name="controlButtonBig" parent="controlButton">
+        <item name="android:layout_width">120dp</item>
+        <item name="android:layout_height">120dp</item>
+        <item name="android:padding">35dp</item>
+    </style>
+
+    <style name="controlButtonBigBlue" parent="controlButtonBig">
+        <item name="android:background">@drawable/ic_btn_background_blue</item>
+    </style>
+
+    <style name="ThemeOverlay.MusicKamaz.AppWidgetContainer" parent="">
+        <item name="appWidgetBackgroundColor">@color/light_blue_600</item>
+        <item name="appWidgetTextColor">@color/light_blue_50</item>
+    </style>
+
+
+</resources>

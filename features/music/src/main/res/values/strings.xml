@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">ViewPager2</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add_new_playlist">Добавить новый плайлист</string>
+    <string name="playlist">Плайлист</string>
+    <string name="artist">Artist</string>
+    <string name="song">Song</string>
+    <string name="connect_bt">Подключите телефон в</string>
+    <string name="bt_question">Перейдти в настройки?</string>
+</resources>
