@@ -6,6 +6,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <FrameLayout
+        android:id="@+id/fragment"
+        android:layout_width="match_parent"
+        android:layout_marginStart="@dimen/margin_list_frag2"
+        android:layout_marginEnd="@dimen/margin_list_frag2"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/source_selection"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_weight="9">
+    </FrameLayout>
+
     <include
         android:id="@+id/source_selection"
         layout="@layout/category_buttons_group"
@@ -17,40 +30,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         />
-
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/search"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layoutDirection="rtl"
-        android:background="@drawable/ic_back_search"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_weight="1.5"
-        android:queryHint="Поиск..."
-        android:textColorHint="@color/white"
-        android:outlineSpotShadowColor="@color/white"
-        android:textSize="@dimen/marginTop"
-        app:goIcon="@drawable/ic_music_white"
-        app:layout_constraintBottom_toTopOf="@+id/fragment"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="@dimen/margin_list_frag"
-        android:layout_marginEnd="@dimen/margin_list_frag"
-        >
-    </androidx.appcompat.widget.SearchView>
-
-    <FrameLayout
-        android:id="@+id/fragment"
-        app:layout_constraintTop_toBottomOf="@+id/search"
-        app:layout_constraintBottom_toTopOf="@+id/source_selection"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_width="match_parent"
-        android:layout_marginStart="@dimen/margin_list_frag2"
-        android:layout_marginEnd="@dimen/margin_list_frag2"
-        app:layout_constraintVertical_weight="9"
-        android:layout_height="0dp">
-    </FrameLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

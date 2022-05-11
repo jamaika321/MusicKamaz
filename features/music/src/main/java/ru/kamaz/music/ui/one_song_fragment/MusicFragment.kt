@@ -78,6 +78,10 @@ class MusicFragment :
             addEvent()
         }
         binding.openListFragment.setOnClickListener {
+            when (viewModel.isUsbModeOn.value) {
+                false -> setFragmentResult("sourceEnum", bundleOf("bundleKey" to 2))
+                true -> setFragmentResult("sourceEnum", bundleOf("bundleKey" to 3))
+            }
             navigator.navigateTo(
                 UiAction(
                     OPEN_TRACK_LIST_FRAGMENT,
@@ -97,7 +101,6 @@ class MusicFragment :
         }
         binding.sourceSelection.disk.setOnClickListener {
             changeSourceViewButtons()
-            setFragmentResult("sourceEnum", bundleOf("bundleKey" to 2))
             viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
         }
         binding.sourceSelection.aux.setOnClickListener {
@@ -107,7 +110,6 @@ class MusicFragment :
 
         binding.sourceSelection.usb.setOnClickListener {
             changeSourceViewButtons()
-            setFragmentResult("sourceEnum", bundleOf("bundleKey" to 3))
             viewModel.vmSourceSelection(MusicService.SourceEnum.USB)
         }
         binding.controlPanel.like.setOnClickListener {

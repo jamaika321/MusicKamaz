@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
@@ -32,8 +33,9 @@ class TrackFragment() :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): FragmentListMusicBinding {
-
-        return FragmentListMusicBinding.inflate(inflater, container, false)
+        val mBinding = FragmentListMusicBinding.inflate(inflater, container, false)
+//
+        return mBinding
     }
 
     override fun initVars(){
@@ -69,4 +71,6 @@ class TrackFragment() :
     }
 
 }
+
+
 
