@@ -128,7 +128,6 @@ class MusicFragment :
             )
         }
 
-
         binding.seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 if (b) {
@@ -215,13 +214,15 @@ class MusicFragment :
         }
 
         viewModel.duration.launchWhenStarted(lifecycleScope) {
-            binding.endTime.text = it
+//            binding.endTime.text = it
         }
 
         viewModel.cover.launchWhenStarted(lifecycleScope) { updateTrackCover(it) }
 
         viewModel.maxSeek.launchWhenStarted(lifecycleScope) {
             binding.seek.max = it
+            binding.endTime.text = Track.convertDuration(it.toLong())
+            Toast.makeText(context, "$it", Toast.LENGTH_SHORT).show()
         }
 
         viewModel.repeatHowModeNow.launchWhenStarted(lifecycleScope) {

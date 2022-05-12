@@ -43,6 +43,15 @@ class RepositoryImpl(
             delay(1000)
         }
     }
+    override fun getMusicDurationFlow(): Flow<Int> = flow {
+        while (true) {
+            val currentPosition = mediaPlayer.currentPosition
+            emit(currentPosition)
+            delay(1000)
+        }
+    }
+
+
 
     override fun lastTrack(): Either<None, String> {
         TODO("Not yet implemented")

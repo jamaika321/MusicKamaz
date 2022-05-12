@@ -151,7 +151,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.ALBUM_ID,
-            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.ALBUM
         )
 
         var DOWNLOAD_FILE_DIR =

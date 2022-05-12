@@ -14,11 +14,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class RecyclerViewAdapter<D>(private val producers: SparseArray<ViewHolderProducer<in Any, *, *>>,
-                             private val data: StateFlow<D>,
+                             data: StateFlow<D>,
                              parent: Fragment,
                              transform: (D) -> List<RecyclerViewBaseDataModel>) : RecyclerView.Adapter<BaseViewHolder<in Any, *, *>>(){
     private var _data = mutableListOf<RecyclerViewBaseDataModel>()
-    private var _filteredData = mutableListOf<RecyclerViewBaseDataModel>()
     init {
         data.launchWhenStarted(parent.lifecycleScope) {
             _data.clear()

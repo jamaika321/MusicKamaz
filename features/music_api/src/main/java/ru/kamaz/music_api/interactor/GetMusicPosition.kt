@@ -7,4 +7,5 @@ import ru.kamaz.music_api.interfaces.Repository
 
 class GetMusicPosition(private val repository: Repository) {
     operator fun invoke(): Flow<Int> = repository.getMusicPositionFlow().flowOn(Dispatchers.IO)
+
 }

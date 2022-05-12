@@ -138,7 +138,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private var mode = SourceEnum.DISK
 
-    private var repeatMode = RepeatMusicEnum.REPEAT_ONE_SONG
+    private var repeatMode = RepeatMusicEnum.REPEAT_OFF
 
     private val _cover = MutableStateFlow("")
     val cover = _cover.asStateFlow()
@@ -646,9 +646,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         _isFavorite.value = false
         val currentTrack = track
         updateTracks(mediaManager)
+        updateSeekBar()
         val albumID: Long = currentTrack.albumId
         _idSong.value = currentTrack.id.toInt()
-        updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
+        updateMusicName(currentTrack.title, currentTrack.album, currentTrack.duration)
         _data.value = track.data
         getMusicImg(albumID)
         mediaPlayer.apply {
@@ -718,14 +719,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun playOrPause(): Boolean {
         when (mode) {
             SourceEnum.DISK -> {
-                updateSeekBar()
                 when (isPlaying()) {
                     true -> pause()
                     false -> resume()
                 }
             }
             SourceEnum.USB -> {
-                updateSeekBar()
                 when (isPlaying()) {
                     true -> pause()
                     false -> resume()
@@ -928,6 +927,13 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             funPlayOneSong(mode)
         }
     }
+
+//    fun lastTrackCheck(mode: Int){
+//        if (tracks.isEmpty()){
+//        } else {
+//            when (currentTrackPosition)
+//        }
+//    }
 
     fun funRepeatOff(mode: Int) {
         if (tracks.isEmpty()) {
@@ -1163,6 +1169,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
+    private fun repeatOff() {
+        repeatMode = RepeatMusicEnum.REPEAT_OFF
+    }
+
     private fun oneSongRepeat() {
         repeatMode = RepeatMusicEnum.REPEAT_ONE_SONG
     }
@@ -1171,9 +1181,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         repeatMode = RepeatMusicEnum.REPEAT_ALL
     }
 
-    private fun repeatOff() {
-        repeatMode = RepeatMusicEnum.REPEAT_OFF
-    }
+
 
     override fun sourceSelection(action: SourceEnum) {
         when (action) {

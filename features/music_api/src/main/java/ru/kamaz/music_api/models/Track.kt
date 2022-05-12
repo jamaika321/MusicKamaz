@@ -13,6 +13,7 @@ data class Track(
 ) : Serializable {
     companion object {
         fun convertDuration(value: Long): String {
+
             val hrs = value / 3600000
             val mns = value / 60000 % 60000
             val scs = value % 60000 / 1000
