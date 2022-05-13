@@ -222,11 +222,14 @@ class MusicFragment :
         viewModel.maxSeek.launchWhenStarted(lifecycleScope) {
             binding.seek.max = it
             binding.endTime.text = Track.convertDuration(it.toLong())
-            Toast.makeText(context, "$it", Toast.LENGTH_SHORT).show()
         }
 
         viewModel.repeatHowModeNow.launchWhenStarted(lifecycleScope) {
             repeatIconChange(it)
+        }
+
+        viewModel.isMusicEmpty.launchWhenStarted(lifecycleScope) {
+            if (it) Toast.makeText(context, "жырлар юк икэн", Toast.LENGTH_LONG).show()
         }
 
         viewModel.musicPosition.launchWhenStarted(lifecycleScope) {

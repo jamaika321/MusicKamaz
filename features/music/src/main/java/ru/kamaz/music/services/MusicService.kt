@@ -243,6 +243,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
 
     fun setShuffleMode() {
+
         when (isShuffleStatus.value) {
             true -> {
                 ShuffleHelper.makeShuffleList(tracks, currentTrackPosition)
@@ -317,7 +318,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         registerReceiver(widgetIntentReceiver, IntentFilter(APP_WIDGET_UPDATE))
         initMediaPlayer()
         startForeground()
-        startMusicListener()
+//        startMusicListener()
         initLifecycleScope()
 
         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION).apply {
@@ -620,7 +621,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun appClosed() {
         stopMediaPlayer()
-        twManagerMusic.close()
+//        twManagerMusic.close()
     }
 
     fun startBtListener() {
@@ -645,11 +646,11 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun initTrack(track: Track, data1: String) {
         _isFavorite.value = false
         val currentTrack = track
-        updateTracks(mediaManager)
-        updateSeekBar()
+//        updateTracks(mediaManager)
         val albumID: Long = currentTrack.albumId
         _idSong.value = currentTrack.id.toInt()
         updateMusicName(currentTrack.title, currentTrack.album, currentTrack.duration)
+        updateSeekBar()
         _data.value = track.data
         getMusicImg(albumID)
         mediaPlayer.apply {
@@ -1100,13 +1101,17 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
                 } else {
-
+                    tracks.clear()
+                    _musicEmpty.value = true
                 }
             }
             false -> {
                 val result = mediaManager.scanTracks(0)
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
+                } else {
+                    tracks.clear()
+                    _musicEmpty.value = true
                 }
             }
         }

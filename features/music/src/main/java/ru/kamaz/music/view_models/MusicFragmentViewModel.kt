@@ -188,10 +188,6 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.changeRepeatMode()
     }
 
-    fun musicEmpty() {
-        Toast.makeText(context, "нет песен", Toast.LENGTH_LONG).show()
-    }
-
     override fun onCompletion(mp: MediaPlayer?) {
         nextTrack()
     }
