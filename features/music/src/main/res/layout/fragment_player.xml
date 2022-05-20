@@ -216,6 +216,7 @@
         <ImageView
             android:id="@+id/open_list_fragment"
             style="@style/controlButton"
+            android:background="@drawable/button_click"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/controlPanel"

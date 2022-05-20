@@ -63,7 +63,7 @@ import kotlin.collections.ArrayList
 
 
 class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener,
-    MusicManagerListener, BluetoothManagerListener{
+    MusicManagerListener, BluetoothManagerListener {
 
     @Inject
     lateinit var mediaPlayer: MediaPlayer
@@ -138,7 +138,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private var mode = SourceEnum.DISK
 
-    private var repeatMode = RepeatMusicEnum.REPEAT_ONE_SONG
+    private var repeatMode = RepeatMusicEnum.REPEAT_OFF
 
     private val _cover = MutableStateFlow("")
     val cover = _cover.asStateFlow()
@@ -243,6 +243,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
 
     fun setShuffleMode() {
+
         when (isShuffleStatus.value) {
             true -> {
                 ShuffleHelper.makeShuffleList(tracks, currentTrackPosition)
@@ -370,29 +371,29 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
         Log.i("USBstatus", "onUsbStatusChanged:$path ")
         _isNotUSBConnected.value = isAdded
-            if (isAdded) {
-                getFilesUseCase.getFiles(path)
-                startUsbMode(isAdded)
-            }else{
-                startDiskMode(isAdded)
-            }
+        if (isAdded) {
+            getFilesUseCase.getFiles(path)
+            startUsbMode(isAdded)
+        } else {
+            startDiskMode(isAdded)
+        }
     }
 
     private fun queryLastMusic() {
-        CoroutineScope(Dispatchers.IO).launch {
-
-            val it = queryLastMusic.run(None())
-
-            it.either({
-
-            }, {
-                (if (it.isEmpty()) initTrack(
-                    tracks[currentTrackPosition],
-                    data.value
-                ) else checkCurrentPosition(it))
-
-            })
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//
+//            val it = queryLastMusic.run(None())
+//
+//            it.either({
+//
+//            }, {
+//                (if (it.isEmpty()) initTrack(
+//                    tracks[currentTrackPosition],
+//                    data.value
+//                ) else checkCurrentPosition(it))
+//
+//            })
+//        }
     }
 
     private fun queryFavoriteMusic() {
@@ -524,6 +525,35 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         REPEAT_ALL(2)
     }
 
+    override fun changeRepeatMode() {
+        when (repeatHowNow.value) {
+            0 -> _repeatHowNow.value = 1
+            1 -> _repeatHowNow.value = 2
+            2 -> _repeatHowNow.value = 0
+        }
+        howRepeatMode()
+    }
+
+    fun howRepeatMode() {
+        when (repeatHowNow.value) {
+            0 -> repeatOff()
+            1 -> oneSongRepeat()
+            2 -> allSongsRepeat()
+        }
+    }
+
+    private fun repeatOff() {
+        repeatMode = RepeatMusicEnum.REPEAT_OFF
+    }
+
+    private fun oneSongRepeat() {
+        repeatMode = RepeatMusicEnum.REPEAT_ONE_SONG
+    }
+
+    private fun allSongsRepeat() {
+        repeatMode = RepeatMusicEnum.REPEAT_ALL
+    }
+
     override fun onBluetoothMusicDataChanged(name: String, artist: String) {
         _title.value = name
         _artist.value = artist
@@ -538,7 +568,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
 
     fun startBtMode() {
-        if (!btModeOn().value){
+        if (!btModeOn().value) {
             changeSource(1)
             stopMediaPlayer()
             startBtListener()
@@ -566,7 +596,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     private fun changeSource(sourceEnum: Int) {
-        if(btModeOn().value) stopBtListener()
+        if (btModeOn().value) stopBtListener()
         when (sourceEnum) {
             //AUX
             0 -> {
@@ -620,7 +650,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun appClosed() {
         stopMediaPlayer()
-        twManagerMusic.close()
+//        twManagerMusic.close()
     }
 
     fun startBtListener() {
@@ -645,10 +675,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun initTrack(track: Track, data1: String) {
         _isFavorite.value = false
         val currentTrack = track
-        updateTracks(mediaManager)
+//        updateTracks(mediaManager)
         val albumID: Long = currentTrack.albumId
         _idSong.value = currentTrack.id.toInt()
-        updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
+        updateMusicName(currentTrack.title, currentTrack.album, currentTrack.duration)
         _data.value = track.data
         getMusicImg(albumID)
         mediaPlayer.apply {
@@ -664,6 +694,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 }
             )
             prepare()
+            updateSeekBar()
         }
         queryFavoriteMusic()
     }
@@ -692,21 +723,21 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     private fun checkCurrentPosition(data: String) {
-        var i = 0
-        var q = 0
-        CoroutineScope(Dispatchers.IO).launch {
-            while (i in tracks.indices) {
-                if (tracks[q].data != data) {
-                    q++
-                    i++
-                } else {
-                    Log.i(TAG, "checkCurrentPosition $q$data")
-                    initTrack(tracks[q], data)
-                    break
-                }
-            }
-        }
-        currentTrackPosition = q
+//        var i = 0
+//        var q = 0
+//        CoroutineScope(Dispatchers.IO).launch {
+//            while (i in tracks.indices) {
+//                if (tracks[q].data != data) {
+//                    q++
+//                    i++
+//                } else {
+//                    Log.i(TAG, "checkCurrentPosition $q$data")
+//                    initTrack(tracks[q], data)
+//                    break
+//                }
+//            }
+//        }
+//        currentTrackPosition = q
     }
 
     override fun firstOpenTrackFound(track: Track) {
@@ -718,14 +749,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun playOrPause(): Boolean {
         when (mode) {
             SourceEnum.DISK -> {
-                updateSeekBar()
                 when (isPlaying()) {
                     true -> pause()
                     false -> resume()
                 }
             }
             SourceEnum.USB -> {
-                updateSeekBar()
                 when (isPlaying()) {
                     true -> pause()
                     false -> resume()
@@ -788,7 +817,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
 
     override fun previousTrack() {
-
         when (mode) {
             SourceEnum.DISK -> {
                 if (tracks.isEmpty()) {
@@ -848,13 +876,14 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     fun compilationMusic() {
         mediaPlayer.setOnCompletionListener(OnCompletionListener {
             Log.i("isPlayingAutoModeMain", "true${isPlaying.value}")
-            if (usbConnectionCheck() && isUsbModeOn.value){
+            if (usbConnectionCheck() && isUsbModeOn.value) {
                 nextTrack(1)
-            } else if (isBtModeOn.value){
+            } else if (isBtModeOn.value) {
+                nextTrack(1)
+            } else if (isDiskModeOn.value) {
                 nextTrack(1)
             } else {
                 startDiskMode(!isNotConnected.value)
-                nextTrack(2)
             }
         })
     }
@@ -868,26 +897,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         mediaPlayer.setAudioAttributes(audioAttributes)
     }
 
-
     override fun nextTrack(auto: Int) {
         when (mode) {
             SourceEnum.DISK -> {
-                when (repeatMode) {
-                    RepeatMusicEnum.REPEAT_OFF -> {
-                        funRepeatOff(0)
-                    }
-                    RepeatMusicEnum.REPEAT_ONE_SONG -> {
-                        when (auto) {
-                            0 -> funRepeatOff(0)
-                            1 -> funPlayOneSong(1)
-                            2 -> restartPlaylist(2)
-                        }
-                    }
-                    RepeatMusicEnum.REPEAT_ALL -> {
-                        funRepeatAll()
-                    }
-
-                }
+                repeatModeListener(auto)
             }
             SourceEnum.BT -> {
                 twManager.playerNext()
@@ -895,113 +908,98 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             SourceEnum.AUX -> {
                 TODO()
             }
-
             SourceEnum.USB -> {
+                repeatModeListener(auto)
+            }
+        }
+    }
+
+    fun repeatModeListener(auto: Int){
+        when (auto) {
+            0 -> funRepeatAll()
+            1 -> {
                 when (repeatMode) {
                     RepeatMusicEnum.REPEAT_OFF -> {
-                        funRepeatOff(0)
+                        funRepeatOff()
                     }
                     RepeatMusicEnum.REPEAT_ONE_SONG -> {
-                        when (auto) {
-                            0 -> funRepeatOff(0)
-                            1 -> funPlayOneSong(1)
-                            2 -> restartPlaylist(2)
-                        }
+                        funPlayOneSong()
                     }
                     RepeatMusicEnum.REPEAT_ALL -> {
                         funRepeatAll()
                     }
                 }
-
             }
+            2 -> restartPlaylist()
+        }
+
+    }
+
+    fun funRepeatOff() {
+        if (tracks.isEmpty()) {
+        } else {
+            when (currentTrackPosition == tracks.size-1) {
+                true -> currentTrackPosition = 0
+                false -> currentTrackPosition++
+            }
+            funPlayOneSong()
         }
     }
 
     fun funRepeatAll() {
+        if (tracks.isEmpty()) {
+        } else {
+            when (currentTrackPosition == tracks.size-1) {
+                true -> {
+                    currentTrackPosition = 0
+                    _isPlaying.value = false
+                }
+                false -> currentTrackPosition++
+            }
+            funPlayOneSong()
+        }
+    }
+
+    fun funPlayOneSong() {
+        when (isPlaying.value) {
+            true -> {
+                initTrack(
+                    tracks[currentTrackPosition],
+                    tracks[currentTrackPosition].data
+                )
+                resume()
+                Log.i("isPlayingWhenPlay", "true${isPlaying.value}")
+            }
+            false -> {
+                initTrack(
+                    tracks[currentTrackPosition],
+                    tracks[currentTrackPosition].data
+                )
+                Log.i("isPlayingWhenStop", "false${isPlaying.value}")
+            }
+        }
 
     }
 
-    private fun restartPlaylist(mode: Int) {
+    private fun restartPlaylist() {
         if (tracks.isEmpty()) {
         } else {
             currentTrackPosition = 0
-            funPlayOneSong(mode)
+            nextTrack(1)
         }
     }
 
-    fun funRepeatOff(mode: Int) {
-        if (tracks.isEmpty()) {
-        } else {
-            when (currentTrackPosition - 1) {
-                -1 -> currentTrackPosition = tracks.size - 1
-                else -> currentTrackPosition--
-            }
-            funPlayOneSong(mode)
-        }
-    }
+//    fun lastTrackCheck(mode: Int){
+//        if (tracks.isEmpty()){
+//        } else {
+//            when (currentTrackPosition)
+//        }
+//    }
 
 
-    fun funPlayOneSong(mode: Int) {
-        when (mode) {
-            0 -> {
-                when (isPlaying.value) {
-                    true -> {
-                        initTrack(
-                            tracks[currentTrackPosition],
-                            tracks[currentTrackPosition].data
-                        )
-                        resume()
-                        Log.i("isPlayingWhenPlay", "true${isPlaying.value}")
-                    }
-                    false -> {
-                        initTrack(
-                            tracks[currentTrackPosition],
-                            tracks[currentTrackPosition].data
-                        )
-                        Log.i("isPlayingWhenStop", "false${isPlaying.value}")
-                    }
-                }
-            }
-            1 -> {
-                when (isPlaying.value) {
-                    true -> {
-                        initTrack(
-                            tracks[currentTrackPosition],
-                            tracks[currentTrackPosition].data
-                        )
-                        resume()
-                        Log.i("isPlayingAutoMode", "true${isPlaying.value}")
-                    }
-                    false -> {
-                        initTrack(
-                            tracks[currentTrackPosition],
-                            tracks[currentTrackPosition].data
-                        )
-                        Log.i("isPlayingAutoMode", "true${isPlaying.value}")
-                    }
-                }
-            }
-            2 -> {
-                when (isPlaying.value) {
-                    true -> {
-                        initTrack(
-                            tracks[currentTrackPosition],
-                            tracks[currentTrackPosition].data
-                        )
-                        resume()
-                        Log.i("isPlayingAutoMode", "true${isPlaying.value}")
-                    }
-                    false -> {
-                        initTrack(
-                            tracks[currentTrackPosition],
-                            tracks[currentTrackPosition].data
-                        )
-                        Log.i("isPlayingAutoMode", "true${isPlaying.value}")
-                    }
-                }
-            }
-        }
-    }
+
+
+
 
     private val widgetIntentReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -1036,7 +1034,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             if (CMDPREV == cmd || ACTIONPREV == action) {
                 previousTrack()
             } else if (CMDNEXT == cmd || ACTIONNEXT == action) {
-                nextTrack(0)
+                nextTrack(1)
             } else if (CMDPP == cmd || ACTIONPP == action) {
                 playOrPause()
             }
@@ -1044,8 +1042,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
         if (intent != null) {
             when (intent.action) {
-//                ACTION_TOGGLE_PAUSE -> playOrPause()
-                ACTION_NEXT -> nextTrack(0)
+                ACTION_TOGGLE_PAUSE -> playOrPause()
+                ACTION_NEXT -> nextTrack(1)
                 ACTION_PREV -> previousTrack()
             }
         }
@@ -1094,13 +1092,17 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
                 } else {
-
+                    tracks.clear()
+                    _musicEmpty.value = true
                 }
             }
             false -> {
                 val result = mediaManager.scanTracks(0)
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
+                } else {
+                    tracks.clear()
+                    _musicEmpty.value = true
                 }
             }
         }
@@ -1144,35 +1146,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
         mediaPlayer.setOnCompletionListener(this)
         mediaPlayer.setAudioAttributes(audioAttributes)
-    }
-
-    override fun changeRepeatMode() {
-        when (repeatHowNow.value) {
-            0 -> _repeatHowNow.value = 1
-            1 -> _repeatHowNow.value = 2
-            2 -> _repeatHowNow.value = 0
-        }
-        howRepeatMode()
-    }
-
-    fun howRepeatMode() {
-        when (repeatHowNow.value) {
-            0 -> repeatOff()
-            1 -> oneSongRepeat()
-            2 -> allSongsRepeat()
-        }
-    }
-
-    private fun oneSongRepeat() {
-        repeatMode = RepeatMusicEnum.REPEAT_ONE_SONG
-    }
-
-    private fun allSongsRepeat() {
-        repeatMode = RepeatMusicEnum.REPEAT_ALL
-    }
-
-    private fun repeatOff() {
-        repeatMode = RepeatMusicEnum.REPEAT_OFF
     }
 
     override fun sourceSelection(action: SourceEnum) {

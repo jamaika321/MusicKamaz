@@ -78,6 +78,10 @@ class MusicFragment :
             addEvent()
         }
         binding.openListFragment.setOnClickListener {
+            when (viewModel.isUsbModeOn.value) {
+                false -> setFragmentResult("sourceEnum", bundleOf("bundleKey" to 2))
+                true -> setFragmentResult("sourceEnum", bundleOf("bundleKey" to 3))
+            }
             navigator.navigateTo(
                 UiAction(
                     OPEN_TRACK_LIST_FRAGMENT,
@@ -97,7 +101,6 @@ class MusicFragment :
         }
         binding.sourceSelection.disk.setOnClickListener {
             changeSourceViewButtons()
-            setFragmentResult("sourceEnum", bundleOf("bundleKey" to 2))
             viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
         }
         binding.sourceSelection.aux.setOnClickListener {
@@ -107,7 +110,6 @@ class MusicFragment :
 
         binding.sourceSelection.usb.setOnClickListener {
             changeSourceViewButtons()
-            setFragmentResult("sourceEnum", bundleOf("bundleKey" to 3))
             viewModel.vmSourceSelection(MusicService.SourceEnum.USB)
         }
         binding.controlPanel.like.setOnClickListener {
@@ -125,7 +127,6 @@ class MusicFragment :
                 )
             )
         }
-
 
         binding.seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
@@ -213,17 +214,22 @@ class MusicFragment :
         }
 
         viewModel.duration.launchWhenStarted(lifecycleScope) {
-            binding.endTime.text = it
+//            binding.endTime.text = it
         }
 
         viewModel.cover.launchWhenStarted(lifecycleScope) { updateTrackCover(it) }
 
         viewModel.maxSeek.launchWhenStarted(lifecycleScope) {
             binding.seek.max = it
+            binding.endTime.text = Track.convertDuration(it.toLong())
         }
 
         viewModel.repeatHowModeNow.launchWhenStarted(lifecycleScope) {
             repeatIconChange(it)
+        }
+
+        viewModel.isMusicEmpty.launchWhenStarted(lifecycleScope) {
+            if (it) Toast.makeText(context, "жырлар юк икэн", Toast.LENGTH_LONG).show()
         }
 
         viewModel.musicPosition.launchWhenStarted(lifecycleScope) {

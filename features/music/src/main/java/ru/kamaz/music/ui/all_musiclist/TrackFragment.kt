@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
+import android.widget.Toast
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.StateFlow
@@ -31,18 +33,16 @@ class TrackFragment() :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): FragmentListMusicBinding {
-
-        setFragmentResultListener("sourceEnum") { key, bundle ->
-            val result = bundle.getInt("bundleKey")
-            when (result){
-                2 -> viewModel.changeSource("2")
-                3 -> viewModel.changeSource("3")
-            }
-        }
-        return FragmentListMusicBinding.inflate(inflater, container, false)
+        val mBinding = FragmentListMusicBinding.inflate(inflater, container, false)
+//
+        return mBinding
     }
 
     override fun initVars(){
+        when (arguments?.getString("bundleKey")){
+            "2" -> viewModel.changeSource("2")
+            "3" -> viewModel.changeSource("3")
+        }
         when (viewModel.sourceEnum.value){
             true -> binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.items)
             false -> binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.itemsUsb)
@@ -71,4 +71,6 @@ class TrackFragment() :
     }
 
 }
+
+
 
