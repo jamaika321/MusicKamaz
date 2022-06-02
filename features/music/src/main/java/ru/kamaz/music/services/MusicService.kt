@@ -672,6 +672,13 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         twManagerMusic.removeListener(this)
     }
 
+    override fun clearTrackData() {
+        updateMusicName("", "", "")
+        _idSong.value = 1
+        _data.value = ""
+
+    }
+
     override fun initTrack(track: Track, data1: String) {
         _isFavorite.value = false
         val currentTrack = track
@@ -753,20 +760,23 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                     true -> pause()
                     false -> resume()
                 }
+                return isPlaying()
             }
             SourceEnum.USB -> {
                 when (isPlaying()) {
                     true -> pause()
                     false -> resume()
                 }
+                return isPlaying()
             }
             SourceEnum.BT -> {
-                _btPlaying.value = !btPlaying.value
                 twManager.playerPlayPause()
+                return btPlaying.value
             }
-            SourceEnum.AUX -> TODO()
+            SourceEnum.AUX -> {
+                return isPlaying()
+            }
         }
-        return isPlaying()
     }
 
 
@@ -983,6 +993,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private fun restartPlaylist() {
         if (tracks.isEmpty()) {
+            when(usbConnectionCheck()){
+                true -> startUsbMode(true)
+                false -> clearTrackData()
+            }
         } else {
             currentTrackPosition = 0
             nextTrack(1)
@@ -1265,6 +1279,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun onPlayerPlayPauseState(isPlaying: Boolean) {
         Log.i("btTest", "onPlayerPlayPauseState: $isPlaying")
+        when(isPlaying){
+            true -> _btPlaying.value = true
+            false -> _btPlaying.value = false
+        }
     }
 
 

@@ -229,7 +229,7 @@ class MusicFragment :
         }
 
         viewModel.isMusicEmpty.launchWhenStarted(lifecycleScope) {
-            if (it) Toast.makeText(context, "жырлар юк икэн", Toast.LENGTH_LONG).show()
+            if (it) Toast.makeText(context, "Файлы не найдены", Toast.LENGTH_LONG).show()
         }
 
         viewModel.musicPosition.launchWhenStarted(lifecycleScope) {

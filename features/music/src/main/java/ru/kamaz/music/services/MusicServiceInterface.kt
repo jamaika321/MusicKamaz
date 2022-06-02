@@ -51,6 +51,7 @@ interface MusicServiceInterface{
         fun changeRv(): StateFlow<Int>
         fun isChangeRv()
         fun initTrack(track: Track, data1: String)
+        fun clearTrackData()
         fun appClosed()
     }
 
