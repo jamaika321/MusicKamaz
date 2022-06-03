@@ -747,6 +747,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 //        currentTrackPosition = q
     }
 
+    override fun lastSavedState(){
+        updateSeekBar()
+    }
+
     override fun firstOpenTrackFound(track: Track) {
         updateTracks(mediaManager)
         val currentTrack = track

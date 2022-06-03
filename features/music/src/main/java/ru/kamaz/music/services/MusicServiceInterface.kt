@@ -53,6 +53,7 @@ interface MusicServiceInterface{
         fun initTrack(track: Track, data1: String)
         fun clearTrackData()
         fun appClosed()
+        fun lastSavedState()
     }
 
     interface ViewModel{

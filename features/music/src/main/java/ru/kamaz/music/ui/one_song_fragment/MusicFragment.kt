@@ -54,6 +54,7 @@ class MusicFragment :
 
     override fun onResume() {
         //      viewModel.startTrack()
+        viewModel.lastSavedState()
         val presenter = MusicPresenter(context)
         presenter.openUSBList()
         presenter.getRecord()

@@ -163,6 +163,11 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.nextTrack(2)
     }
 
+    fun lastSavedState(){
+        service.value?.lastSavedState()
+        _isPlaying.value = service.value?.isPlaying()?: false
+    }
+
 
     fun vmSourceSelection(action: MusicService.SourceEnum) {
         when (action) {
