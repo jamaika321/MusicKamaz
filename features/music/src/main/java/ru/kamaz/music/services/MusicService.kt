@@ -596,7 +596,11 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     private fun changeSource(sourceEnum: Int) {
-        if (btModeOn().value) stopBtListener()
+        if (btModeOn().value){
+            stopBtListener()
+//            _btPlaying.value = false
+
+        }
         when (sourceEnum) {
             //AUX
             0 -> {
@@ -637,9 +641,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         try {
             if (btPlaying.value) {
                 twManager.playerPlayPause()
-                _btPlaying.value = false
             }
-            twManager.removeListener(this)
+            twManagerMusic.removeListener(this)
             twManager.stopMonitoring(applicationContext)
 
         } catch (e: Exception) {
@@ -656,13 +659,14 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     fun startBtListener() {
         onBluetoothMusicDataChanged("", "")
         twManager.startMonitoring(applicationContext) {
-//            twManager.addListener(this)
+            twManagerMusic.addListener(this)
             twManager.requestConnectionInfo()
         }
     }
 
     fun startMusicListener() {
-        twManagerMusic.addListener(this)
+        twManagerMusic.removeListener(this)
+//        twManager.addListener(this)
     }
 
 
