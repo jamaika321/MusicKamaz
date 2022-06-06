@@ -165,7 +165,7 @@ class MusicFragmentViewModel @Inject constructor(
 
     fun lastSavedState(){
         service.value?.lastSavedState()
-        _isPlaying.value = service.value?.isPlaying()?: false
+        _isPlaying.value = service.value?.isPlaying() ?: false
     }
 
 

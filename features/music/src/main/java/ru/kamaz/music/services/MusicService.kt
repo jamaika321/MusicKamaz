@@ -335,12 +335,15 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             twManager.addListener(this)
             twManager.requestConnectionInfo()
         }
+
         artist.launchOn(lifecycleScope) {
             widgettest.updateTestArtist(this, it)
         }
+
         title.launchOn(lifecycleScope) {
             widgettest.updateTestTitle(this, it)
         }
+
         duration.launchOn(lifecycleScope) {
             widgettest.updateTestDuration(this, it)
         }
@@ -348,7 +351,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         isPlaying.launchOn(lifecycleScope) {
             widgettest.updatePlayPauseImg(this, it)
         }
-
 
         isPlaying.launchOn(lifecycleScope) {
             widgettest.updatePlayPauseImg(this, it)
@@ -375,7 +377,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             getFilesUseCase.getFiles(path)
             startUsbMode(isAdded)
         } else {
-            startDiskMode(isAdded)
+            startDiskMode()
         }
     }
 
@@ -555,9 +557,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun onBluetoothMusicDataChanged(name: String, artist: String) {
-        _title.value = name
-        _artist.value = artist
-        _isPlaying.value = mediaPlayer.isPlaying
+        if (isBtModeOn.value) {
+            _title.value = name
+            _artist.value = artist
+        }
     }
 
     fun startAuxMode() {
@@ -575,7 +578,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    fun startDiskMode(btOn: Boolean) {
+    fun startDiskMode() {
         if (!isDiskModeOn.value) {
             changeSource(2)
             updateTracks(mediaManager)
@@ -596,10 +599,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     private fun changeSource(sourceEnum: Int) {
-        if (btModeOn().value){
+        Toast.makeText(this, "${isPlaying.value}", Toast.LENGTH_SHORT).show()
+        if (btModeOn().value) {
             stopBtListener()
-//            _btPlaying.value = false
-
         }
         when (sourceEnum) {
             //AUX
@@ -610,7 +612,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             }
             //BT
             1 -> {
-                _isPlaying.value = false
                 _isUsbModeOn.tryEmit(false)
                 _isDiskModeOn.tryEmit(false)
                 _isAuxModeOn.tryEmit(false)
@@ -639,12 +640,11 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     fun stopBtListener() {
         try {
-            if (btPlaying.value) {
-                twManager.playerPlayPause()
+            if (!isPlaying.value) {
+                playOrPause()
             }
             twManagerMusic.removeListener(this)
-            twManager.stopMonitoring(applicationContext)
-
+//            twManager.stopMonitoring(applicationContext)
         } catch (e: Exception) {
 
         }
@@ -657,15 +657,16 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     fun startBtListener() {
-        onBluetoothMusicDataChanged("", "")
+        onBluetoothMusicDataChanged("Name", "Artist")
         twManager.startMonitoring(applicationContext) {
             twManagerMusic.addListener(this)
             twManager.requestConnectionInfo()
         }
+            playOrPause()
     }
 
     fun startMusicListener() {
-        twManagerMusic.removeListener(this)
+        twManagerMusic.addListener(this)
 //        twManager.addListener(this)
     }
 
@@ -712,7 +713,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private fun stopMediaPlayer() {
         mediaPlayer.stop()
-        tracks.clear()
+//        tracks.clear()
     }
 
     override fun testPlay(track: Track) {
@@ -751,7 +752,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 //        currentTrackPosition = q
     }
 
-    override fun lastSavedState(){
+    override fun lastSavedState() {
         updateSeekBar()
     }
 
@@ -764,27 +765,26 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun playOrPause(): Boolean {
         when (mode) {
             SourceEnum.DISK -> {
-                when (isPlaying()) {
+                when (isPlaying.value) {
                     true -> pause()
                     false -> resume()
                 }
-                return isPlaying()
             }
             SourceEnum.USB -> {
-                when (isPlaying()) {
+                when (isPlaying.value) {
                     true -> pause()
                     false -> resume()
                 }
-                return isPlaying()
             }
             SourceEnum.BT -> {
                 twManager.playerPlayPause()
-                return btPlaying.value
+                _isPlaying.value = isPlaying()
             }
             SourceEnum.AUX -> {
-                return isPlaying()
+
             }
         }
+        return isPlaying.value
     }
 
 
@@ -792,7 +792,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         _title.value = title
         _artist.value = artist
         _duration.value = duration
-        _isPlaying.value = mediaPlayer.isPlaying
+//        _isPlaying.value = mediaPlayer.isPlaying
     }
 
     override fun getMusicImg(albumID: Long) {
@@ -821,7 +821,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    override fun isPlaying(): Boolean = mediaPlayer.isPlaying
+    override fun isPlaying(): Boolean = isPlaying.value
 
 
     override fun checkPosition(position: Int) {
@@ -840,12 +840,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 if (tracks.isEmpty()) {
 
                 } else {
-                    when (currentTrackPosition + 1) {
-                        tracks.size -> currentTrackPosition = 0
-                        else -> currentTrackPosition++
+                    when (currentTrackPosition - 1) {
+                        -1 -> currentTrackPosition = tracks.size -1
+                        else -> currentTrackPosition--
                     }
 
-                    when (isPlaying()) {
+                    when (isPlaying.value) {
                         true -> {
                             initTrack(
                                 tracks[currentTrackPosition],
@@ -868,12 +868,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             SourceEnum.USB -> if (tracks.isEmpty()) {
 
             } else {
-                when (currentTrackPosition + 1) {
-                    tracks.size -> currentTrackPosition = 0
-                    else -> currentTrackPosition++
+                when (currentTrackPosition - 1) {
+                    -1 -> currentTrackPosition = tracks.size -1
+                    else -> currentTrackPosition--
                 }
 
-                when (isPlaying()) {
+                when (isPlaying.value) {
                     true -> {
                         initTrack(
                             tracks[currentTrackPosition],
@@ -901,7 +901,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             } else if (isDiskModeOn.value) {
                 nextTrack(1)
             } else {
-                startDiskMode(!isNotConnected.value)
+                startDiskMode()
             }
         })
     }
@@ -932,9 +932,21 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    fun repeatModeListener(auto: Int){
+    fun repeatModeListener(auto: Int) {
         when (auto) {
-            0 -> funRepeatAll()
+            0 -> {
+                when (repeatMode) {
+                    RepeatMusicEnum.REPEAT_OFF -> {
+                        funRepeatOff()
+                    }
+                    RepeatMusicEnum.REPEAT_ONE_SONG -> {
+                        funPlayOneSong()
+                    }
+                    RepeatMusicEnum.REPEAT_ALL -> {
+                        funRepeatAll()
+                    }
+                }
+            }
             1 -> {
                 when (repeatMode) {
                     RepeatMusicEnum.REPEAT_OFF -> {
@@ -956,7 +968,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     fun funRepeatOff() {
         if (tracks.isEmpty()) {
         } else {
-            when (currentTrackPosition == tracks.size-1) {
+            when (currentTrackPosition == tracks.size - 1) {
                 true -> currentTrackPosition = 0
                 false -> currentTrackPosition++
             }
@@ -967,7 +979,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     fun funRepeatAll() {
         if (tracks.isEmpty()) {
         } else {
-            when (currentTrackPosition == tracks.size-1) {
+            when (currentTrackPosition == tracks.size - 1) {
                 true -> {
                     currentTrackPosition = 0
                     _isPlaying.value = false
@@ -1001,7 +1013,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private fun restartPlaylist() {
         if (tracks.isEmpty()) {
-            when(usbConnectionCheck()){
+            when (usbConnectionCheck()) {
                 true -> startUsbMode(true)
                 false -> clearTrackData()
             }
@@ -1017,10 +1029,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 //            when (currentTrackPosition)
 //        }
 //    }
-
-
-
-
 
 
     private val widgetIntentReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -1184,12 +1192,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                     startBtMode()
                 }
             }
-            SourceEnum.DISK ->
-                if (isNotConnected.value) {
-                    startDiskMode(false)
-                } else {
-                    startDiskMode(true)
-                }
+            SourceEnum.DISK -> startDiskMode()
             SourceEnum.USB -> {
                 _isNotUSBConnected.value = usbConnectionCheck()
                 if (_isNotUSBConnected.value) {
@@ -1287,9 +1290,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun onPlayerPlayPauseState(isPlaying: Boolean) {
         Log.i("btTest", "onPlayerPlayPauseState: $isPlaying")
-        when(isPlaying){
-            true -> _btPlaying.value = true
-            false -> _btPlaying.value = false
+        when (isPlaying) {
+            true -> _isPlaying.value = false
+            false -> _isPlaying.value = true
         }
     }
 
