@@ -32,14 +32,16 @@ class MusicFragmentViewModel @Inject constructor(
     private var tracks = ArrayList<Track>()
     private var currentTrackPosition = 0
 
-    private val _isPlaying = MutableStateFlow(false)
-    val isPlaying = _isPlaying.asStateFlow()
     private val _btModeActivation = MutableStateFlow(false)
     val btModeActivation = _btModeActivation.asStateFlow()
 
     val artist: StateFlow<String> by lazy {
       service.value?.getArtistName() ?: MutableStateFlow("Unknown")
     }
+
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying = _isPlaying.asStateFlow()
+
     val repeatHowModeNow: StateFlow<Int> by lazy {
       service.value?.getRepeat() ?: MutableStateFlow(0)
     }
@@ -165,7 +167,6 @@ class MusicFragmentViewModel @Inject constructor(
 
     fun lastSavedState(){
         service.value?.lastSavedState()
-        _isPlaying.value = service.value?.isPlaying() ?: false
     }
 
 

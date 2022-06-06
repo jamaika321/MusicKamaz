@@ -602,6 +602,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         Toast.makeText(this, "${isPlaying.value}", Toast.LENGTH_SHORT).show()
         if (btModeOn().value) {
             stopBtListener()
+            startMusicListener()
         }
         when (sourceEnum) {
             //AUX
@@ -762,7 +763,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
     }
 
-    override fun playOrPause(): Boolean {
+    override fun playOrPause() : Boolean {
         when (mode) {
             SourceEnum.DISK -> {
                 when (isPlaying.value) {
