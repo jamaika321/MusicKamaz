@@ -10,6 +10,7 @@ import java.io.File
 
 interface Repository: PathManager, SourceManager {
     fun getMusicDurationFlow(): Flow<Int>
+    fun loadAllTracks(): Either<None, List<Track>>
     fun loadDiskData(): Either<None, List<Track>>
     fun loadUsbData(): Either<None, List<Track>>
     fun rvArtist(): Either<None, List<Track>>

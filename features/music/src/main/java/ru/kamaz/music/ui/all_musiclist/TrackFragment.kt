@@ -37,14 +37,17 @@ class TrackFragment() :
     }
 
     override fun initVars(){
-        when (arguments?.getString("bundleKey")){
-            "2" -> viewModel.changeSource("2")
-            "3" -> viewModel.changeSource("3")
-        }
-        when (viewModel.sourceEnum.value){
-            true -> binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.items)
-            false -> binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.itemsUsb)
-        }
+        //Выводит отдельно каждый список песен
+//        when (arguments?.getString("bundleKey")){
+//            "2" -> viewModel.changeSource("2")
+//            "3" -> viewModel.changeSource("3")
+//        }
+//        when (viewModel.sourceEnum.value){
+//            true -> binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.items)
+//            false -> binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.itemsUsb)
+//        }
+        binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.itemsAll)
+
 
     }
 

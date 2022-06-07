@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.domain.GetFilesUseCase
+import ru.kamaz.music_api.interactor.LoadAllTracks
 import ru.kamaz.music_api.interactor.LoadDiskData
 import ru.kamaz.music_api.interactor.LoadUsbData
 import ru.kamaz.music_api.models.Track
@@ -48,6 +49,9 @@ class TrackViewModel @Inject constructor(
     private val _itemsUsb = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     var itemsUsb = _itemsUsb.asStateFlow()
 
+    private val _itemsAll = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
+    var itemsAll = _itemsAll.asStateFlow()
+
     private val _sourceEnum = MutableStateFlow(true)
     var sourceEnum = _sourceEnum.asStateFlow()
 
@@ -61,8 +65,9 @@ class TrackViewModel @Inject constructor(
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
 
-        loadDiskPlaylist()
         loadUsbPlaylist()
+        loadDiskPlaylist()
+//        loadAllTracks()
 
         Log.i("trackFrag1", "initVars: ${items.value}")
 
@@ -96,27 +101,17 @@ class TrackViewModel @Inject constructor(
 
     fun searchMusic(music: String){
         _items.value = filterRecyclerList(music).toRecyclerViewItems()
-
-
-//       val sdfsdf= listTrack[0].title.lowercase(Locale.ROOT)
-//        Log.i("FORTESTSEARCH", "searchMusic: ${listTrack.size}")
-//        listTrack.filter {
-//            it.title == "Весна"
-//        }
-//
-//        Log.i("FORTESTSEARCH", "searchMusic: $music")
-//        for (i in 0..listTrack.size-1){
-//            Log.i("FORTESTSEARCH", "searchMusic: ${listTrack[i].title}")
-//        }
-//        Log.i("FORTESTSEARCH", "searchMusic: ${listTrack.size}")
-//        Log.i("FORTESTSEARCH", "searchMusic: ${sdfsdf}")
     }
+
     fun loadUsbPlaylist(){
         loadUsbData(None()) { it.either({  }, ::onUsbDataLoaded) }
     }
     fun loadDiskPlaylist(){
         loadDiskData(None()) { it.either({  }, ::onDiskDataLoaded) }
     }
+//    fun loadAllTracks(){
+//        loadAllData(None()) { it.either({  }, ::onAllDataLoaded) }
+//    }
 
     private fun onDiskDataLoaded(data: List<Track>) {
         if (data.isEmpty()) {
@@ -136,6 +131,17 @@ class TrackViewModel @Inject constructor(
         } else _trackIsEmpty.value = false
         listTrack = data as ArrayList<Track>
         _itemsUsb.value = data.toRecyclerViewItems()
+        _isLoading.value = false
+
+    }
+    private fun onAllDataLoaded(data: List<Track>) {
+        if (data.isEmpty()) {
+            Log.d("mediaPlayer", "no")
+            _trackIsEmpty.value = true
+           // toast()
+        } else _trackIsEmpty.value = false
+        listTrack = data as ArrayList<Track>
+        _itemsAll.value = data.toRecyclerViewItems()
         _isLoading.value = false
 
     }
