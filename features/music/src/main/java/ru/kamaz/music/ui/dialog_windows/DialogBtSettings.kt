@@ -28,7 +28,7 @@ class DialogBtSettings : DialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding= null
+        _binding = null
     }
 
     override fun onStart() {

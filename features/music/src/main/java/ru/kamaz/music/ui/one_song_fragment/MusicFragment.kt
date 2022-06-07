@@ -41,7 +41,7 @@ class MusicFragment :
 
     override fun onDestroy() {
         viewModel.isSaveLastMusic()
-//        viewModel.appClosed()
+        viewModel.appClosed()
         super.onDestroy()
     }
 
@@ -201,7 +201,7 @@ class MusicFragment :
     }
 
     private fun initServiceVars() {
-        viewModel.isPlaying.launchWhenStarted(lifecycleScope) { isPlaying ->
+        viewModel.isPlay.launchWhenStarted(lifecycleScope) { isPlaying ->
             if (isPlaying) binding.controlPanel.playPause.setImageResource(R.drawable.ic_pause_white)
             else binding.controlPanel.playPause.setImageResource(R.drawable.ic_play_center)
         }

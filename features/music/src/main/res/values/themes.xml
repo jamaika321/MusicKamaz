@@ -13,6 +13,14 @@
         <item name="shapeAppearance">@style/Animation.Design.BottomSheetDialog</item>
     </style>
 
+    <style name="ThemeOverlay.SearchView" parent="">
+        <!-- Text color -->
+        <item name="android:editTextColor">@color/white</item>
+        <!-- Hint text color -->
+        <item name="android:textColorHint">@color/white</item>
+        <item name="tint">@color/white</item>
+    </style>
+
     <style name="Theme.Music" parent="Theme.MaterialComponents.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>

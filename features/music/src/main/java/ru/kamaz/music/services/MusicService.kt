@@ -654,6 +654,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun appClosed() {
         stopMediaPlayer()
+        twManager.stopMonitoring(applicationContext)
 //        twManagerMusic.close()
     }
 
@@ -779,7 +780,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             }
             SourceEnum.BT -> {
                 twManager.playerPlayPause()
-                _isPlaying.value = isPlaying()
+                _isPlaying.value = isPlaying.value
             }
             SourceEnum.AUX -> {
 
@@ -822,7 +823,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    override fun isPlaying(): Boolean = isPlaying.value
+    override fun isPlay(): StateFlow<Boolean> = isPlaying
 
 
     override fun checkPosition(position: Int) {

@@ -12,6 +12,8 @@
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search"
         android:layout_width="match_parent"
+        android:theme="@style/ThemeOverlay.SearchView"
+        android:outlineAmbientShadowColor="@color/white"
         android:layout_height="0dp"
         android:layoutDirection="rtl"
         android:background="@drawable/ic_back_search"

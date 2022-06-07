@@ -4,12 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SearchView
-import android.widget.Toast
-import androidx.fragment.app.setFragmentResultListener
+import androidx.appcompat.widget.SearchView
+import androidx.core.graphics.toColor
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.onEach
 import ru.kamaz.music.databinding.FragmentListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.ui.producers.MusicListViewHolderProducer
@@ -54,6 +52,28 @@ class TrackFragment() :
         viewModel.trackIsEmpty.launchOn(lifecycleScope){
             musicListIsEmpty(it)
         }
+        val searchView = binding.search as SearchView
+
+        searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener
+        {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+               return false
+            }
+
+            override fun onQueryTextChange(musicText: String): Boolean {
+                viewModel.searchMusic(musicText)
+                return false
+            }
+
+        }
+        )
+
+        binding.search.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                binding.search.setIconified(false)
+            }
+        })
+
         super.setListeners()
     }
     fun onTrackClicked(track: Track) {

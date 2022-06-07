@@ -18,7 +18,7 @@ interface MusicServiceInterface{
         fun getMusicImg(albumID: Long)
         fun pause()
         fun resume()
-        fun isPlaying(): Boolean
+        fun isPlay(): StateFlow<Boolean>
         fun checkPosition(position: Int)
         fun previousTrack()
         fun nextTrack(auto:Int)/* fun updateMusic(track: Track)*/

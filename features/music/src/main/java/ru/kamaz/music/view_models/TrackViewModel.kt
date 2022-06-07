@@ -18,9 +18,11 @@ import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.LoadDiskData
 import ru.kamaz.music_api.interactor.LoadUsbData
 import ru.kamaz.music_api.models.Track
+import ru.sir.core.Either
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseViewModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
+import java.util.*
 import javax.inject.Inject
 
 class TrackViewModel @Inject constructor(
@@ -52,6 +54,7 @@ class TrackViewModel @Inject constructor(
     private val _trackIsEmpty = MutableStateFlow(false)
     val trackIsEmpty = _trackIsEmpty.asStateFlow()
 
+    lateinit var listTrack : ArrayList<Track>
 
     override fun init() {
         _isLoading.value = true
@@ -71,6 +74,43 @@ class TrackViewModel @Inject constructor(
             "3" -> _sourceEnum.value = false
         }
     }
+
+
+
+    @OptIn(ExperimentalStdlibApi::class)
+    fun filterRecyclerList (constraint: String) : ArrayList<Track> {
+        val musicFilterList : ArrayList<Track>
+        if (constraint.isEmpty()) {
+            musicFilterList = listTrack
+        } else {
+            val resultList = ArrayList<Track>()
+            for (row in listTrack) {
+                if (row.title.lowercase(Locale.ROOT).contains(constraint.lowercase(Locale.ROOT))) {
+                    resultList.add(row)
+                }
+            }
+            musicFilterList = resultList
+        }
+        return musicFilterList
+    }
+
+    fun searchMusic(music: String){
+        _items.value = filterRecyclerList(music).toRecyclerViewItems()
+
+
+//       val sdfsdf= listTrack[0].title.lowercase(Locale.ROOT)
+//        Log.i("FORTESTSEARCH", "searchMusic: ${listTrack.size}")
+//        listTrack.filter {
+//            it.title == "Весна"
+//        }
+//
+//        Log.i("FORTESTSEARCH", "searchMusic: $music")
+//        for (i in 0..listTrack.size-1){
+//            Log.i("FORTESTSEARCH", "searchMusic: ${listTrack[i].title}")
+//        }
+//        Log.i("FORTESTSEARCH", "searchMusic: ${listTrack.size}")
+//        Log.i("FORTESTSEARCH", "searchMusic: ${sdfsdf}")
+    }
     fun loadUsbPlaylist(){
         loadUsbData(None()) { it.either({  }, ::onUsbDataLoaded) }
     }
@@ -84,6 +124,7 @@ class TrackViewModel @Inject constructor(
             _trackIsEmpty.value = true
            // toast()
         } else _trackIsEmpty.value = false
+        listTrack = data as ArrayList<Track>
         _items.value = data.toRecyclerViewItems()
         _isLoading.value = false
     }
@@ -93,6 +134,7 @@ class TrackViewModel @Inject constructor(
             _trackIsEmpty.value = true
            // toast()
         } else _trackIsEmpty.value = false
+        listTrack = data as ArrayList<Track>
         _itemsUsb.value = data.toRecyclerViewItems()
         _isLoading.value = false
 

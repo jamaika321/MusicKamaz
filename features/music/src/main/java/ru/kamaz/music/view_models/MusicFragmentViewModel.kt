@@ -42,6 +42,10 @@ class MusicFragmentViewModel @Inject constructor(
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying = _isPlaying.asStateFlow()
 
+    val isPlay : StateFlow<Boolean> by lazy {
+        service.value?.isPlay() ?: MutableStateFlow(false)
+    }
+
     val repeatHowModeNow: StateFlow<Int> by lazy {
       service.value?.getRepeat() ?: MutableStateFlow(0)
     }
@@ -135,7 +139,7 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     fun playOrPause() {
-        _isPlaying.value = service.value?.playOrPause()?: false
+        service.value?.playOrPause()
     }
 
     fun checkPosition(position: Int) {
