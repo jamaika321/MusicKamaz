@@ -494,7 +494,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun onDeviceDisconnected() {
         _isNotConnected.value = true
-
+        Toast.makeText(this, "Устройство отсоединено.", Toast.LENGTH_SHORT).show()
+        startDiskMode()
     }
 
     inner class MyBinder : Binder() {
@@ -642,7 +643,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     fun stopBtListener() {
         try {
-            if (!isPlaying.value) {
+            if (isPlaying.value) {
                 playOrPause()
             }
             twManagerMusic.removeListener(this)
@@ -661,7 +662,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     fun startBtListener() {
         onBluetoothMusicDataChanged("Name", "Artist")
-            playOrPause()
+        playOrPause()
     }
 
     fun startMusicListener() {
@@ -1293,6 +1294,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         when (isPlaying) {
             true -> _isPlaying.value = true
             false -> _isPlaying.value = false
+        }
+        if (!isBtModeOn.value){
+            _isPlaying.value = true
         }
     }
 

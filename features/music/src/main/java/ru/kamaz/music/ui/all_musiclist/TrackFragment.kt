@@ -53,13 +53,14 @@ class TrackFragment() :
             }
         }
 
+        viewModel.checkUsbConnection()
+
         viewModel.trackIsEmpty.launchOn(lifecycleScope) {
             musicListIsEmpty(it)
         }
     }
 
     override fun setListeners() {
-
         binding.search.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 binding.search.setIconified(false)

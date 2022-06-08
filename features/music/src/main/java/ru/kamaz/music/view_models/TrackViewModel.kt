@@ -37,8 +37,6 @@ class TrackViewModel @Inject constructor(
         private const val RV_ITEM = 2
     }
 
-
-
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
     val service = _service.asStateFlow()
 
@@ -58,6 +56,7 @@ class TrackViewModel @Inject constructor(
         service.value?.checkUSBConnection() ?: MutableStateFlow(false)
     }
 
+    lateinit var listAllTrack : ArrayList<Track>
     lateinit var listTrack : ArrayList<Track>
 
     override fun init() {
@@ -73,7 +72,7 @@ class TrackViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    fun filterRecyclerList (constraint: String) : ArrayList<Track> {
+    fun filterRecyclerList (constraint: String, listTrack: ArrayList<Track>) : ArrayList<Track> {
         val musicFilterList : ArrayList<Track>
         if (constraint.isEmpty()) {
             musicFilterList = listTrack
@@ -90,7 +89,16 @@ class TrackViewModel @Inject constructor(
     }
 
     fun searchMusic(music: String){
-        _items.value = filterRecyclerList(music).toRecyclerViewItems()
+        if (isNotConnectedUsb.value){
+            _itemsAll.value = filterRecyclerList(music, listAllTrack).toRecyclerViewItems()
+        } else {
+            _items.value = filterRecyclerList(music, listTrack).toRecyclerViewItems()
+        }
+
+    }
+
+    fun checkUsbConnection(){
+        service.value?.usbConnectionCheck()
     }
 
     fun loadUsbPlaylist(){
@@ -101,9 +109,7 @@ class TrackViewModel @Inject constructor(
         loadDiskData(None()) { it.either({  }, ::onDiskDataLoaded) }
     }
 
-    fun checkUsbConnection(){
-        service.value?.usbConnectionCheck()
-    }
+
 
     private fun onDiskDataLoaded(data: List<Track>) {
         if (data.isEmpty()) {
@@ -121,7 +127,7 @@ class TrackViewModel @Inject constructor(
             _trackIsEmpty.value = true
            // toast()
         } else _trackIsEmpty.value = false
-        listTrack = data as ArrayList<Track>
+        listAllTrack = data as ArrayList<Track>
         _itemsAll.value = data.toRecyclerViewItems()
         _isLoading.value = false
 
