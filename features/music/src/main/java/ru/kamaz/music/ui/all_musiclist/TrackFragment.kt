@@ -18,6 +18,7 @@ import ru.sir.presentation.base.BaseFragment
 import ru.sir.presentation.base.recycler_view.RecyclerViewAdapter
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
 import ru.sir.presentation.extensions.launchOn
+import ru.sir.presentation.extensions.launchWhenStarted
 
 class TrackFragment() :
     BaseFragment<TrackViewModel, FragmentListMusicBinding>(TrackViewModel::class.java ) {
@@ -37,43 +38,32 @@ class TrackFragment() :
     }
 
     override fun initVars(){
-        //Выводит отдельно каждый список песен
-//        when (arguments?.getString("bundleKey")){
-//            "2" -> viewModel.changeSource("2")
-//            "3" -> viewModel.changeSource("3")
-//        }
-//        when (viewModel.sourceEnum.value){
-//            true -> binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.items)
-//            false -> binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.itemsUsb)
-//        }
-        binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.itemsAll)
+        viewModel.service.launchWhenStarted(lifecycleScope) {
+            if (it == null) return@launchWhenStarted
+            initServiceVars()
+        }
+    }
 
+    private fun initServiceVars(){
+        viewModel.isNotConnectedUsb.launchWhenStarted(lifecycleScope){
+            if (it){
+                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.itemsAll)
+            } else {
+                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.items)
+            }
+        }
 
+        viewModel.trackIsEmpty.launchOn(lifecycleScope) {
+            musicListIsEmpty(it)
+        }
     }
 
     override fun setListeners() {
-        viewModel.trackIsEmpty.launchOn(lifecycleScope){
-            musicListIsEmpty(it)
-        }
-        val searchView = binding.search as SearchView
-
-        searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener
-        {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-               return false
-            }
-
-            override fun onQueryTextChange(musicText: String): Boolean {
-                viewModel.searchMusic(musicText)
-                return false
-            }
-
-        }
-        )
 
         binding.search.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 binding.search.setIconified(false)
+                searchActived()
             }
         })
 
@@ -87,11 +77,28 @@ class TrackFragment() :
         .addProducer(MusicListViewHolderProducer())
         .build { it }
 
-
     private fun  musicListIsEmpty(isEmpty:Boolean){
         if (isEmpty) binding.audioIsEmpty.visibility = View.VISIBLE
         else binding.audioIsEmpty.visibility = View.GONE
     }
+
+    private fun searchActived(){
+        val searchView = binding.search as SearchView
+        searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener
+        {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(musicText: String): Boolean {
+                viewModel.searchMusic(musicText)
+                return false
+            }
+
+        }
+        )
+    }
+
 
 }
 

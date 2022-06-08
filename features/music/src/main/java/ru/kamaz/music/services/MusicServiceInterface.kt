@@ -54,6 +54,11 @@ interface MusicServiceInterface{
         fun clearTrackData()
         fun appClosed()
         fun lastSavedState()
+        fun usbConnectionCheck(): Boolean
+    }
+
+    interface MusicListService{
+
     }
 
     interface ViewModel{

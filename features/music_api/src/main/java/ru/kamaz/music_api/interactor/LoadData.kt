@@ -13,6 +13,3 @@ class LoadDiskData(private val repository: Repository): AsyncUseCase<List<Track>
 class LoadUsbData(private val repository: Repository): AsyncUseCase<List<Track>, None, None>()  {
     override suspend fun run(params: None): Either<None, List<Track>> = repository.loadUsbData()
 }
-class LoadAllTracks(private val repository: Repository): AsyncUseCase<List<Track>, None, None>()  {
-    override suspend fun run(params: None): Either<None, List<Track>> = repository.loadAllTracks()
-}

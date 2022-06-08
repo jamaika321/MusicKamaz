@@ -297,6 +297,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun usbModeOn(): StateFlow<Boolean> = isUsbModeOn
     override fun usbConnect(): StateFlow<Boolean> = isNotUSBConnected
     override fun howModeNow(): Int = 2
+    override fun isPlay(): StateFlow<Boolean> = isPlaying
 
     override fun dialogFragment(): StateFlow<Boolean> = btDeviceIsConnecting
     override fun musicEmpty(): StateFlow<Boolean> = musicEmpty
@@ -660,10 +661,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     fun startBtListener() {
         onBluetoothMusicDataChanged("Name", "Artist")
-        twManager.startMonitoring(applicationContext) {
-            twManagerMusic.addListener(this)
-            twManager.requestConnectionInfo()
-        }
             playOrPause()
     }
 
@@ -756,6 +753,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun lastSavedState() {
         updateSeekBar()
+        twManager.startMonitoring(applicationContext) {
+            twManagerMusic.addListener(this)
+            twManager.requestConnectionInfo()
+        }
     }
 
     override fun firstOpenTrackFound(track: Track) {
@@ -780,7 +781,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             }
             SourceEnum.BT -> {
                 twManager.playerPlayPause()
-                _isPlaying.value = isPlaying.value
             }
             SourceEnum.AUX -> {
 
@@ -811,7 +811,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun pause() {
         mediaPlayer.pause()
-        _isPlaying.value = mediaPlayer.isPlaying
+        _isPlaying.value = false
     }
 
     override fun resume() {
@@ -819,12 +819,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
         } else {
             mediaPlayer.start()
-            _isPlaying.value = mediaPlayer.isPlaying
+            _isPlaying.value = true
         }
     }
-
-    override fun isPlay(): StateFlow<Boolean> = isPlaying
-
 
     override fun checkPosition(position: Int) {
         mediaPlayer.seekTo(position)
@@ -1206,7 +1203,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    fun usbConnectionCheck(): Boolean {
+    override fun usbConnectionCheck(): Boolean {
+        _isNotUSBConnected.value = mediaManager.scanTracks(1).isRight
         return mediaManager.scanTracks(1).isRight
     }
 
@@ -1293,8 +1291,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun onPlayerPlayPauseState(isPlaying: Boolean) {
         Log.i("btTest", "onPlayerPlayPauseState: $isPlaying")
         when (isPlaying) {
-            true -> _isPlaying.value = false
-            false -> _isPlaying.value = true
+            true -> _isPlaying.value = true
+            false -> _isPlaying.value = false
         }
     }
 

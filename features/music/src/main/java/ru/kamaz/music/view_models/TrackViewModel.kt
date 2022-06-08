@@ -12,10 +12,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.domain.GetFilesUseCase
-import ru.kamaz.music_api.interactor.LoadAllTracks
 import ru.kamaz.music_api.interactor.LoadDiskData
 import ru.kamaz.music_api.interactor.LoadUsbData
 import ru.kamaz.music_api.models.Track
@@ -31,14 +31,16 @@ class TrackViewModel @Inject constructor(
     private val loadDiskData: LoadDiskData,
     private val loadUsbData: LoadUsbData,
     private val getFilesUseCase: GetFilesUseCase
-) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel {
+) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel, MusicManagerListener{
 
     companion object {
         private const val RV_ITEM = 2
     }
 
-    private var service: MusicServiceInterface.Service? = null
 
+
+    private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
+    val service = _service.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -46,17 +48,15 @@ class TrackViewModel @Inject constructor(
     private val _items = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     var items = _items.asStateFlow()
 
-    private val _itemsUsb = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
-    var itemsUsb = _itemsUsb.asStateFlow()
-
     private val _itemsAll = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     var itemsAll = _itemsAll.asStateFlow()
 
-    private val _sourceEnum = MutableStateFlow(true)
-    var sourceEnum = _sourceEnum.asStateFlow()
-
     private val _trackIsEmpty = MutableStateFlow(false)
     val trackIsEmpty = _trackIsEmpty.asStateFlow()
+
+    val isNotConnectedUsb: StateFlow<Boolean> by lazy {
+        service.value?.checkUSBConnection() ?: MutableStateFlow(false)
+    }
 
     lateinit var listTrack : ArrayList<Track>
 
@@ -67,20 +67,10 @@ class TrackViewModel @Inject constructor(
 
         loadUsbPlaylist()
         loadDiskPlaylist()
-//        loadAllTracks()
 
         Log.i("trackFrag1", "initVars: ${items.value}")
 
     }
-
-    fun changeSource(sourceEnum: String){
-        when (sourceEnum) {
-            "2" -> _sourceEnum.value = true
-            "3" -> _sourceEnum.value = false
-        }
-    }
-
-
 
     @OptIn(ExperimentalStdlibApi::class)
     fun filterRecyclerList (constraint: String) : ArrayList<Track> {
@@ -106,12 +96,14 @@ class TrackViewModel @Inject constructor(
     fun loadUsbPlaylist(){
         loadUsbData(None()) { it.either({  }, ::onUsbDataLoaded) }
     }
+
     fun loadDiskPlaylist(){
         loadDiskData(None()) { it.either({  }, ::onDiskDataLoaded) }
     }
-//    fun loadAllTracks(){
-//        loadAllData(None()) { it.either({  }, ::onAllDataLoaded) }
-//    }
+
+    fun checkUsbConnection(){
+        service.value?.usbConnectionCheck()
+    }
 
     private fun onDiskDataLoaded(data: List<Track>) {
         if (data.isEmpty()) {
@@ -130,25 +122,14 @@ class TrackViewModel @Inject constructor(
            // toast()
         } else _trackIsEmpty.value = false
         listTrack = data as ArrayList<Track>
-        _itemsUsb.value = data.toRecyclerViewItems()
-        _isLoading.value = false
-
-    }
-    private fun onAllDataLoaded(data: List<Track>) {
-        if (data.isEmpty()) {
-            Log.d("mediaPlayer", "no")
-            _trackIsEmpty.value = true
-           // toast()
-        } else _trackIsEmpty.value = false
-        listTrack = data as ArrayList<Track>
         _itemsAll.value = data.toRecyclerViewItems()
         _isLoading.value = false
 
     }
     fun onItemClick(track: Track, data: String) {
-        service?.intMediaPlayer()
-        service?.initTrack(track, data)
-        service?.playOrPause()
+        service.value?.intMediaPlayer()
+        service.value?.initTrack(track, data)
+        service.value?.playOrPause()
         Log.i("onTrackClicked", "onTrackClicked")
     }
 
@@ -159,12 +140,13 @@ class TrackViewModel @Inject constructor(
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        Log.d("serWStart", "onServiceConnected: LIST-VM")
-        this.service = (service as MusicService.MyBinder).getService()
+        Log.d("testPlayTrack", "onServiceConnected")
+        _service.value = (service as MusicService.MyBinder).getService()
+        this.service.value?.setViewModel(this)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-        service = null
+        _service.value = null
     }
 
     override fun addListener() {
