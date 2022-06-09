@@ -1,12 +1,14 @@
 package ru.kamaz.music.ui.all_musiclist
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.core.graphics.toColor
+import androidx.core.view.isInvisible
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.StateFlow
 import ru.kamaz.music.databinding.FragmentListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
@@ -53,6 +55,18 @@ class TrackFragment() :
             }
         }
 
+        binding.rvAllMusic.addOnScrollListener(object: RecyclerView.OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 5){
+                    binding.search.visibility = View.INVISIBLE
+                }
+                if (dy < -1){
+                    binding.search.visibility = View.VISIBLE
+                }
+                super.onScrolled(recyclerView, dx, dy)
+            }
+        })
+
         viewModel.checkUsbConnection()
 
         viewModel.trackIsEmpty.launchOn(lifecycleScope) {
@@ -64,7 +78,7 @@ class TrackFragment() :
         binding.search.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 binding.search.setIconified(false)
-                searchActived()
+                searchActive()
             }
         })
 
@@ -83,8 +97,9 @@ class TrackFragment() :
         else binding.audioIsEmpty.visibility = View.GONE
     }
 
-    private fun searchActived(){
+    private fun searchActive(){
         val searchView = binding.search as SearchView
+
         searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener
         {
             override fun onQueryTextSubmit(query: String?): Boolean {

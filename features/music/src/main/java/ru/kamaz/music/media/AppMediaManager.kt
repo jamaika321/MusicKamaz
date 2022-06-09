@@ -178,96 +178,97 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
     }
 
 
-    override fun scanUSBTracks(path: String): Either<None, List<Track>> {
-        val array = ArrayList<Track>()
-
-
-        val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        val projection = arrayOf(
-            MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.ALBUM_ID,
-            MediaStore.Audio.Media.ALBUM
-        )
-
-        var DOWNLOAD_FILE_DIR =
-            Environment.getExternalStorageDirectory().getPath() + "/mnt/media_rw/usbdisk0"
-        val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0 AND " +
-                MediaStore.Audio.Media.DATA + " LIKE '" + DOWNLOAD_FILE_DIR + "/%'"
-//        val selection = "${MediaStore.Audio.Media.IS_MUSIC   + " != 0 AND " +
-//                MediaStore.Audio.Media.DATA + " LIKE '"+/mnt/media_rw/usbdisk0+"/%'}  *//*
-        val sortOrder = "${MediaStore.Audio.AudioColumns.TITLE} COLLATE LOCALIZED ASC"
-
-        val cursor = context.contentResolver.query(uri, projection, selection, null, sortOrder)
-
-        var cursorPicture = context.contentResolver.query(
-            MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-            arrayOf(
-                MediaStore.Audio.Albums._ID,
-                MediaStore.Audio.Albums.ALBUM_ART
-            ),
-            MediaStore.Audio.Albums._ID.toString() + "=?",
-            null,
-            sortOrder
-        )
-
-        if (cursorPicture != null) {
-            cursorPicture.moveToFirst()
-
-            while (!cursorPicture.isAfterLast) {
-                val albumArt =
-                    cursorPicture.getString(cursorPicture.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART))
-            }
-        }
-
-        if (cursor != null) {
-            cursor.moveToFirst()
-
-            while (!cursor.isAfterLast) {
-                val id =
-                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)).toLong()
-                val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
-                val artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
-                val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
-                val duration = Track.convertDuration(
-                    cursor.getString(
-                        cursor.getColumnIndex(
-                            MediaStore.Audio.Media.DURATION
-                        )
-                    ).toLong()
-                )
-                val albumId =
-                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))
-                        .toLong()
-                val album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
-
-                cursor.moveToNext()
-
-                array.add(
-                    Track(
-                        id,
-                        title,
-                        artist,
-                        data,
-                        duration,
-                        albumId,
-                        album
-                    )
-                )
-            }
-            cursor.close()
-        }
-        return Either.Right(array)
-    }
+//    override fun scanUSBTracks(path: String): Either<None, List<Track>> {
+//        val array = ArrayList<Track>()
+//
+//
+//        val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+//        val imageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+//        val projection = arrayOf(
+//            MediaStore.Audio.Media._ID,
+//            MediaStore.Audio.Media.TITLE,
+//            MediaStore.Audio.Media.ARTIST,
+//            MediaStore.Audio.Media.DATA,
+//            MediaStore.Audio.Media.DURATION,
+//            MediaStore.Audio.Media.ALBUM_ID,
+//            MediaStore.Audio.Media.ALBUM
+//        )
+//
+//        var DOWNLOAD_FILE_DIR =
+//            Environment.getExternalStorageDirectory().getPath() + "/mnt/media_rw/usbdisk0"
+//        val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0 AND "
+////         + MediaStore.Audio.Media.DATA + " LIKE '" + DOWNLOAD_FILE_DIR + "/%'"
+////        val selection = "${MediaStore.Audio.Media.IS_MUSIC   + " != 0 AND " +
+////                MediaStore.Audio.Media.DATA + " LIKE '"+/mnt/media_rw/usbdisk0+"/%'}  *//*
+//        val sortOrder = "${MediaStore.Audio.AudioColumns.TITLE} COLLATE LOCALIZED ASC"
+//
+//        val cursor = context.contentResolver.query(uri, projection, selection, null, sortOrder)
+//
+//        var cursorPicture = context.contentResolver.query(
+//            MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+//            arrayOf(
+//                MediaStore.Audio.Albums._ID,
+//                MediaStore.Audio.Albums.ALBUM_ART
+//            ),
+//            MediaStore.Audio.Albums._ID.toString() + "=?",
+//            null,
+//            sortOrder
+//        )
+//
+//        if (cursorPicture != null) {
+//            cursorPicture.moveToFirst()
+//
+//            while (!cursorPicture.isAfterLast) {
+//                val albumArt =
+//                    cursorPicture.getString(cursorPicture.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART))
+//            }
+//        }
+//
+//        if (cursor != null) {
+//            cursor.moveToFirst()
+//
+//            while (!cursor.isAfterLast) {
+//                val id =
+//                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)).toLong()
+//                val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
+//                val artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
+//                val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
+//                val duration = Track.convertDuration(
+//                    cursor.getString(
+//                        cursor.getColumnIndex(
+//                            MediaStore.Audio.Media.DURATION
+//                        )
+//                    ).toLong()
+//                )
+//                val albumId =
+//                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))
+//                        .toLong()
+//                val album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
+//
+//                cursor.moveToNext()
+//
+//                array.add(
+//                    Track(
+//                        id,
+//                        title,
+//                        artist,
+//                        data,
+//                        duration,
+//                        albumId,
+//                        album
+//                    )
+//                )
+//            }
+//            cursor.close()
+//        }
+//        return Either.Right(array)
+//    }
 
 
     override fun getAlbumImagePath(albumID: Long): Either<None, String> {
-        val uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
-        val projection = arrayOf(MediaStore.Audio.Albums.ALBUM_ART)
-        val selection = MediaStore.Audio.Albums._ID + "=?"
+        val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val selection = MediaStore.Images.Media._ID + "=?"
         val args = arrayOf(albumID.toString())
 
         val cursor = context.contentResolver.query(uri, projection, selection, args, null)
@@ -502,6 +503,53 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         } else {
             file.delete()
         }
+    }
+
+
+    fun scanMediaFiles(sourceType: SourceType): List<File> {
+        val resultList: MutableList<File> = mutableListOf()
+
+
+
+        val basePath: String = when (sourceType) {
+            SourceType.MEDIA_AUDIO -> MediaStore.Audio.Media.DATA
+            SourceType.MEDIA_IMAGE -> MediaStore.Images.Media.DATA
+            SourceType.MEDIA_VIDEO -> MediaStore.Video.Media.DATA
+            else -> MediaStore.Images.Media.DATA
+        }
+
+        val uri = when (sourceType) {
+            SourceType.MEDIA_AUDIO -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            SourceType.MEDIA_IMAGE -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            SourceType.MEDIA_VIDEO -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            else -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        }
+
+        //перечень набора данных из таблицы
+        val projection = arrayOf(basePath)
+        //выбор аудио файлов
+        val selection = when (sourceType) {
+            SourceType.MEDIA_AUDIO -> "${MediaStore.Audio.Media.IS_MUSIC}  != 0"
+            else -> null
+        }
+
+        val cursor = context.contentResolver
+            .query(uri, projection, selection, null, null)
+
+        if (cursor != null) {
+            cursor.moveToFirst()
+            while (!cursor.isAfterLast) {
+                //получаем Uri файла
+                val data = cursor.getString(cursor.getColumnIndex(basePath))
+
+                resultList.add(File(data))
+
+                cursor.moveToNext()
+            }
+            cursor.close()
+        }
+
+        return resultList.toList()
     }
 
 

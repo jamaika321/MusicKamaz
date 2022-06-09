@@ -47,7 +47,7 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     val repeatHowModeNow: StateFlow<Int> by lazy {
-      service.value?.getRepeat() ?: MutableStateFlow(0)
+      service.value?.getRepeat() ?: MutableStateFlow(2)
     }
 
     val title: StateFlow<String> by lazy {
@@ -103,8 +103,9 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.musicEmpty()?: MutableStateFlow(false)
     }
 
-    private val _cover = MutableStateFlow("")
-    val cover = _cover.asStateFlow()
+    val cover: StateFlow<String> by lazy {
+        service.value?.coverId()?: MutableStateFlow("")
+    }
 
     private val _mode = MutableStateFlow("")
     val mode = _mode.asStateFlow()

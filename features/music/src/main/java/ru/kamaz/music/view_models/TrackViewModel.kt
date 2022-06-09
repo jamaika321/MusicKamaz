@@ -37,6 +37,9 @@ class TrackViewModel @Inject constructor(
         private const val RV_ITEM = 2
     }
 
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying = _isPlaying.asStateFlow()
+
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
     val service = _service.asStateFlow()
 
@@ -168,7 +171,7 @@ class TrackViewModel @Inject constructor(
     }
 
     override fun onUpdateSeekBar(duration: Int) {
-        Toast.makeText(context, "$duration", Toast.LENGTH_SHORT).show()
+
     }
 
     override fun selectBtMode() {

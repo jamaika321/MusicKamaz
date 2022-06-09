@@ -138,7 +138,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private var mode = SourceEnum.DISK
 
-    private var repeatMode = RepeatMusicEnum.REPEAT_OFF
+    private var repeatMode = RepeatMusicEnum.REPEAT_ALL
 
     private val _cover = MutableStateFlow("")
     val cover = _cover.asStateFlow()
@@ -149,7 +149,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private val _artist = MutableStateFlow("Unknown")
     val artist = _artist.asStateFlow()
 
-    private val _repeatHowNow = MutableStateFlow(0)
+    private val _repeatHowNow = MutableStateFlow(2)
     val repeatHowNow = _repeatHowNow.asStateFlow()
 
     private val _data = MutableStateFlow("")
@@ -238,12 +238,11 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private val _musicEmpty = MutableStateFlow<Boolean>(false)
     val musicEmpty = _musicEmpty.asStateFlow()
 
-    val _isShuffleStatus = MutableStateFlow(false)
+    private val _isShuffleStatus = MutableStateFlow(false)
     val isShuffleStatus = _isShuffleStatus.asStateFlow()
 
 
     fun setShuffleMode() {
-
         when (isShuffleStatus.value) {
             true -> {
                 ShuffleHelper.makeShuffleList(tracks, currentTrackPosition)
@@ -254,12 +253,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             }
         }
     }
-
-//    override fun onPlayPauseKeyPressed(isPlaying: Boolean) {
-//        Toast.makeText(this, "btPlayPause", Toast.LENGTH_SHORT).show()
-//        Log.i("btTest", "onPlayPauseKeyPressed: $isPlaying")
-//        super.onPlayPauseKeyPressed()
-//    }
 
 
     private val scopeIO = CoroutineScope(Dispatchers.IO + Job())
@@ -301,6 +294,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun dialogFragment(): StateFlow<Boolean> = btDeviceIsConnecting
     override fun musicEmpty(): StateFlow<Boolean> = musicEmpty
+    override fun coverId(): StateFlow<String> = cover
 
     override fun init() {
         val audioAttributes: AudioAttributes = AudioAttributes.Builder()
@@ -321,6 +315,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         startForeground()
         startMusicListener()
         initLifecycleScope()
+
 
         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION).apply {
             addAction(ACTIONPP)
@@ -494,7 +489,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun onDeviceDisconnected() {
         _isNotConnected.value = true
-        Toast.makeText(this, "Устройство отсоединено.", Toast.LENGTH_SHORT).show()
         startDiskMode()
     }
 
@@ -524,30 +518,23 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     enum class RepeatMusicEnum(val value: Int) {
-        REPEAT_OFF(0),
         REPEAT_ONE_SONG(1),
         REPEAT_ALL(2)
     }
 
     override fun changeRepeatMode() {
         when (repeatHowNow.value) {
-            0 -> _repeatHowNow.value = 1
             1 -> _repeatHowNow.value = 2
-            2 -> _repeatHowNow.value = 0
+            2 -> _repeatHowNow.value = 1
         }
         howRepeatMode()
     }
 
-    fun howRepeatMode() {
+    private fun howRepeatMode() {
         when (repeatHowNow.value) {
-            0 -> repeatOff()
             1 -> oneSongRepeat()
             2 -> allSongsRepeat()
         }
-    }
-
-    private fun repeatOff() {
-        repeatMode = RepeatMusicEnum.REPEAT_OFF
     }
 
     private fun oneSongRepeat() {
@@ -585,6 +572,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             changeSource(2)
             updateTracks(mediaManager)
             nextTrack(2)
+            Log.i("getFilesFromSource", "startDiskMode: ")
+            getRootFilesFromSource(SourceType.DEVICE)
         }
     }
 
@@ -601,7 +590,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     private fun changeSource(sourceEnum: Int) {
-        Toast.makeText(this, "${isPlaying.value}", Toast.LENGTH_SHORT).show()
         if (btModeOn().value) {
             stopBtListener()
             startMusicListener()
@@ -641,7 +629,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
 
-    fun stopBtListener() {
+    private fun stopBtListener() {
         try {
             if (isPlaying.value) {
                 playOrPause()
@@ -690,7 +678,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 //        updateTracks(mediaManager)
         val albumID: Long = currentTrack.albumId
         _idSong.value = currentTrack.id.toInt()
-        updateMusicName(currentTrack.title, currentTrack.album, currentTrack.duration)
+        updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
         _data.value = track.data
         getMusicImg(albumID)
         mediaPlayer.apply {
@@ -714,24 +702,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private fun stopMediaPlayer() {
         mediaPlayer.stop()
 //        tracks.clear()
-    }
-
-    override fun testPlay(track: Track) {
-        updateTracks(mediaManager)
-        val currentTrack = track
-        val albumID: Long = currentTrack.albumId
-        _idSong.value = currentTrack.id.toInt()
-        updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
-        Log.i("onTrackClicked ", "testPley")
-        getMusicImg(albumID)
-        mediaPlayer.apply {
-            stop()
-            reset()
-            setDataSource(track.data)
-            prepare()
-        }
-        updateSeekBar()
-
     }
 
     private fun checkCurrentPosition(data: String) {
@@ -795,7 +765,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         _title.value = title
         _artist.value = artist
         _duration.value = duration
-//        _isPlaying.value = mediaPlayer.isPlaying
     }
 
     override fun getMusicImg(albumID: Long) {
@@ -891,7 +860,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     }
 
-    fun compilationMusic() {
+    private fun compilationMusic() {
         mediaPlayer.setOnCompletionListener(OnCompletionListener {
             Log.i("isPlayingAutoModeMain", "true${isPlaying.value}")
             if (usbConnectionCheck() && isUsbModeOn.value) {
@@ -906,7 +875,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         })
     }
 
-    fun initMediaPlayer() {
+    private fun initMediaPlayer() {
         val audioAttributes: AudioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_MEDIA)
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -932,15 +901,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    fun repeatModeListener(auto: Int) {
+    private fun repeatModeListener(auto: Int) {
         when (auto) {
             0 -> {
                 when (repeatMode) {
-                    RepeatMusicEnum.REPEAT_OFF -> {
-                        funRepeatOff()
-                    }
                     RepeatMusicEnum.REPEAT_ONE_SONG -> {
-                        funPlayOneSong()
+                        funRepeatAll()
                     }
                     RepeatMusicEnum.REPEAT_ALL -> {
                         funRepeatAll()
@@ -949,9 +915,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             }
             1 -> {
                 when (repeatMode) {
-                    RepeatMusicEnum.REPEAT_OFF -> {
-                        funRepeatOff()
-                    }
                     RepeatMusicEnum.REPEAT_ONE_SONG -> {
                         funPlayOneSong()
                     }
@@ -965,18 +928,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     }
 
-    fun funRepeatOff() {
-        if (tracks.isEmpty()) {
-        } else {
-            when (currentTrackPosition == tracks.size - 1) {
-                true -> currentTrackPosition = 0
-                false -> currentTrackPosition++
-            }
-            funPlayOneSong()
-        }
-    }
-
-    fun funRepeatAll() {
+    private fun funRepeatAll() {
         if (tracks.isEmpty()) {
         } else {
             when (currentTrackPosition == tracks.size - 1) {
@@ -990,7 +942,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    fun funPlayOneSong() {
+    private fun funPlayOneSong() {
         when (isPlaying.value) {
             true -> {
                 initTrack(
@@ -1022,14 +974,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             nextTrack(1)
         }
     }
-
-//    fun lastTrackCheck(mode: Int){
-//        if (tracks.isEmpty()){
-//        } else {
-//            when (currentTrackPosition)
-//        }
-//    }
-
 
     private val widgetIntentReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -1064,7 +1008,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             if (CMDPREV == cmd || ACTIONPREV == action) {
                 previousTrack()
             } else if (CMDNEXT == cmd || ACTIONNEXT == action) {
-                nextTrack(1)
+                nextTrack(0)
             } else if (CMDPP == cmd || ACTIONPP == action) {
                 playOrPause()
             }
@@ -1073,7 +1017,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         if (intent != null) {
             when (intent.action) {
                 ACTION_TOGGLE_PAUSE -> playOrPause()
-                ACTION_NEXT -> nextTrack(1)
+                ACTION_NEXT -> nextTrack(0)
                 ACTION_PREV -> previousTrack()
             }
         }
@@ -1135,6 +1079,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                     _musicEmpty.value = true
                 }
             }
+        }
+        if(isShuffleStatus.value){
+            setShuffleMode()
         }
 
     }
@@ -1253,17 +1200,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     val twMusic: TWMusic = TWMusic.open()
     val usbManager: UsbManager? = null
-
-
-    fun usbTest() {
-        //  val presenter = MusicPresenter(context)
-        // presenter.openUSBList()
-        // twMusic.addRecordUSB("/storage/usbdisk0")
-        //twMusic.addRecordUSB("/storage/usbdisk0/Моргенштерн - Я лью кристал.mp3")
-        //presenter.musicPlay()
-
-        Log.i("USBlib ", "usbTest: ")
-    }
 
     override fun insertLastMusic() {
         val music = HistorySongs(

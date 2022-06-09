@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,9 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
+import com.google.android.material.slider.Slider
 import com.squareup.picasso.Picasso
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentPlayerBinding
@@ -66,6 +69,8 @@ class MusicFragment :
             viewModel.nextTrack()
             addEvent2()
         }
+
+        GestureDetector.SimpleOnGestureListener()
 
         binding.controlPanel.playPause
             .setOnClickListener {
@@ -282,10 +287,12 @@ class MusicFragment :
     }
 
     private fun updateTrackCover(coverPath: String) {
-        if (coverPath.isEmpty()) {
+        if (!coverPath.isEmpty()) {
+            Log.i("picasso", "updateTrackCover:$coverPath  ")
         } else {
+            Log.i("picasso", "updateackCover:$coverPath  ")
             Picasso.with(context)
-                .load(Uri.fromFile(File(coverPath)))
+                .load(Uri.fromFile(File("7269476454060146266")))
                 .into(binding.pictureDevice)
         }
     }
@@ -302,9 +309,8 @@ class MusicFragment :
 
     private fun repeatIconChange(repeat: Int) {
         when (repeat) {
-            0 -> binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_white)
-            1 -> binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_blue_one)
-            2 -> binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_blue_all)
+            2 -> binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_white)
+            1 -> binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_blue_all)
         }
 
     }
@@ -425,5 +431,6 @@ class MusicFragment :
 
 
 }
+
 
 

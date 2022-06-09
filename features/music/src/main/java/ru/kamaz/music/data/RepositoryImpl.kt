@@ -120,7 +120,7 @@ class RepositoryImpl(
     override suspend fun rootFilesFromSource(source: SourceType): List<File> {
         sourceType = source
         val listFiles = when (source) {
-            SourceType.MEDIA_AUDIO -> readMediaStore(source)
+            SourceType.MEDIA_AUDIO -> readMediaStore(SourceType.MEDIA_IMAGE)
             SourceType.NO_MEDIA -> getNoMediaFiles()
             else -> getFiles(devicePath) //пока так
         }

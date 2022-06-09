@@ -13,7 +13,6 @@ interface MusicServiceInterface{
         fun setViewModel(viewModel:ViewModel)
         fun init()
         fun playOrPause(): Boolean
-        fun testPlay(track: Track)
         fun firstOpenTrackFound(track: Track)
         fun getMusicImg(albumID: Long)
         fun pause()
@@ -40,6 +39,7 @@ interface MusicServiceInterface{
         fun howModeNow():Int
         fun dialogFragment():StateFlow<Boolean>
         fun musicEmpty():StateFlow<Boolean>
+        fun coverId(): StateFlow<String>
         fun isFavoriteMusic():StateFlow<Boolean>
         fun insertFavoriteMusic()
         fun shuffleStatusChange()
@@ -55,10 +55,6 @@ interface MusicServiceInterface{
         fun appClosed()
         fun lastSavedState()
         fun usbConnectionCheck(): Boolean
-    }
-
-    interface MusicListService{
-
     }
 
     interface ViewModel{
