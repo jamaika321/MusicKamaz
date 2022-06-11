@@ -288,7 +288,7 @@ class MusicFragment :
     }
 
     private fun updateTrackCover(coverPath: String) {
-        if (!coverPath.isEmpty()) {
+        if (coverPath != "") {
             Log.i("picasso", "updateTrackCover:$coverPath")
             Picasso.with(context)
                 .load(Uri.fromFile(File(coverPath.trim())))
@@ -301,6 +301,8 @@ class MusicFragment :
             binding.pictureBucket.visibility = View.VISIBLE
         } else {
             Log.i("picasso", "updateackCover:${coverPath.trim()}")
+            binding.picture.visibility = View.INVISIBLE
+            binding.pictureDevice.setBackgroundResource(R.drawable.back_item)
         }
     }
 

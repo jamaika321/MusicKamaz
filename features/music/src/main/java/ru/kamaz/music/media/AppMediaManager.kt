@@ -27,6 +27,7 @@ import ru.sir.core.None
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -390,12 +391,12 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             MediaStore.Audio.Media.AUTHOR,
             MediaStore.Audio.Media.YEAR,
             MediaStore.Audio.Media.GENRE,
+            MediaStore.Audio.Media.AUTHOR,
         )
         //выбор аудио файлов
-        val selection = "${MediaStore.Audio.Albums.ALBUM}  != 0"
+        val selection = "${MediaStore.Audio.Media.ALBUM}  != 0"
 
-        lateinit var picture: Bitmap
-
+        var albumArt = File("")
 
         val cursor = context.contentResolver
             .query(uri, null, null, null, null)
@@ -416,10 +417,15 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 val contentUri =
                     ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
 
-                val picture =
-                    context.contentResolver.loadThumbnail(contentUri, Size(500, 350), null)
+                try {
+                    val picture =
+                        context.contentResolver.loadThumbnail(contentUri, Size(500, 350), null)
+                    albumArt = getAlbumArt(picture, title)
+                } catch (e : IOException){
+                    e.printStackTrace()
+                }
 
-                val albumArt = bitmapToFile(picture, "$title.png")!!
+
 
                 array.add(
                     Track(
@@ -460,7 +466,11 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         }
     }
 
-    fun bitmapToFile(bitmap: Bitmap, fileNameToSave: String): File? { // File name like "image.png"
+    private fun getAlbumArt(picture: Bitmap, title: String): File{
+        return bitmapToFile(picture, "$title.png")!!
+    }
+
+    private fun bitmapToFile(bitmap: Bitmap, fileNameToSave: String): File? { // File name like "image.png"
         //create a file to write bitmap data
         var file: File? = null
         return try {
@@ -486,83 +496,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             file // it will return null
         }
     }
-
-//    override fun scanTracks(type: Int): Either<None, List<Track>> {
-//        val array = ArrayList<Track>()
-//        val uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI
-//        val projection = arrayOf(
-//            MediaStore.Audio.Media._ID,
-//            MediaStore.Audio.Media.TITLE,
-//            MediaStore.Audio.Media.ARTIST,
-//            MediaStore.Audio.Media.DATA,
-//            MediaStore.Audio.Media.DURATION,
-//            MediaStore.Audio.Media.ALBUM_ID,
-//            MediaStore.Audio.Media.ALBUM
-//        )
-//
-//        var DOWNLOAD_FILE_DIR =
-//            Environment.getExternalStorageDirectory().getPath() + "/mnt/media_rw/usbdisk0"
-//        val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
-//        *//*val selection = "${MediaStore.Audio.Media.IS_MUSIC   + " != 0 AND " +
-//        MediaStore.Audio.Media.DATA + " LIKE '"+/mnt/media_rw/usbdisk0+"/%'}  *//*
-//        val sortOrder = "${MediaStore.Audio.AudioColumns.TITLE} COLLATE LOCALIZED ASC"
-//
-//        val cursor = context.contentResolver.query(uri,
-//            projection,
-//            selection,
-//            null,
-//            sortOrder)
-//
-//        *//*  val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0 AND " +
-//        MediaStore.Audio.Media.DATA + " LIKE '/storage/usbdisk0/Музыка для тестов%'"
-//
-//        // val selection = "${MediaStore.Audio.Media.IS_MUSIC}  != 0"
-//
-//        val sortOrder = "${MediaStore.Audio.AudioColumns.TITLE} COLLATE LOCALIZED ASC"
-//
-//        val cursor = context.contentResolver.query(uri, projection, selection, null, sortOrder)*//*
-//
-//                if (cursor != null) {
-//                    cursor.moveToFirst()
-//
-//                    while (!cursor.isAfterLast) {
-//                        val id =
-//                            cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)).toLong()
-//                        val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
-//                        val artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
-//                        val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
-//                        val duration = Track.convertDuration(
-//                            cursor.getString(
-//                                cursor.getColumnIndex(
-//                                    MediaStore.Audio.Media.DURATION
-//                                )
-//                            ).toLong()
-//                        )
-//                        val albumId =
-//                            cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))
-//                                .toLong()
-//
-//                        val album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
-//
-//                        cursor.moveToNext()
-//
-//                        array.add(
-//                            Track(
-//                                id,
-//                                title,
-//                                artist,
-//                                data,
-//                                duration,
-//                                albumId,
-//                                album
-//                            )
-//                        )
-//                    }
-//                    cursor.close()
-//                }
-//        Log.i("trackList", "scanTracks: $array")
-//        return Either.Right(array)
-//    }
 
 
 }
