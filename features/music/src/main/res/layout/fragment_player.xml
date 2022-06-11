@@ -13,9 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:foreground="@drawable/test2"
-        android:layout_marginBottom="30dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/song"
         app:layout_constraintStart_toStartOf="@+id/song"
@@ -23,10 +20,9 @@
 
     <ImageView
         android:id="@+id/picture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:foreground="@drawable/test2"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="320dp"
+        android:layout_height="320dp"
+        android:layout_marginTop="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -60,6 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:text="USB"
+            android:textSize="30sp"
             android:textColor="@color/white"
             android:gravity="center_vertical"
             android:visibility="invisible"
@@ -86,58 +83,71 @@
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/margin"
         android:layout_marginEnd="@dimen/margin"
-        android:text="@string/song"
-        android:textColor="@color/white"
+        android:text="@string/artist"
+        android:textColor="#999999"
+        android:fontFamily="sans-serif-thin"
         android:autoSizeTextType="uniform"
         app:layout_constraintBottom_toTopOf="@+id/artist"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/next_prev"
-        app:layout_constraintVertical_weight="1"/>
+        app:layout_constraintVertical_weight="0.6"/>
 
     <TextView
         android:id="@+id/artist"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/margin"
-        android:layout_marginEnd="@dimen/margin"
-        android:text="@string/artist"
-        android:textColor="#999999"
+        android:paddingHorizontal="52dp"
+        android:text="@string/song"
+        android:background="#8F000000"
+        android:textColor="@color/white"
         android:autoSizeTextType="uniform"
-        app:layout_constraintBottom_toTopOf="@+id/seek"
+        app:layout_constraintBottom_toTopOf="@+id/seekLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/song"
-        app:layout_constraintVertical_weight="0.6"/>
+        app:layout_constraintVertical_weight="1"/>
 
-    <SeekBar
-        android:id="@+id/seek"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/seekLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/margin"
-        android:layout_marginEnd="@dimen/margin"
-        android:saveEnabled="false"
-        android:paddingBottom="9dp"
-        android:paddingTop="9dp"
-        android:progressDrawable="@drawable/seekbar_style"
-        android:thumb="@drawable/ic_seekbar_thumb"
+        android:background="#8F000000"
         app:layout_constraintBottom_toTopOf="@+id/times"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/artist"
-        app:layout_constraintVertical_weight="0.6"/>
+        app:layout_constraintVertical_weight="0.6">
+
+    <SeekBar
+        android:id="@+id/seek"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:saveEnabled="false"
+        android:paddingBottom="9dp"
+        android:paddingTop="9dp"
+        android:layout_marginHorizontal="52dp"
+        android:progressDrawable="@drawable/seekbar_style"
+        android:thumb="@drawable/ic_seekbar_thumb"
+        app:layout_constraintTop_toTopOf="@+id/seekLayout"
+        app:layout_constraintStart_toStartOf="@+id/seekLayout"
+        app:layout_constraintEnd_toEndOf="@+id/seekLayout"
+        app:layout_constraintBottom_toBottomOf="@+id/seekLayout"
+        />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/times"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/margin"
-        android:layout_marginEnd="@dimen/margin"
+        android:paddingHorizontal="52dp"
         android:orientation="horizontal"
+        android:background="#8F000000"
         app:layout_constraintBottom_toTopOf="@+id/music_buttons"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seek"
+        app:layout_constraintTop_toBottomOf="@+id/seekLayout"
         app:layout_constraintVertical_weight="0.6"
         >
 
@@ -146,6 +156,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="00:00"
+            android:fontFamily="sans-serif-thin"
             android:textColor="@color/white"
             android:autoSizeTextType="uniform"
             app:layout_constraintHorizontal_weight="1"
@@ -159,6 +170,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="--:--"
+            android:fontFamily="sans-serif-thin"
             android:textColor="@color/white"
             android:autoSizeTextType="uniform"
             app:layout_constraintHorizontal_weight="1"
@@ -176,10 +188,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="20dp"
+        android:paddingBottom="20dp"
+        android:paddingHorizontal="52dp"
+        android:background="#8F000000"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/times"
-        app:layout_constraintStart_toStartOf="@+id/times"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/times"
         app:layout_constraintVertical_weight="2">
 

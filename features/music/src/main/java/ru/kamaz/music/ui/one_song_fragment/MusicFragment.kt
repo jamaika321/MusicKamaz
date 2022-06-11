@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
 import com.google.android.material.slider.Slider
 import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.BlurTransformation
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentPlayerBinding
 import ru.kamaz.music.di.components.MusicComponent
@@ -212,11 +213,11 @@ class MusicFragment :
         }
 
         viewModel.title.launchWhenStarted(lifecycleScope) {
-            binding.song.text = it
+            binding.artist.text = it
         }
 
         viewModel.artist.launchWhenStarted(lifecycleScope) {
-            binding.artist.text = it
+            binding.song.text = it
         }
 
         viewModel.duration.launchWhenStarted(lifecycleScope) {
@@ -288,12 +289,17 @@ class MusicFragment :
 
     private fun updateTrackCover(coverPath: String) {
         if (!coverPath.isEmpty()) {
-            Log.i("picasso", "updateTrackCover:$coverPath  ")
-        } else {
-            Log.i("picasso", "updateackCover:$coverPath  ")
+            Log.i("picasso", "updateTrackCover:$coverPath")
             Picasso.with(context)
-                .load(Uri.fromFile(File("7269476454060146266")))
+                .load(Uri.fromFile(File(coverPath.trim())))
+                .into(binding.picture)
+            Picasso.with(context)
+                .load(Uri.fromFile(File(coverPath.trim())))
+                .transform(BlurTransformation(context, 40,2))
+                .resize(1100, 600)
                 .into(binding.pictureDevice)
+        } else {
+            Log.i("picasso", "updateackCover:${coverPath.trim()}")
         }
     }
 
@@ -373,7 +379,7 @@ class MusicFragment :
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        binding.picture.visibility = View.INVISIBLE
+        binding.picture.visibility = View.VISIBLE
         binding.pictureDevice.visibility = View.VISIBLE
         binding.pictureDevice.setBackgroundResource(R.drawable.music_png_bg)
         binding.textUsb.visibility = View.INVISIBLE

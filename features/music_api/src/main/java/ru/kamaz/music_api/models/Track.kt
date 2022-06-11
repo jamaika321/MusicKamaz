@@ -7,9 +7,9 @@ data class Track(
     val title: String,
     val artist: String,
     val data: String,
-    val duration: String,
-    val albumId: Long,
-    val album: String
+    val duration: Long,
+    val album: String,
+    val albumArt: String
 ) : Serializable {
     companion object {
         fun convertDuration(value: Long): String {

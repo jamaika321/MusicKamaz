@@ -1,6 +1,7 @@
 package ru.kamaz.music.services
 
 import android.content.Context
+import android.graphics.Bitmap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,7 @@ interface MusicServiceInterface{
         fun init()
         fun playOrPause(): Boolean
         fun firstOpenTrackFound(track: Track)
-        fun getMusicImg(albumID: Long)
+        fun getMusicImg(albumID: String)
         fun pause()
         fun resume()
         fun isPlay(): StateFlow<Boolean>

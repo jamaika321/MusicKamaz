@@ -572,10 +572,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             changeSource(2)
             updateTracks(mediaManager)
             nextTrack(2)
-            Log.i("getFilesFromSource", "startDiskMode: ")
-            getRootFilesFromSource(SourceType.DEVICE)
         }
     }
+
+
 
     fun startUsbMode(usbOn: Boolean) {
         if (usbOn) {
@@ -666,21 +666,22 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun clearTrackData() {
-        updateMusicName("", "", "")
+        updateMusicName("", "", 120)
         _idSong.value = 1
         _data.value = ""
 
     }
 
+
     override fun initTrack(track: Track, data1: String) {
         _isFavorite.value = false
         val currentTrack = track
 //        updateTracks(mediaManager)
-        val albumID: Long = currentTrack.albumId
         _idSong.value = currentTrack.id.toInt()
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
         _data.value = track.data
-        getMusicImg(albumID)
+        Log.i("checkTrackCover", "initTrack: ${track.albumArt}")
+        _cover.value = track.albumArt
         mediaPlayer.apply {
             stop()
             reset()
@@ -761,22 +762,14 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
 
-    private fun updateMusicName(title: String, artist: String, duration: String) {
+    private fun updateMusicName(title: String, artist: String, duration: Long) {
         _title.value = title
         _artist.value = artist
-        _duration.value = duration
+        _duration.value = "120"
     }
 
-    override fun getMusicImg(albumID: Long) {
-        getMusicCover(GetMusicCover.Params(albumID)) {
-            _cover.value = when (it) {
-                is Either.Left -> ""
-                is Either.Right -> {
-                    it.r
-                }
-                else -> ""
-            }
-        }
+    override fun getMusicImg(albumID: String) {
+
     }
 
     override fun pause() {
@@ -934,7 +927,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             when (currentTrackPosition == tracks.size - 1) {
                 true -> {
                     currentTrackPosition = 0
-                    _isPlaying.value = false
                 }
                 false -> currentTrackPosition++
             }
@@ -1062,7 +1054,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun updateTracks(mediaManager: MediaManager) {
         when (_isUsbModeOn.value) {
             true -> {
-                val result = mediaManager.scanTracks(1)
+                val result = mediaManager.scanTracks(0)
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
                 } else {
@@ -1071,7 +1063,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 }
             }
             false -> {
-                val result = mediaManager.scanTracks(0)
+                val result = mediaManager.scanMediaFiles()
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
                 } else {
