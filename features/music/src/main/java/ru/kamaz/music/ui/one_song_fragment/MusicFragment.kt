@@ -298,6 +298,7 @@ class MusicFragment :
                 .transform(BlurTransformation(context, 40,2))
                 .resize(1100, 600)
                 .into(binding.pictureDevice)
+            binding.pictureBucket.visibility = View.VISIBLE
         } else {
             Log.i("picasso", "updateackCover:${coverPath.trim()}")
         }

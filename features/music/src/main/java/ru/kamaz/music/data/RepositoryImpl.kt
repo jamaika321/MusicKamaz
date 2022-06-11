@@ -24,7 +24,7 @@ class RepositoryImpl(
     private val mediaPlayer: MediaPlayer,
     private val testDBDao: MusicCache
 ) : Repository {
-    override fun loadDiskData(): Either<None, List<Track>> = media.scanTracks(0)
+    override fun loadDiskData(): Either<None, List<Track>> = media.scanMediaFiles()
     override fun loadUsbData(): Either<None, List<Track>> = media.scanTracks(2)
     override fun rvArtist(): Either<None, List<Track>> = media.scanTracks(1)
     override fun rvPlayList(): Flow<List<PlayListModel>> = testDBDao.getAllPlayList()

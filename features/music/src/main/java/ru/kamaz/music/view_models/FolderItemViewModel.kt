@@ -1,12 +1,15 @@
 package ru.kamaz.music.view_models
 
+import android.net.Uri
 import androidx.lifecycle.lifecycleScope
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.kamaz.music.databinding.MainCategoryItemBinding
 import ru.kamaz.music_api.models.AllFolderWithMusic
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
-
+import java.io.File
+import kotlin.coroutines.coroutineContext
 
 
 class FolderItemViewModel: RecyclerViewBaseItem<AllFolderWithMusic, MainCategoryItemBinding>(){
@@ -22,6 +25,9 @@ class FolderItemViewModel: RecyclerViewBaseItem<AllFolderWithMusic, MainCategory
         title.launchWhenStarted(parent.lifecycleScope){
 
         }
+
+
+
 
         binding.root.setOnClickListener {
 
