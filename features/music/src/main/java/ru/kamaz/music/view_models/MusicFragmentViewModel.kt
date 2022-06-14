@@ -83,6 +83,10 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.auxModeOn() ?: MutableStateFlow(true)
     }
 
+    val lastMusic: StateFlow<String> by lazy {
+        service.value?.lastMusic() ?: MutableStateFlow("")
+    }
+
     val isBtModeOn: StateFlow<Boolean> by lazy {
         service.value?.btModeOn() ?: MutableStateFlow(true)
     }

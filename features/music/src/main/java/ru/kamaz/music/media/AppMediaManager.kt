@@ -411,7 +411,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 val duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)).toLong()
                 val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
 
-
                 val id: Long =
                     cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
                 val contentUri =

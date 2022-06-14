@@ -43,6 +43,11 @@ class MusicFragment :
         app.getComponent<MusicComponent>().inject(this)
     }
 
+    override fun onPause() {
+        viewModel.isSaveLastMusic()
+        super.onPause()
+    }
+
     override fun onDestroy() {
         viewModel.isSaveLastMusic()
         viewModel.appClosed()
@@ -85,10 +90,6 @@ class MusicFragment :
             addEvent()
         }
         binding.openListFragment.setOnClickListener {
-            when (viewModel.isUsbModeOn.value) {
-                false -> setFragmentResult("sourceEnum", bundleOf("bundleKey" to 2))
-                true -> setFragmentResult("sourceEnum", bundleOf("bundleKey" to 3))
-            }
             navigator.navigateTo(
                 UiAction(
                     OPEN_TRACK_LIST_FRAGMENT,
@@ -284,6 +285,10 @@ class MusicFragment :
 
         viewModel.isDeviceNotConnectFromBt.launchWhenStarted(lifecycleScope) {
             if (it) dialog()
+        }
+
+        viewModel.lastMusic.launchWhenStarted(lifecycleScope){
+            setFragmentResult("lastMusic", bundleOf("bundleKey" to it))
         }
     }
 

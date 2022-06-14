@@ -12,8 +12,6 @@ class DomainModule {
     @Provides
     fun provideLoadDiskData(repository: Repository): LoadDiskData = LoadDiskData(repository)
     @Provides
-    fun provideLoadUsbData(repository: Repository): LoadUsbData = LoadUsbData(repository)
-    @Provides
     fun provideArtistLoadRV(repository: Repository): ArtistLoadRV = ArtistLoadRV(repository)
     @Provides
     fun provideAllFolderWithMusic(repository: Repository): AllFolderWithMusicRV = AllFolderWithMusicRV(repository)

@@ -22,6 +22,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_weight="3"
+        android:background="#0D5AC6"
         android:layout_width="0dp"
         android:layout_height="match_parent">
 

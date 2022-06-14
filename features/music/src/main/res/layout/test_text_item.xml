@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/main_layout_music_item"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginTop= "@dimen/marginTop"
@@ -27,6 +28,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         </ImageView>
+        <ImageView
+            android:id="@+id/foreground_image"
+            android:visibility="invisible"
+            android:padding="30dp"
+            android:background="#80000000"
+            android:src="@drawable/ic_music_white"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </androidx.cardview.widget.CardView>
 
     <androidx.constraintlayout.widget.ConstraintLayout

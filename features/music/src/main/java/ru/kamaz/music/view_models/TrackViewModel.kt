@@ -17,7 +17,6 @@ import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.LoadDiskData
-import ru.kamaz.music_api.interactor.LoadUsbData
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.core.None
@@ -29,7 +28,6 @@ import javax.inject.Inject
 class TrackViewModel @Inject constructor(
     application: Application,
     private val loadDiskData: LoadDiskData,
-    private val loadUsbData: LoadUsbData,
     private val getFilesUseCase: GetFilesUseCase
 ) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel, MusicManagerListener{
 
@@ -37,17 +35,11 @@ class TrackViewModel @Inject constructor(
         private const val RV_ITEM = 2
     }
 
-    private val _isPlaying = MutableStateFlow(false)
-    val isPlaying = _isPlaying.asStateFlow()
-
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
     val service = _service.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
-
-    private val _items = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
-    var items = _items.asStateFlow()
 
     private val _itemsAll = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     var itemsAll = _itemsAll.asStateFlow()
@@ -59,6 +51,16 @@ class TrackViewModel @Inject constructor(
         service.value?.checkUSBConnection() ?: MutableStateFlow(false)
     }
 
+    private val _lastMusic = MutableStateFlow("")
+    val lastMusic = _lastMusic
+
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying = _isPlaying
+
+    val lastMusicChanged : StateFlow<String> by lazy {
+        service.value?.lastMusic() ?: MutableStateFlow("")
+    }
+
     lateinit var listAllTrack : ArrayList<Track>
     lateinit var listTrack : ArrayList<Track>
 
@@ -67,11 +69,13 @@ class TrackViewModel @Inject constructor(
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
 
-        loadUsbPlaylist()
         loadDiskPlaylist()
 
-        Log.i("trackFrag1", "initVars: ${items.value}")
+    }
 
+    fun lastMusic(title: String){
+        _lastMusic.value = title
+        loadDiskPlaylist()
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -92,27 +96,16 @@ class TrackViewModel @Inject constructor(
     }
 
     fun searchMusic(music: String){
-        if (isNotConnectedUsb.value){
-            _itemsAll.value = filterRecyclerList(music, listAllTrack).toRecyclerViewItems()
-        } else {
-            _items.value = filterRecyclerList(music, listTrack).toRecyclerViewItems()
-        }
-
+        _itemsAll.value = filterRecyclerList(music, listAllTrack).toRecyclerViewItems()
     }
 
     fun checkUsbConnection(){
         service.value?.usbConnectionCheck()
     }
 
-    fun loadUsbPlaylist(){
-        loadUsbData(None()) { it.either({  }, ::onUsbDataLoaded) }
-    }
-
     fun loadDiskPlaylist(){
         loadDiskData(None()) { it.either({  }, ::onDiskDataLoaded) }
     }
-
-
 
     private fun onDiskDataLoaded(data: List<Track>) {
         if (data.isEmpty()) {
@@ -120,26 +113,28 @@ class TrackViewModel @Inject constructor(
             _trackIsEmpty.value = true
            // toast()
         } else _trackIsEmpty.value = false
-        listTrack = data as ArrayList<Track>
-        _items.value = data.toRecyclerViewItems()
+        listTrack = findPlayingMusic(data, lastMusic.value) as ArrayList<Track>
+        _itemsAll.value = findPlayingMusic(data, lastMusic.value).toRecyclerViewItems()
         _isLoading.value = false
     }
-    private fun onUsbDataLoaded(data: List<Track>) {
-        if (data.isEmpty()) {
-            Log.d("mediaPlayer", "no")
-            _trackIsEmpty.value = true
-           // toast()
-        } else _trackIsEmpty.value = false
-        listAllTrack = data as ArrayList<Track>
-        _itemsAll.value = data.toRecyclerViewItems()
-        _isLoading.value = false
 
+    private fun findPlayingMusic(data: List<Track>, title:String): List<Track>{
+        for (i in data.indices){
+            if (data[i].title == title){
+                data[i].playing = true
+            }
+        }
+        return data
     }
+
     fun onItemClick(track: Track, data: String) {
         service.value?.intMediaPlayer()
-        service.value?.initTrack(track, data)
-        service.value?.playOrPause()
-        Log.i("onTrackClicked", "onTrackClicked")
+        if (track.title != lastMusic.value) {
+            service.value?.initTrack(track, data)
+            service.value?.resume()
+        } else {
+            service.value?.playOrPause()
+        }
     }
 
     private fun List<Track>.toRecyclerViewItems(): List<RecyclerViewBaseDataModel> {

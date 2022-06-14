@@ -10,6 +10,3 @@ import ru.sir.core.None
 class LoadDiskData(private val repository: Repository): AsyncUseCase<List<Track>, None, None>()  {
     override suspend fun run(params: None): Either<None, List<Track>> = repository.loadDiskData()
 }
-class LoadUsbData(private val repository: Repository): AsyncUseCase<List<Track>, None, None>()  {
-    override suspend fun run(params: None): Either<None, List<Track>> = repository.loadUsbData()
-}

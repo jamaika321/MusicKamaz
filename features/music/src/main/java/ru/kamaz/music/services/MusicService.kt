@@ -223,6 +223,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private val _idSong = MutableStateFlow(1)
     val idSong = _idSong.asStateFlow()
+
+    private val _lastMusic = MutableStateFlow("")
+    val lastMusic = _lastMusic.asStateFlow()
+
     private val _tickFlow = MutableSharedFlow<Unit>(replay = 0)
     val tickFlow: MutableSharedFlow<Unit> = _tickFlow
 
@@ -291,6 +295,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun usbConnect(): StateFlow<Boolean> = isNotUSBConnected
     override fun howModeNow(): Int = 2
     override fun isPlay(): StateFlow<Boolean> = isPlaying
+    override fun lastMusic(): StateFlow<String> = lastMusic
+
 
     override fun dialogFragment(): StateFlow<Boolean> = btDeviceIsConnecting
     override fun musicEmpty(): StateFlow<Boolean> = musicEmpty
@@ -643,7 +649,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun appClosed() {
-        stopMediaPlayer()
+//        stopMediaPlayer()
         twManager.stopMonitoring(applicationContext)
 //        twManagerMusic.close()
     }
@@ -676,6 +682,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun initTrack(track: Track, data1: String) {
         _isFavorite.value = false
         val currentTrack = track
+        _lastMusic.value = currentTrack.title
+        Log.i("getLastMusic", "initTrack: ${currentTrack.title}")
 //        updateTracks(mediaManager)
         _idSong.value = currentTrack.id.toInt()
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
@@ -695,7 +703,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 }
             )
             prepare()
-            updateSeekBar()
+            updateSeekBar(track.duration)
         }
         queryFavoriteMusic()
     }
@@ -724,7 +732,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun lastSavedState() {
-        updateSeekBar()
+        updateSeekBar(mediaPlayer.duration.toLong())
         twManager.startMonitoring(applicationContext) {
             twManagerMusic.addListener(this)
             twManager.requestConnectionInfo()
@@ -790,9 +798,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         mediaPlayer.seekTo(position)
     }
 
-    private fun updateSeekBar() {
-        val duration = mediaPlayer.duration
-        myViewModel.onUpdateSeekBar(duration)
+    private fun updateSeekBar(duration: Long) {
+        myViewModel.onUpdateSeekBar(duration.toInt())
     }
 
 
@@ -1054,7 +1061,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun updateTracks(mediaManager: MediaManager) {
         when (_isUsbModeOn.value) {
             true -> {
-                val result = mediaManager.scanTracks(0)
+                val result = mediaManager.scanTracks(1)
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
                 } else {
@@ -1213,10 +1220,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         insertLastMusic(InsertLastMusic.Params(music))
     }
 
-    override fun onCompletion(mp: MediaPlayer?) {
-
-    }
-
     override fun onPlayerPlayPauseState(isPlaying: Boolean) {
         Log.i("btTest", "onPlayerPlayPauseState: $isPlaying")
         when (isPlaying) {
@@ -1226,6 +1229,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         if (!isBtModeOn.value){
             _isPlaying.value = true
         }
+    }
+
+    override fun onCompletion(mp: MediaPlayer?) {
+
     }
 
 

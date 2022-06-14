@@ -1,11 +1,12 @@
 package ru.kamaz.music.view_models
 
-
 import android.net.Uri
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableStateFlow
+import ru.kamaz.music.R
 import ru.kamaz.music.databinding.TestTextItemBinding
 import ru.kamaz.music.ui.all_musiclist.TrackFragment
 import ru.kamaz.music_api.models.Track
@@ -17,6 +18,7 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
     private val artist = MutableStateFlow("")
     private val title =MutableStateFlow("")
     private val image = MutableStateFlow("")
+    private val playing = MutableStateFlow(false)
     private lateinit var data: Track
 
     override fun bindData(data: Track) {
@@ -24,9 +26,20 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
         artist.value= data.artist
         title.value= data.title
         image.value = data.albumArt
+        playing.value = data.playing
+
     }
 
     override fun initVars() {
+        playing.launchWhenStarted(parent.lifecycleScope){
+            if (it){
+                binding.foregroundImage.visibility = View.VISIBLE
+                binding.mainLayoutMusicItem.setBackgroundResource(R.drawable.back_item_true)
+            }else{
+                binding.foregroundImage.visibility = View.INVISIBLE
+                binding.mainLayoutMusicItem.setBackgroundResource(R.drawable.ic_back_item)
+            }
+        }
         artist.launchWhenStarted(parent.lifecycleScope){
             binding.artistName.text=it
         }

@@ -1,12 +1,16 @@
 package ru.kamaz.music.ui.all_musiclist
 
+import android.animation.ArgbEvaluator
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.StateFlow
@@ -47,13 +51,13 @@ class TrackFragment() :
     }
 
     private fun initServiceVars(){
-        viewModel.isNotConnectedUsb.launchWhenStarted(lifecycleScope){
-            if (it){
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.itemsAll)
-            } else {
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.items)
-            }
+        changeRVItems()
+
+        setFragmentResultListener("lastMusic") { key, bundle ->
+            val result = bundle.getString("bundleKey")
+            if (!result.isNullOrEmpty())  viewModel.lastMusic(result)
         }
+
 
         binding.rvAllMusic.addOnScrollListener(object: RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -72,6 +76,14 @@ class TrackFragment() :
         viewModel.trackIsEmpty.launchOn(lifecycleScope) {
             musicListIsEmpty(it)
         }
+
+        viewModel.lastMusicChanged.launchWhenStarted(lifecycleScope){
+            viewModel.lastMusic(it)
+        }
+    }
+
+    private fun changeRVItems(){
+        binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.itemsAll)
     }
 
     override fun setListeners() {

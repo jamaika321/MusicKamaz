@@ -41,7 +41,7 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
 
     override fun queryHistorySongs(): Either<Failure, String> {
         return try {
-            Either.Right(db.historySongsDao().getLastMusic().data)
+            Either.Right(db.historySongsDao().getLastMusic().title)
         } catch (e: Exception) {
             Either.Left(Failure.AuthorizationError(ErrorMessage(404, e.message.toString(), e.localizedMessage ?: "")))
         }
