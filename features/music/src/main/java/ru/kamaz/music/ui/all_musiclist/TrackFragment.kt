@@ -55,7 +55,7 @@ class TrackFragment() :
 
         setFragmentResultListener("lastMusic") { key, bundle ->
             val result = bundle.getString("bundleKey")
-            if (!result.isNullOrEmpty())  viewModel.lastMusic(result)
+            if (!result.isNullOrEmpty())  viewModel.lastMusic.value = result
         }
 
 

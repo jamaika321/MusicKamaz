@@ -69,10 +69,10 @@ class TestWidget : BaseAppWidget() {
         pushUpdate(context, null, appWidgetView)
     }
 
-    fun updateTestDuration(context: Context, title: String) {
+    fun updateTestDuration(context: Context, title: Int) {
         val appWidgetView = RemoteViews(context.packageName, R.layout.test_widget)
 
-        appWidgetView.setTextViewText(ru.kamaz.widget.R.id.duration_widget, title)
+//        appWidgetView.setTextViewText(ru.kamaz.widget.R.id.duration_widget, title)
 
         pushUpdate(context, null, appWidgetView)
     }

@@ -54,8 +54,8 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.getMusicName() ?: MutableStateFlow("Unknown")
     }
 
-    val duration: StateFlow<String> by lazy {
-        service.value?.getMusicDuration() ?: MutableStateFlow("--:--")
+    val duration: StateFlow<Int> by lazy {
+        service.value?.getMusicDuration() ?: MutableStateFlow(0)
     }
 
     val isShuffleOn: StateFlow<Boolean> by lazy {
@@ -230,7 +230,7 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     override fun onUpdateSeekBar(duration: Int) {
-        _maxSeek.value = duration
+
     }
 
 

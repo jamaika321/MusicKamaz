@@ -27,7 +27,7 @@ interface MusicServiceInterface{
         fun sourceSelection(action: MusicService.SourceEnum)
         fun getMusicName(): StateFlow<String>
         fun getArtistName(): StateFlow<String>
-        fun getMusicDuration(): StateFlow<String>
+        fun getMusicDuration(): StateFlow<Int>
         fun checkDeviceConnection(): StateFlow<Boolean>
         fun lastMusic(): StateFlow<String>
         fun checkUSBConnection(): StateFlow<Boolean>

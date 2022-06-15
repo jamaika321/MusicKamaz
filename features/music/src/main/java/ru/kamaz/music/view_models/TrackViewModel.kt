@@ -24,6 +24,7 @@ import ru.sir.presentation.base.BaseViewModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 class TrackViewModel @Inject constructor(
     application: Application,
@@ -62,7 +63,7 @@ class TrackViewModel @Inject constructor(
     }
 
     lateinit var listAllTrack : ArrayList<Track>
-    lateinit var listTrack : ArrayList<Track>
+    lateinit var changedListTrack : ArrayList<Track>
 
     override fun init() {
         _isLoading.value = true
@@ -75,7 +76,11 @@ class TrackViewModel @Inject constructor(
 
     fun lastMusic(title: String){
         _lastMusic.value = title
-        loadDiskPlaylist()
+        if (itemsAll.value.isEmpty()){
+            loadDiskPlaylist()
+        }else{
+            convertToRecyclerViewItems(changedListTrack)
+        }
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -92,11 +97,12 @@ class TrackViewModel @Inject constructor(
             }
             musicFilterList = resultList
         }
+        changedListTrack = musicFilterList
         return musicFilterList
     }
 
     fun searchMusic(music: String){
-        _itemsAll.value = filterRecyclerList(music, listAllTrack).toRecyclerViewItems()
+        convertToRecyclerViewItems(filterRecyclerList(music, listAllTrack))
     }
 
     fun checkUsbConnection(){
@@ -107,28 +113,32 @@ class TrackViewModel @Inject constructor(
         loadDiskData(None()) { it.either({  }, ::onDiskDataLoaded) }
     }
 
+    private fun convertToRecyclerViewItems(listTrack: ArrayList<Track>){
+        var listAllTrack = findPlayingMusic(listTrack, lastMusic.value) as ArrayList<Track>
+        _itemsAll.value = listAllTrack.toRecyclerViewItems()
+    }
+
     private fun onDiskDataLoaded(data: List<Track>) {
         if (data.isEmpty()) {
             Log.d("mediaPlayer", "no")
             _trackIsEmpty.value = true
            // toast()
         } else _trackIsEmpty.value = false
-        listTrack = findPlayingMusic(data, lastMusic.value) as ArrayList<Track>
-        _itemsAll.value = findPlayingMusic(data, lastMusic.value).toRecyclerViewItems()
+        listAllTrack = data as ArrayList<Track>
+        changedListTrack = data
+        convertToRecyclerViewItems(data)
         _isLoading.value = false
     }
 
     private fun findPlayingMusic(data: List<Track>, title:String): List<Track>{
         for (i in data.indices){
-            if (data[i].title == title){
-                data[i].playing = true
-            }
+            data[i].playing = data[i].title == title
         }
         return data
     }
 
     fun onItemClick(track: Track, data: String) {
-        service.value?.intMediaPlayer()
+//        service.value?.intMediaPlayer()
         if (track.title != lastMusic.value) {
             service.value?.initTrack(track, data)
             service.value?.resume()

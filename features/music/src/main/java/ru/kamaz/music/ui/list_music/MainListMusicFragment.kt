@@ -45,8 +45,8 @@ class MainListMusicFragment
 //        Toast.makeText(context, arguments?.get("source").toString(), Toast.LENGTH_SHORT).show()
         startListAllMusic()
 
-    }
 
+    }
 
     override fun setListeners() {
         binding.sourceSelection.listMusic.setOnClickListener {
@@ -66,12 +66,8 @@ class MainListMusicFragment
     }
 
     private fun  startListAllMusic(){
-        val trackFrag = TrackFragment()
-        setFragmentResultListener("sourceEnum") { key , bundle ->
-            when (bundle.getInt("bundleKey")){
-                2 -> trackFrag.arguments = bundleOf("bundleKey" to "2")
-                3 -> trackFrag.arguments = bundleOf("bundleKey" to "3")
-            }
+        val trackFrag : TrackFragment by lazy {
+            TrackFragment()
         }
         parentFragmentManager
             .beginTransaction()

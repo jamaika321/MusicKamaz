@@ -88,11 +88,6 @@ class MainListMusicViewModel @Inject constructor(
         _folder.value = folderMusic.toRecyclerViewItemsFolder()
     }
 
-    fun onItemClick(track: Track) {
-        service?.intMediaPlayer()
-        service?.playOrPause()
-    }
-
     private fun List<Track>.toRecyclerViewItems(): List<RecyclerViewBaseDataModel> {
         val newList = mutableListOf<RecyclerViewBaseDataModel>()
         this.forEach { newList.add(RecyclerViewBaseDataModel(it, RV_ITEM)) }

@@ -218,7 +218,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
 
-    private val _duration = MutableStateFlow("00:00")
+    private val _duration = MutableStateFlow(0)
     val duration = _duration.asStateFlow()
 
     private val _idSong = MutableStateFlow(1)
@@ -276,7 +276,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun getMusicName(): StateFlow<String> = title
     override fun getArtistName(): StateFlow<String> = artist
     override fun getRepeat(): StateFlow<Int> = repeatHowNow
-    override fun getMusicDuration(): StateFlow<String> = duration
+    override fun getMusicDuration(): StateFlow<Int> = duration
     override fun isFavoriteMusic(): StateFlow<Boolean> = isFavorite
     override fun isShuffleOn(): StateFlow<Boolean> = isShuffleStatus
     override fun changeRv(): StateFlow<Int> = rvChange
@@ -688,6 +688,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         _idSong.value = currentTrack.id.toInt()
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
         _data.value = track.data
+        _duration.value = track.duration.toInt()
         Log.i("checkTrackCover", "initTrack: ${track.albumArt}")
         _cover.value = track.albumArt
         mediaPlayer.apply {
@@ -703,7 +704,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 }
             )
             prepare()
-            updateSeekBar(track.duration)
         }
         queryFavoriteMusic()
     }
@@ -732,7 +732,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun lastSavedState() {
-        updateSeekBar(mediaPlayer.duration.toLong())
+//        updateSeekBar(mediaPlayer.duration.toLong())
         twManager.startMonitoring(applicationContext) {
             twManagerMusic.addListener(this)
             twManager.requestConnectionInfo()
@@ -773,7 +773,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private fun updateMusicName(title: String, artist: String, duration: Long) {
         _title.value = title
         _artist.value = artist
-        _duration.value = "120"
+//        _duration.value = duration.toInt()
     }
 
     override fun getMusicImg(albumID: String) {
@@ -797,11 +797,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun checkPosition(position: Int) {
         mediaPlayer.seekTo(position)
     }
-
-    private fun updateSeekBar(duration: Long) {
-        myViewModel.onUpdateSeekBar(duration.toInt())
-    }
-
 
     override fun previousTrack() {
         when (mode) {

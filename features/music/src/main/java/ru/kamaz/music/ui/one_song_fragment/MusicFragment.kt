@@ -221,13 +221,9 @@ class MusicFragment :
             binding.song.text = it
         }
 
-        viewModel.duration.launchWhenStarted(lifecycleScope) {
-//            binding.endTime.text = it
-        }
-
         viewModel.cover.launchWhenStarted(lifecycleScope) { updateTrackCover(it) }
 
-        viewModel.maxSeek.launchWhenStarted(lifecycleScope) {
+        viewModel.duration.launchWhenStarted(lifecycleScope) {
             binding.seek.max = it
             binding.endTime.text = Track.convertDuration(it.toLong())
         }
