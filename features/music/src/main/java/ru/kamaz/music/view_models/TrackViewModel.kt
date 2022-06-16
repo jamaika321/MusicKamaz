@@ -62,6 +62,7 @@ class TrackViewModel @Inject constructor(
         service.value?.lastMusic() ?: MutableStateFlow("")
     }
 
+
     lateinit var listAllTrack : ArrayList<Track>
     lateinit var changedListTrack : ArrayList<Track>
 
@@ -69,8 +70,7 @@ class TrackViewModel @Inject constructor(
         _isLoading.value = true
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
-
-        loadDiskPlaylist()
+        Log.i("fragmentState", "init: ")
 
     }
 

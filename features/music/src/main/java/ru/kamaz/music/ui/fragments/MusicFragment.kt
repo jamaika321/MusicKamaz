@@ -1,4 +1,4 @@
-package ru.kamaz.music.ui.one_song_fragment
+package ru.kamaz.music.ui.fragments
 
 import android.app.Activity
 import android.content.Intent
@@ -14,9 +14,7 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
 import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
-import com.google.android.material.slider.Slider
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.BlurTransformation
 import ru.kamaz.music.R

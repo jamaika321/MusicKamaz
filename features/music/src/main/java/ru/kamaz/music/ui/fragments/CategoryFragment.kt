@@ -1,4 +1,4 @@
-package ru.kamaz.music.ui.category
+package ru.kamaz.music.ui.fragments
 
 import android.os.Bundle
 import android.util.Log
@@ -85,6 +85,11 @@ class CategoryFragment :
 
     fun clickAddNewPlayList() {
         dialog()
+    }
+
+    override fun onDestroy() {
+        Log.i("fragmentState", "onDestroy:CategoryFragment ")
+        super.onDestroy()
     }
 
     private fun dialog(){

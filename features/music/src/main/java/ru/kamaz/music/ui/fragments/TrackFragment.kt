@@ -1,15 +1,11 @@
-package ru.kamaz.music.ui.all_musiclist
+package ru.kamaz.music.ui.fragments
 
-import android.animation.ArgbEvaluator
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
-import androidx.core.view.isInvisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -39,6 +35,7 @@ class TrackFragment() :
         savedInstanceState: Bundle?
     ): FragmentListMusicBinding {
         val mBinding = FragmentListMusicBinding.inflate(inflater, container, false)
+
 //
         return mBinding
     }
@@ -49,6 +46,7 @@ class TrackFragment() :
             initServiceVars()
         }
     }
+
 
     private fun initServiceVars(){
         changeRVItems()

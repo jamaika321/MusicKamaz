@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import ru.kamaz.music.databinding.MainCategoryItemBinding
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
-import ru.kamaz.music.ui.category.CategoryFragment
+import ru.kamaz.music.ui.fragments.CategoryFragment
 import ru.kamaz.music_api.models.CategoryMusicModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted

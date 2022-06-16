@@ -133,11 +133,6 @@ class MusicFragmentViewModel @Inject constructor(
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
     }
 
-    override fun onCreate() {
-      //updateTracks(mediaManager)
-        super.onCreate()
-    }
-
 
     fun shuffleStatusChange(){
         service.value?.shuffleStatusChange()

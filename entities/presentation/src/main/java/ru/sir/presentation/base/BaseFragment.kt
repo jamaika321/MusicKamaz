@@ -2,6 +2,7 @@ package ru.sir.presentation.base
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -60,6 +61,7 @@ abstract class BaseFragment<T : BaseViewModel, B : ViewBinding>(private val type
     fun setBackPressedEnable(enable: Boolean) {
         onBackPressedCallback.isEnabled = enable
     }
+
 
     protected fun hideKeyBoard() {
         activity?.currentFocus?.let { view ->
