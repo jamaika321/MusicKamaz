@@ -70,7 +70,6 @@ class TrackViewModel @Inject constructor(
         _isLoading.value = true
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
-        Log.i("fragmentState", "init: ")
 
     }
 

@@ -253,7 +253,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 Log.i("setShuffleMode", "setShuffleMode: ")
             }
             false -> {
-                updateTracks(mediaManager)
+//                updateTracks(mediaManager)
             }
         }
     }
@@ -332,7 +332,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
         registerReceiver(br, filter)
 
-        updateTracks(mediaManager)
+//        updateTracks(mediaManager)
         twManager.startMonitoring(applicationContext) {
             twManager.addListener(this)
             twManager.requestConnectionInfo()
@@ -1056,7 +1056,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun updateTracks(mediaManager: MediaManager) {
         when (_isUsbModeOn.value) {
             true -> {
-                val result = mediaManager.scanTracks(1)
+                val result = mediaManager.getMediaFilesFromPath("sdCard")
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
                 } else {
@@ -1065,7 +1065,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 }
             }
             false -> {
-                val result = mediaManager.scanMediaFiles()
+                val result = mediaManager.getMediaFilesFromPath("storage")
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
                 } else {
@@ -1146,8 +1146,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun usbConnectionCheck(): Boolean {
-        _isNotUSBConnected.value = mediaManager.scanTracks(1).isRight
-        return mediaManager.scanTracks(1).isRight
+        _isNotUSBConnected.value = mediaManager.getMediaFilesFromPath("sdCard").isRight
+        return mediaManager.getMediaFilesFromPath("sdCard").isRight
     }
 
     fun getToastConnectBtDevice(btDevise: Boolean) {
