@@ -45,6 +45,7 @@ import ru.kamaz.music_api.BaseConstants.ACTION_PREV
 import ru.kamaz.music_api.BaseConstants.ACTION_TOGGLE_PAUSE
 import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
 import ru.kamaz.music_api.BaseConstants.EXTRA_APP_WIDGET_NAME
+import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.SourceType
 import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.*
@@ -91,6 +92,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     @Inject
     lateinit var deleteFavoriteMusic: DeleteFavoriteMusic
+
+    @Inject
+    lateinit var insertTrackListToDB: InsertTrackListToDB
 
     @Inject
     lateinit var getFilesUseCase: GetFilesUseCase
@@ -178,9 +182,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private val _isUsbModeOn = MutableStateFlow<Boolean>(false)
     val isUsbModeOn = _isUsbModeOn.asStateFlow()
-
-    private val _isBtPlaying = MutableStateFlow<Boolean>(false)
-    val isBtPlaying = _isBtPlaying.asStateFlow()
 
     val br: BroadcastReceiver = BrReceiver()
     var CMDPREV = "prev"
@@ -332,7 +333,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
         registerReceiver(br, filter)
 
-//        updateTracks(mediaManager)
         twManager.startMonitoring(applicationContext) {
             twManager.addListener(this)
             twManager.requestConnectionInfo()
@@ -1148,6 +1148,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun usbConnectionCheck(): Boolean {
         _isNotUSBConnected.value = mediaManager.getMediaFilesFromPath("sdCard").isRight
         return mediaManager.getMediaFilesFromPath("sdCard").isRight
+    }
+
+    override fun insertTrackListToDB(tracks: List<Track>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            insertTrackListToDB.run(InsertTrackListToDB.Params(tracks))
+        }
     }
 
     fun getToastConnectBtDevice(btDevise: Boolean) {

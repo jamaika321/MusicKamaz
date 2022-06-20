@@ -10,8 +10,9 @@ import ru.kamaz.music.cache.db.dao.PlayListDao
 import ru.kamaz.music.domain.FavoriteSongsEntity
 import ru.kamaz.music.domain.HistorySongsEntity
 import ru.kamaz.music.domain.PlayListEntity
+import ru.kamaz.music.domain.TrackEntity
 
-@Database(entities = arrayOf(FavoriteSongsEntity::class, HistorySongsEntity::class,PlayListEntity::class), version = 3, exportSchema = false)
+@Database(entities = arrayOf(FavoriteSongsEntity::class, HistorySongsEntity::class,PlayListEntity::class, TrackEntity::class), version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): LikeMusicDao
     abstract fun historySongsDao(): HistoryDao

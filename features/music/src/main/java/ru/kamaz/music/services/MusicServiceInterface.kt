@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.kamaz.music.data.MediaManager
+import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.models.Track
+import ru.sir.core.Either
 
 
 interface MusicServiceInterface{
@@ -57,6 +59,7 @@ interface MusicServiceInterface{
         fun appClosed()
         fun lastSavedState()
         fun usbConnectionCheck(): Boolean
+        fun insertTrackListToDB(tracks: List<Track>)
     }
 
     interface ViewModel{

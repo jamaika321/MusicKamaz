@@ -45,4 +45,8 @@ class DomainModule {
     fun provideInsertPlayList(repository: Repository): InsertPlayList = InsertPlayList(repository)
     @Provides
     fun provideDeleteFavoriteMusic(repository: Repository): DeleteFavoriteMusic = DeleteFavoriteMusic(repository)
+    @Provides
+    fun provideInsertTrackList(repository: Repository): InsertTrackListToDB = InsertTrackListToDB(repository)
+    @Provides
+    fun provideGetTrackList(repository: Repository): GetTrackListFromDB = GetTrackListFromDB(repository)
 }

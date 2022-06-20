@@ -55,28 +55,27 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
     private fun scanMediaFilesInSdCard(): Either<None, List<Track>> {
         metaRetriver = MediaMetadataRetriever()
 
-        lateinit var listWithTrackData : ArrayList<Track>
+        val listWithTrackData = ArrayList<Track>()
         val trackPaths = scanTracksPath()
 
         if (trackPaths is Either.Right)
         {
             for (i in 0 until trackPaths.r.size){
-                metaRetriver.setDataSource("/storage/usbdisk0/Musik/${trackPaths.r[i]}")
-
-                Log.i("filteredPath", "/storage/usbdisk0/Musik/${trackPaths.r[i]}")
+                metaRetriver.setDataSource(trackPaths.r[i])
 
                 val artist = metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST)) ?: ("unknown")
                 val album = metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))?: ("unknown")
                 val title = metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE))?: ("unknown")
                 val duration = metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))?.toLong() ?: (180)
                 val albumArtist = metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST))?: ("unknown")
+                val data = trackPaths.r[i]
 
                 listWithTrackData.add(
                     Track(
                         Random.nextLong(),
                         title,
                         artist,
-                        "",
+                        data,
                         duration,
                         album,
                         ""
@@ -97,9 +96,8 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         val store = "/storage/usbdisk0"
         lateinit var list: List<String>
 
-
         list = readRecursive(File(store), listOf("mp3", "wav")).sorted().map {
-            it.name
+            it.toString()
         }
         return if (list.isEmpty()) {
             Either.Left(None())

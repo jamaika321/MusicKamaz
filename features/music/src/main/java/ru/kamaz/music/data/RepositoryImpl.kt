@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.flow
 import ru.kamaz.music.domain.FavoriteSongsEntity
 import ru.kamaz.music.domain.HistorySongsEntity
 import ru.kamaz.music.domain.PlayListEntity
+import ru.kamaz.music.domain.TrackEntity
 import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.SourceType
 import ru.kamaz.music_api.interfaces.Repository
@@ -109,6 +110,26 @@ class RepositoryImpl(
         this.albumArtist,
         this.timePlayed
     )
+    private fun Track.toDao() = TrackEntity(
+        this.id,
+        this.title,
+        this.artist,
+        this.data,
+        this.duration,
+        this.album,
+        this.albumArt,
+        this.playing
+    )
+    private fun TrackEntity.fromDao() = Track(
+        this.id,
+        this.title,
+        this.artist,
+        this.data,
+        this.duration,
+        this.album,
+        this.albumArt,
+        this.playing
+    )
 
     private val devicePath = "/storage/usbdisk0"
 
@@ -132,6 +153,22 @@ class RepositoryImpl(
         val list = file.listFiles().toList().sorted()
         Log.i("usbMusic", "getFiles: $list")
         return (list)
+    }
+
+    override fun insertTrackList(track: List<Track>): Either<Failure, None> {
+        var trackEntity = ArrayList<TrackEntity>()
+        for (i in track.indices){
+            trackEntity.add(i, track[i].toDao())
+        }
+        return testDBDao.insertTrackList(trackEntity)
+    }
+
+    override fun getTrackList(): Either<Failure, List<Track>> {
+        var track = ArrayList<Track>()
+        for (i in testDBDao.getTrackList().indices) {
+            track.add(testDBDao.getTrackList()[i].fromDao())
+        }
+        return Either.Right(track)
     }
 
     private fun readMediaStore(media1: SourceType) {

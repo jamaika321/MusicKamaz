@@ -41,6 +41,10 @@ class MainListMusicViewModel @Inject constructor(
 
     private var service: MusicServiceInterface.Service? = null
 
+    init {
+        Log.i("trackState", "loading ")
+    }
+
 
     val pp = MusicPresenter(context)
 

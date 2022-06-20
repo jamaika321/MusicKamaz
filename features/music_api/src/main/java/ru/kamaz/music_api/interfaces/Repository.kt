@@ -30,5 +30,8 @@ interface Repository: PathManager, SourceManager {
     fun getFiles(path: String): List<File>
  //suspend fun getFilesFromDirectory(path: String): List<File
 
+    fun insertTrackList(track: List<Track>): Either<Failure, None>
+    fun getTrackList(): Either<Failure, List<Track>>
+
 
 }

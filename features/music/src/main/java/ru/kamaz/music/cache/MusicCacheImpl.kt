@@ -8,6 +8,7 @@ import ru.kamaz.music.data.MusicCache
 import ru.kamaz.music.domain.FavoriteSongsEntity
 import ru.kamaz.music.domain.HistorySongsEntity
 import ru.kamaz.music.domain.PlayListEntity
+import ru.kamaz.music.domain.TrackEntity
 import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.models.ErrorMessage
 import ru.kamaz.music_api.models.FavoriteSongs
@@ -45,6 +46,15 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         } catch (e: Exception) {
             Either.Left(Failure.AuthorizationError(ErrorMessage(404, e.message.toString(), e.localizedMessage ?: "")))
         }
+    }
+
+    override fun insertTrackList(tracks: List<TrackEntity>) : Either<Failure, None> {
+        db.historySongsDao().insertTrackList(tracks)
+        return Either.Right(None())
+    }
+
+    override fun getTrackList(): List<TrackEntity> {
+        return db.historySongsDao().getTrackList()
     }
 
     override fun insertHistorySong(song: HistorySongsEntity): Either<Failure, None> {

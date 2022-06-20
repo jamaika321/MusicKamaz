@@ -12,6 +12,7 @@ import ru.kamaz.music.view_models.list.ListViewModel
 import ru.kamaz.music.view_models.music_category.CategoryViewModel
 import ru.sir.presentation.annotations.ViewModelKey
 import ru.sir.presentation.factories.ViewModelFactory
+import javax.inject.Singleton
 
 @Module
 abstract class ViewModelModel() {

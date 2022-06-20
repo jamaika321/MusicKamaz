@@ -16,6 +16,7 @@ import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.domain.GetFilesUseCase
+import ru.kamaz.music_api.interactor.GetTrackListFromDB
 import ru.kamaz.music_api.interactor.LoadDiskData
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
@@ -28,6 +29,7 @@ import kotlin.collections.ArrayList
 
 class TrackViewModel @Inject constructor(
     application: Application,
+    private val loadTrackList: GetTrackListFromDB,
     private val loadDiskData: LoadDiskData,
     private val getFilesUseCase: GetFilesUseCase
 ) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel, MusicManagerListener{
@@ -66,17 +68,22 @@ class TrackViewModel @Inject constructor(
     lateinit var listAllTrack : ArrayList<Track>
     lateinit var changedListTrack : ArrayList<Track>
 
+    init {
+
+    }
+
     override fun init() {
         _isLoading.value = true
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
+
 
     }
 
     fun lastMusic(title: String){
         _lastMusic.value = title
         if (itemsAll.value.isEmpty()){
-            loadDiskPlaylist()
+            loadDataFromDB()
         }else{
             convertToRecyclerViewItems(changedListTrack)
         }
@@ -112,6 +119,10 @@ class TrackViewModel @Inject constructor(
         loadDiskData(None()) { it.either({  }, ::onDiskDataLoaded) }
     }
 
+    fun loadDataFromDB(){
+        loadTrackList(None()) { it.either({  }, ::onDiskDataLoaded)}
+    }
+
     private fun convertToRecyclerViewItems(listTrack: ArrayList<Track>){
         var listAllTrack = findPlayingMusic(listTrack, lastMusic.value) as ArrayList<Track>
         _itemsAll.value = listAllTrack.toRecyclerViewItems()
@@ -121,7 +132,7 @@ class TrackViewModel @Inject constructor(
         if (data.isEmpty()) {
             Log.d("mediaPlayer", "no")
             _trackIsEmpty.value = true
-           // toast()
+            loadDiskPlaylist()
         } else _trackIsEmpty.value = false
         listAllTrack = data as ArrayList<Track>
         changedListTrack = data
@@ -150,6 +161,11 @@ class TrackViewModel @Inject constructor(
         val newList = mutableListOf<RecyclerViewBaseDataModel>()
         this.forEach { newList.add(RecyclerViewBaseDataModel(it, RV_ITEM)) }
         return newList
+    }
+
+    override fun onPause() {
+        service.value?.insertTrackListToDB(listAllTrack)
+        super.onPause()
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
