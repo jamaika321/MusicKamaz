@@ -41,9 +41,6 @@ class TrackViewModel @Inject constructor(
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
     val service = _service.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
     private val _itemsAll = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     var itemsAll = _itemsAll.asStateFlow()
 
@@ -64,19 +61,13 @@ class TrackViewModel @Inject constructor(
         service.value?.lastMusic() ?: MutableStateFlow("")
     }
 
-
     lateinit var listAllTrack : ArrayList<Track>
     lateinit var changedListTrack : ArrayList<Track>
 
-    init {
-
-    }
-
     override fun init() {
-        _isLoading.value = true
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
-
+        loadDiskPlaylist()
 
     }
 
@@ -116,7 +107,9 @@ class TrackViewModel @Inject constructor(
     }
 
     fun loadDiskPlaylist(){
+        Log.i("ReviewTest", "loadDiskPlaylist: ")
         loadDiskData(None()) { it.either({  }, ::onDiskDataLoaded) }
+//        insertTrackListToDB()
     }
 
     fun loadDataFromDB(){
@@ -133,11 +126,12 @@ class TrackViewModel @Inject constructor(
             Log.d("mediaPlayer", "no")
             _trackIsEmpty.value = true
             loadDiskPlaylist()
-        } else _trackIsEmpty.value = false
+        } else {
+            _trackIsEmpty.value = false
+        }
         listAllTrack = data as ArrayList<Track>
         changedListTrack = data
         convertToRecyclerViewItems(data)
-        _isLoading.value = false
     }
 
     private fun findPlayingMusic(data: List<Track>, title:String): List<Track>{
@@ -158,14 +152,20 @@ class TrackViewModel @Inject constructor(
     }
 
     private fun List<Track>.toRecyclerViewItems(): List<RecyclerViewBaseDataModel> {
+        Log.i("ReviewTest", "toRecyclerViewItems: ")
         val newList = mutableListOf<RecyclerViewBaseDataModel>()
         this.forEach { newList.add(RecyclerViewBaseDataModel(it, RV_ITEM)) }
         return newList
     }
 
     override fun onPause() {
-        service.value?.insertTrackListToDB(listAllTrack)
+        insertTrackListToDB()
         super.onPause()
+    }
+
+    fun insertTrackListToDB(){
+        Log.i("ReviewTest", "insertTrackListToDB: ")
+        service.value?.insertTrackListToDB(listAllTrack)
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {

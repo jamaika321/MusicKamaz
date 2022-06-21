@@ -254,7 +254,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 Log.i("setShuffleMode", "setShuffleMode: ")
             }
             false -> {
-//                updateTracks(mediaManager)
+                updateTracks(mediaManager)
             }
         }
     }
@@ -354,9 +354,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             widgettest.updatePlayPauseImg(this, it)
         }
 
-        isPlaying.launchOn(lifecycleScope) {
-            widgettest.updatePlayPauseImg(this, it)
-        }
+//        isPlaying.launchOn(lifecycleScope) {
+//            widgettest.updatePlayPauseImg(this, it)
+//        }
 
         _musicEmpty.value = tracks.isEmpty()
         compilationMusic()
@@ -858,7 +858,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private fun compilationMusic() {
         mediaPlayer.setOnCompletionListener(OnCompletionListener {
             Log.i("isPlayingAutoModeMain", "true${isPlaying.value}")
-            if (usbConnectionCheck() && isUsbModeOn.value) {
+            if (isNotUSBConnected.value && isUsbModeOn.value) {
                 nextTrack(1)
             } else if (isBtModeOn.value) {
                 nextTrack(1)
@@ -880,6 +880,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun nextTrack(auto: Int) {
+        Log.i("ReviewTest", "nextTrack: ")
         when (mode) {
             SourceEnum.DISK -> {
                 repeatModeListener(auto)
@@ -1054,25 +1055,43 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun updateTracks(mediaManager: MediaManager) {
-        when (_isUsbModeOn.value) {
-            true -> {
-                val result = mediaManager.getMediaFilesFromPath("sdCard")
+        Log.i("ReviewTest", "updateTracks: ")
+//        when (isUsbModeOn.value) {
+//            true -> {
+//                val result = mediaManager.getMediaFilesFromPath("sdCard")
+//                if (result is Either.Right) {
+//                    replaceAllTracks(result.r)
+//                } else {
+//                    tracks.clear()
+//                    _musicEmpty.value = true
+//                }
+//            }
+//            false -> {
+//                val result = mediaManager.getMediaFilesFromPath("storage")
+//                if (result is Either.Right) {
+//                    replaceAllTracks(result.r)
+//                } else {
+//                    tracks.clear()
+//                    _musicEmpty.value = true
+//                }
+//            }
+//        }
+        if (isUsbModeOn.value){
+            val result = mediaManager.getMediaFilesFromPath("sdCard")
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
                 } else {
                     tracks.clear()
                     _musicEmpty.value = true
                 }
-            }
-            false -> {
-                val result = mediaManager.getMediaFilesFromPath("storage")
+        } else {
+            val result = mediaManager.getMediaFilesFromPath("storage")
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
                 } else {
                     tracks.clear()
                     _musicEmpty.value = true
                 }
-            }
         }
         if(isShuffleStatus.value){
             setShuffleMode()
@@ -1096,14 +1115,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             false -> {
 
             }
-        }
-    }
-
-    fun shuffle() {
-        if (isShuffleStatus.value) {
-            Log.i("updateTracks", "updateTracks: ${tracks[0]} ")
-            tracks = tracks.shuffled().toMutableList()
-            Log.i("updateTracks", "updateTracks: ${tracks[0]} ")
         }
     }
 
@@ -1175,7 +1186,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun shuffleStatusChange() {
         _isShuffleStatus.value = !isShuffleStatus.value
         setShuffleMode()
-        //  shuffle()
     }
 
     override fun deleteFavoriteMusic() {

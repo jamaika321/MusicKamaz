@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.*
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.biozzlab.twmanager.utils.easyLog
 import ru.kamaz.music.data.MediaManager
+import ru.kamaz.music.domain.TestSettings
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.domain.GetFilesUseCase
@@ -24,23 +25,16 @@ import javax.inject.Inject
 
 class MusicFragmentViewModel @Inject constructor(
     application: Application,
+    private val testSettings: TestSettings,
     private val mediaManager: MediaManager,
     private val getMusicPosition: GetMusicPosition,
     private val getFilesUseCase: GetFilesUseCase
 ) : BaseViewModel(application), MediaPlayer.OnCompletionListener, ServiceConnection,
     MusicServiceInterface.ViewModel,MusicManagerListener {
-    private var tracks = ArrayList<Track>()
-    private var currentTrackPosition = 0
-
-    private val _btModeActivation = MutableStateFlow(false)
-    val btModeActivation = _btModeActivation.asStateFlow()
 
     val artist: StateFlow<String> by lazy {
       service.value?.getArtistName() ?: MutableStateFlow("Unknown")
     }
-
-    private val _isPlaying = MutableStateFlow(false)
-    val isPlaying = _isPlaying.asStateFlow()
 
     val isPlay : StateFlow<Boolean> by lazy {
         service.value?.isPlay() ?: MutableStateFlow(false)
@@ -65,11 +59,6 @@ class MusicFragmentViewModel @Inject constructor(
     val isNotConnected: StateFlow<Boolean> by lazy {
         service.value?.checkDeviceConnection() ?: MutableStateFlow(true)
     }
-
-    val isNotConnectedBt: StateFlow<Boolean> by lazy {
-        service.value?.checkBTConnection() ?: MutableStateFlow(true)
-    }
-
 
     val isFavoriteMusic: StateFlow<Boolean> by lazy {
         service.value?.isFavoriteMusic() ?: MutableStateFlow(true)
@@ -111,26 +100,27 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.coverId()?: MutableStateFlow("")
     }
 
-    private val _mode = MutableStateFlow("")
-    val mode = _mode.asStateFlow()
-
-
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
     val service = _service.asStateFlow()
 
     var musicPosition: StateFlow<Int> =
         getMusicPosition().stateIn(viewModelScope, SharingStarted.Lazily, 0)
 
-    private val _maxSeek = MutableStateFlow(0)
-    val maxSeek = _maxSeek.asStateFlow()
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
 
     override fun init() {
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
+        remoteNextPrevControlButton()
+
+    }
+
+    fun remoteNextPrevControlButton(){
+        testSettings.start {
+            when (it){
+                19 -> nextTrack()
+                21 -> previousTrack()
+            }
+        }
     }
 
 
@@ -165,9 +155,6 @@ class MusicFragmentViewModel @Inject constructor(
     fun appClosed() {
         service.value?.appClosed()
     }
-    fun updateTracks() {
-        service.value?.nextTrack(2)
-    }
 
     fun lastSavedState(){
         service.value?.lastSavedState()
@@ -179,7 +166,6 @@ class MusicFragmentViewModel @Inject constructor(
             MusicService.SourceEnum.AUX -> {
                 service.value?.sourceSelection(action)
             }
-
             MusicService.SourceEnum.BT -> {
                 service.value?.sourceSelection(action)
             }
@@ -200,6 +186,11 @@ class MusicFragmentViewModel @Inject constructor(
 
     override fun onCompletion(mp: MediaPlayer?) {
         nextTrack()
+    }
+
+    override fun onDestroy() {
+        testSettings.stop()
+        super.onDestroy()
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {

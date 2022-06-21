@@ -32,25 +32,20 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
     private lateinit var metaRetriver: MediaMetadataRetriever
 
 
-    fun getAllTracks(extentions: List<String>): List<File> {
-        val list = ArrayList<File>()
-        File("/sdcard").listFiles()?.filter { it.isDirectory }?.forEach {
-            list.addAll(readRecursive(it, extentions))
-        }
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun getAllTracks(): Either<None, List<Track>> {
+        val allTracks = ArrayList<Track>()
 
-        File("/sdcard").listFiles()?.filter { extentions.contains(it.extension) }?.forEach {
-            list.add(it)
+        var sdCard = scanMediaFilesInSdCard()
+        if (sdCard is Either.Right){
+            allTracks.addAll(sdCard.r)
         }
-        File("/storage").listFiles()?.filter { it.isDirectory }?.forEach {
-            list.addAll(readRecursive(it, extentions))
+        sdCard = scanMediaFilesInStorage()
+        if (sdCard is Either.Right){
+            allTracks.addAll(sdCard.r)
         }
-
-        File("/storage").listFiles()?.filter { extentions.contains(it.extension) }?.forEach {
-            list.add(it)
-        }
-        return list
+        return Either.Right(allTracks)
     }
-
 
     private fun scanMediaFilesInSdCard(): Either<None, List<Track>> {
         metaRetriver = MediaMetadataRetriever()
@@ -120,9 +115,11 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun getMediaFilesFromPath(path: String): Either<None, List<Track>> {
+        Log.i("ReviewTest", "getMediaFilesFromPath: $path ")
         return when (path) {
             "sdCard" -> scanMediaFilesInSdCard()
             "storage" -> scanMediaFilesInStorage()
+            "all" -> getAllTracks()
             else -> Either.Left(None())
         }
     }
@@ -345,12 +342,10 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 try {
                     val picture =
                         context.contentResolver.loadThumbnail(contentUri, Size(500, 350), null)
-                    albumArt = getAlbumArt(picture, title)
+                    albumArt = getAlbumArt(picture, id.toString())
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
-
-
 
                 array.add(
                     Track(

@@ -2,6 +2,8 @@ package ru.kamaz.music.di.modules
 
 import dagger.Module
 import dagger.Provides
+import ru.kamaz.music.domain.TestSettings
+import ru.kamaz.music.utils.TWSetting
 import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.*
 import ru.kamaz.music_api.interfaces.Repository
@@ -49,4 +51,9 @@ class DomainModule {
     fun provideInsertTrackList(repository: Repository): InsertTrackListToDB = InsertTrackListToDB(repository)
     @Provides
     fun provideGetTrackList(repository: Repository): GetTrackListFromDB = GetTrackListFromDB(repository)
+
+    @Provides
+    fun provideTestSettings(twSetting: TWSetting): TestSettings = TestSettings.Base(twSetting)
+    @Provides
+    fun provideTWSetting(): TWSetting = TWSetting.open()
 }

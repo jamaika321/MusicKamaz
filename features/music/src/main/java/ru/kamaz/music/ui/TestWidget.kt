@@ -16,6 +16,7 @@ import ru.kamaz.music.R
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.BaseConstants
+import ru.kamaz.music_api.models.Track
 import ru.kamaz.widget.ui.MusicWidget
 import ru.kamaz.widget.ui.base.BaseAppWidget
 import ru.sir.presentation.extensions.easyLog
@@ -29,6 +30,7 @@ class TestWidget : BaseAppWidget() {
 
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
     val service = _service.asStateFlow()
+
 
     override fun performUpdate(context: Context, appWidgetIds: IntArray?) {
         val appWidgetView = RemoteViews(context.packageName, R.layout.test_widget)
@@ -72,7 +74,7 @@ class TestWidget : BaseAppWidget() {
     fun updateTestDuration(context: Context, title: Int) {
         val appWidgetView = RemoteViews(context.packageName, R.layout.test_widget)
 
-//        appWidgetView.setTextViewText(ru.kamaz.widget.R.id.duration_widget, title)
+        appWidgetView.setTextViewText(ru.kamaz.widget.R.id.duration_widget, Track.convertDuration(title.toLong()))
 
         pushUpdate(context, null, appWidgetView)
     }

@@ -52,7 +52,11 @@ class MainListMusicFragment
     }
 
     private fun startCategoryMusic(){
-        parentFragmentManager.beginTransaction().replace(R.id.fragment, CategoryFragment()).addToBackStack("CategoryFragment").commit()
+        parentFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment, CategoryFragment())
+            .addToBackStack("CategoryFragment")
+            .commit()
     }
 
     private fun  startListAllMusic(){
@@ -64,7 +68,11 @@ class MainListMusicFragment
     }
 
     private fun startFolderListFragment(){
-        parentFragmentManager.beginTransaction().replace(R.id.fragment, FolderFragment()).addToBackStack("FolderFragment").commit()
+        parentFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment, FolderFragment())
+            .addToBackStack("FolderFragment")
+            .commit()
     }
 
 

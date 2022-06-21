@@ -242,14 +242,14 @@ class MusicFragment :
         }
 
 
-//        viewModel.isNotConnected.launchWhenStarted(lifecycleScope) {
-//            if (it) {
-//                diskModeActivation()
-//            } else {
-//                viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
-//                btModeActivation()
-//            }
-//        }
+        viewModel.isNotConnected.launchWhenStarted(lifecycleScope) {
+            if (it) {
+                diskModeActivation()
+            } else {
+                viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
+                btModeActivation()
+            }
+        }
 
         viewModel.isShuffleOn.launchWhenStarted(lifecycleScope) {
             randomSongStatus(it)
@@ -300,8 +300,8 @@ class MusicFragment :
             binding.pictureBucket.visibility = View.VISIBLE
         } else {
             Log.i("picasso", "updateackCover:${coverPath.trim()}")
-            binding.picture.visibility = View.INVISIBLE
-            binding.pictureDevice.setBackgroundResource(R.drawable.back_item)
+            binding.pictureBucket.visibility = View.INVISIBLE
+            binding.pictureDevice.setImageResource(R.drawable.music_png_bg)
         }
     }
 
