@@ -254,7 +254,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 Log.i("setShuffleMode", "setShuffleMode: ")
             }
             false -> {
-                updateTracks(mediaManager)
+//                updateTracks()
             }
         }
     }
@@ -357,8 +357,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 //        isPlaying.launchOn(lifecycleScope) {
 //            widgettest.updatePlayPauseImg(this, it)
 //        }
-
-        _musicEmpty.value = tracks.isEmpty()
         compilationMusic()
         // queryLastMusic()
     }
@@ -377,7 +375,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         _isNotUSBConnected.value = isAdded
         if (isAdded) {
             getFilesUseCase.getFiles(path)
-            startUsbMode(isAdded)
+            startUsbMode()
         } else {
             startDiskMode()
         }
@@ -490,12 +488,14 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     override fun onDeviceConnected() {
         _isNotConnected.value = false
+        Log.i("DeviceConnection", "Устройство подключено")
     }
 
 
     override fun onDeviceDisconnected() {
         _isNotConnected.value = true
-        startDiskMode()
+        Log.i("DeviceConnection", "Устройство отключено")
+//        startDiskMode()
     }
 
     inner class MyBinder : Binder() {
@@ -576,22 +576,17 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     fun startDiskMode() {
         if (!isDiskModeOn.value) {
             changeSource(2)
-            updateTracks(mediaManager)
+            updateTracks()
             nextTrack(2)
         }
     }
 
 
-
-    fun startUsbMode(usbOn: Boolean) {
-        if (usbOn) {
-            if (!isUsbModeOn.value) {
-                changeSource(3)
-                updateTracks(mediaManager)
-                nextTrack(2)
-            }
-        } else {
-            Toast.makeText(this, "Подключите USB устройство", Toast.LENGTH_SHORT).show()
+    fun startUsbMode() {
+        if (!isUsbModeOn.value) {
+            changeSource(3)
+            updateTracks()
+            nextTrack(2)
         }
     }
 
@@ -740,12 +735,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun firstOpenTrackFound(track: Track) {
-        updateTracks(mediaManager)
+        updateTracks()
         val currentTrack = track
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
     }
 
-    override fun playOrPause() : Boolean {
+    override fun playOrPause(): Boolean {
         when (mode) {
             SourceEnum.DISK -> {
                 when (isPlaying.value) {
@@ -805,7 +800,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
                 } else {
                     when (currentTrackPosition - 1) {
-                        -1 -> currentTrackPosition = tracks.size -1
+                        -1 -> currentTrackPosition = tracks.size - 1
                         else -> currentTrackPosition--
                     }
 
@@ -833,7 +828,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
             } else {
                 when (currentTrackPosition - 1) {
-                    -1 -> currentTrackPosition = tracks.size -1
+                    -1 -> currentTrackPosition = tracks.size - 1
                     else -> currentTrackPosition--
                 }
 
@@ -880,7 +875,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun nextTrack(auto: Int) {
-        Log.i("ReviewTest", "nextTrack: ")
+        Log.i("ReviewTest", "nextTrack: $auto")
         when (mode) {
             SourceEnum.DISK -> {
                 repeatModeListener(auto)
@@ -960,8 +955,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private fun restartPlaylist() {
         if (tracks.isEmpty()) {
-            when (usbConnectionCheck()) {
-                true -> startUsbMode(true)
+            when (isNotUSBConnected.value) {
+                true -> startUsbMode()
                 false -> clearTrackData()
             }
         } else {
@@ -1054,46 +1049,32 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         return channelId
     }
 
-    override fun updateTracks(mediaManager: MediaManager) {
+    override fun updateTracks() {
         Log.i("ReviewTest", "updateTracks: ")
-//        when (isUsbModeOn.value) {
-//            true -> {
-//                val result = mediaManager.getMediaFilesFromPath("sdCard")
-//                if (result is Either.Right) {
-//                    replaceAllTracks(result.r)
-//                } else {
+        when (mode) {
+            SourceEnum.USB -> {
+                val result = mediaManager.getMediaFilesFromPath("sdCard")
+                if (result is Either.Right) {
+                    replaceAllTracks(result.r)
+                    _isNotUSBConnected.value = true
+                } else {
+                    _isNotUSBConnected.value = false
+                    startDiskMode()
 //                    tracks.clear()
-//                    _musicEmpty.value = true
-//                }
-//            }
-//            false -> {
-//                val result = mediaManager.getMediaFilesFromPath("storage")
-//                if (result is Either.Right) {
-//                    replaceAllTracks(result.r)
-//                } else {
-//                    tracks.clear()
-//                    _musicEmpty.value = true
-//                }
-//            }
-//        }
-        if (isUsbModeOn.value){
-            val result = mediaManager.getMediaFilesFromPath("sdCard")
+                    _musicEmpty.value = true
+                }
+            }
+            SourceEnum.DISK -> {
+                val result = mediaManager.getMediaFilesFromPath("storage")
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
                 } else {
-                    tracks.clear()
+//                    tracks.clear()
                     _musicEmpty.value = true
                 }
-        } else {
-            val result = mediaManager.getMediaFilesFromPath("storage")
-                if (result is Either.Right) {
-                    replaceAllTracks(result.r)
-                } else {
-                    tracks.clear()
-                    _musicEmpty.value = true
-                }
+            }
         }
-        if(isShuffleStatus.value){
+        if (isShuffleStatus.value) {
             setShuffleMode()
         }
 
@@ -1146,19 +1127,17 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             }
             SourceEnum.DISK -> startDiskMode()
             SourceEnum.USB -> {
-                _isNotUSBConnected.value = usbConnectionCheck()
                 if (_isNotUSBConnected.value) {
-                    startUsbMode(true)
+                    startUsbMode()
                 } else {
-                    startUsbMode(false)
+                    startUsbMode()
                 }
             }
         }
     }
 
-    override fun usbConnectionCheck(): Boolean {
+    override fun usbConnectionCheck() {
         _isNotUSBConnected.value = mediaManager.getMediaFilesFromPath("sdCard").isRight
-        return mediaManager.getMediaFilesFromPath("sdCard").isRight
     }
 
     override fun insertTrackListToDB(tracks: List<Track>) {
@@ -1237,7 +1216,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             true -> _isPlaying.value = true
             false -> _isPlaying.value = false
         }
-        if (!isBtModeOn.value){
+        if (!isBtModeOn.value) {
             _isPlaying.value = true
         }
     }

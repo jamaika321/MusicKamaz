@@ -65,9 +65,11 @@ class TrackViewModel @Inject constructor(
     lateinit var changedListTrack : ArrayList<Track>
 
     override fun init() {
+        Log.i("ReviewTest", "TrackViewModelInit")
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
         loadDiskPlaylist()
+
 
     }
 
@@ -109,7 +111,6 @@ class TrackViewModel @Inject constructor(
     fun loadDiskPlaylist(){
         Log.i("ReviewTest", "loadDiskPlaylist: ")
         loadDiskData(None()) { it.either({  }, ::onDiskDataLoaded) }
-//        insertTrackListToDB()
     }
 
     fun loadDataFromDB(){
@@ -117,13 +118,13 @@ class TrackViewModel @Inject constructor(
     }
 
     private fun convertToRecyclerViewItems(listTrack: ArrayList<Track>){
-        var listAllTrack = findPlayingMusic(listTrack, lastMusic.value) as ArrayList<Track>
+        listTrack.findPlayingMusic(lastMusic.value)
         _itemsAll.value = listAllTrack.toRecyclerViewItems()
     }
 
     private fun onDiskDataLoaded(data: List<Track>) {
         if (data.isEmpty()) {
-            Log.d("mediaPlayer", "no")
+            Log.d("ReviewTest", "onDiskDataLoaded")
             _trackIsEmpty.value = true
             loadDiskPlaylist()
         } else {
@@ -134,11 +135,11 @@ class TrackViewModel @Inject constructor(
         convertToRecyclerViewItems(data)
     }
 
-    private fun findPlayingMusic(data: List<Track>, title:String): List<Track>{
-        for (i in data.indices){
-            data[i].playing = data[i].title == title
+    private fun List<Track>.findPlayingMusic(title:String): List<Track>{
+        for (i in this.indices){
+            this[i].playing = this[i].title == title
         }
-        return data
+        return this
     }
 
     fun onItemClick(track: Track, data: String) {

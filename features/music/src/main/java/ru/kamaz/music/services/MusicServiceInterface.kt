@@ -24,7 +24,7 @@ interface MusicServiceInterface{
         fun checkPosition(position: Int)
         fun previousTrack()
         fun nextTrack(auto:Int)/* fun updateMusic(track: Track)*/
-        fun updateTracks(mediaManager: MediaManager)
+        fun updateTracks()
         fun intMediaPlayer()
         fun sourceSelection(action: MusicService.SourceEnum)
         fun getMusicName(): StateFlow<String>
@@ -58,7 +58,7 @@ interface MusicServiceInterface{
         fun clearTrackData()
         fun appClosed()
         fun lastSavedState()
-        fun usbConnectionCheck(): Boolean
+        fun usbConnectionCheck()
         fun insertTrackListToDB(tracks: List<Track>)
     }
 

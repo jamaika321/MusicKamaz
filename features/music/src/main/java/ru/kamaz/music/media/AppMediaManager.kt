@@ -316,7 +316,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             MediaStore.Audio.Media._ID
         )
         //выбор аудио файлов
-        var selection = "${MediaStore.Audio.Media.DATA} LIKE '/storage/emulated%'"
+        var selection = "${MediaStore.Audio.Media.DATA} LIKE '/storage%'"
 
         var albumArt = File("")
 
@@ -325,7 +325,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         if (cursor != null) {
             cursor.moveToFirst()
             while (!cursor.isAfterLast) {
-
                 val artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
                 val album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
                 val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))

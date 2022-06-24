@@ -71,6 +71,10 @@ class TrackFragment() :
 
         viewModel.checkUsbConnection()
 
+        viewModel.isNotConnectedUsb.launchWhenStarted(lifecycleScope){
+            viewModel.loadDiskPlaylist()
+        }
+
         viewModel.trackIsEmpty.launchOn(lifecycleScope) {
             musicListIsEmpty(it)
         }
