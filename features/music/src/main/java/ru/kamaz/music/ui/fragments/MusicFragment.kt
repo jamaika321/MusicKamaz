@@ -88,6 +88,10 @@ class MusicFragment :
             addEvent()
         }
         binding.openListFragment.setOnClickListener {
+            when (viewModel.isUsbModeOn.value) {
+                false -> setFragmentResult("sourceEnum", bundleOf("bundleKey" to "DISK"))
+                true -> setFragmentResult("sourceEnum", bundleOf("bundleKey" to "USB"))
+            }
             navigator.navigateTo(
                 UiAction(
                     OPEN_TRACK_LIST_FRAGMENT,
@@ -242,14 +246,14 @@ class MusicFragment :
         }
 
 
-        viewModel.isNotConnected.launchWhenStarted(lifecycleScope) {
-            if (it) {
-                diskModeActivation()
-            } else {
-                viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
-                btModeActivation()
-            }
-        }
+//        viewModel.isNotConnected.launchWhenStarted(lifecycleScope) {
+//            if (it) {
+//                diskModeActivation()
+//            } else {
+//                viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
+//                btModeActivation()
+//            }
+//        }
 
         viewModel.isShuffleOn.launchWhenStarted(lifecycleScope) {
             randomSongStatus(it)
@@ -351,13 +355,12 @@ class MusicFragment :
         binding.artist.visibility = View.VISIBLE
         binding.song.visibility = View.VISIBLE
         binding.times.visibility = View.INVISIBLE
-        binding.picture.visibility = View.VISIBLE
-        binding.pictureDevice.visibility = View.INVISIBLE
+        binding.pictureDevice.visibility = View.VISIBLE
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        binding.picture.setBackgroundResource(R.drawable.bluetooth_back)
+        binding.pictureDevice.setBackgroundResource(R.drawable.bluetooth_back)
         binding.textUsb.visibility = View.INVISIBLE
 
     }

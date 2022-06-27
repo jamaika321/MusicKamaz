@@ -51,7 +51,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
-            android:autoSizeTextType="uniform"
             android:hint="MusicName"
             android:textSize="30sp"
             android:textColor="@color/white"
@@ -65,7 +64,7 @@
             android:id="@+id/artist_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:autoSizeTextType="uniform"
+            android:maxLines="1"
             android:hint="ArtistName"
             android:textSize="20sp"
             android:layout_marginBottom="20dp"
@@ -97,4 +96,3 @@
         app:layout_constraintStart_toEndOf="@+id/like"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
-

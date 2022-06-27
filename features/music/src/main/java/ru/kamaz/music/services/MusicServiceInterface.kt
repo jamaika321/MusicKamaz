@@ -1,14 +1,11 @@
 package ru.kamaz.music.services
 
 import android.content.Context
-import android.graphics.Bitmap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.kamaz.music.data.MediaManager
-import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.models.Track
-import ru.sir.core.Either
 
 
 interface MusicServiceInterface{
@@ -58,8 +55,6 @@ interface MusicServiceInterface{
         fun clearTrackData()
         fun appClosed()
         fun lastSavedState()
-        fun usbConnectionCheck()
-        fun insertTrackListToDB(tracks: List<Track>)
     }
 
     interface ViewModel{

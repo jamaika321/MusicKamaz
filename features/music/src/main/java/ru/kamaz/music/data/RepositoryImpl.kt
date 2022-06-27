@@ -25,8 +25,9 @@ class RepositoryImpl(
     private val mediaPlayer: MediaPlayer,
     private val testDBDao: MusicCache
 ) : Repository {
-    override fun loadDiskData(): Either<None, List<Track>> = media.getMediaFilesFromPath("all")
-    override fun rvArtist(): Either<None, List<Track>> = media.getMediaFilesFromPath("storage")
+    override fun loadDiskData(): Either<None, List<Track>> = media.getMediaFilesFromPath("storage", "all")
+    override fun loadUsbData(): Either<None, List<Track>> = media.getMediaFilesFromPath("sdCard", "all")
+    override fun rvArtist(): Either<None, List<Track>> = media.getMediaFilesFromPath("storage", "all")
     override fun rvPlayList(): Flow<List<PlayListModel>> = testDBDao.getAllPlayList()
     override fun rvCategory(): Either<None, List<CategoryMusicModel>> = media.getCategory()
     override fun rvFavorite(): Flow<List<FavoriteSongs>> = testDBDao.getAllFavoriteSongs()
@@ -148,27 +149,11 @@ class RepositoryImpl(
     }
 
 
-   override fun getFiles(path: String): List<File> {
+    override fun getFiles(path: String): List<File> {
         val file = File(path)
         val list = file.listFiles().toList().sorted()
         Log.i("usbMusic", "getFiles: $list")
         return (list)
-    }
-
-    override fun insertTrackList(track: List<Track>): Either<Failure, None> {
-        var trackEntity = ArrayList<TrackEntity>()
-        for (i in track.indices){
-            trackEntity.add(i, track[i].toDao())
-        }
-        return testDBDao.insertTrackList(trackEntity)
-    }
-
-    override fun getTrackList(): Either<Failure, List<Track>> {
-        var track = ArrayList<Track>()
-        for (i in testDBDao.getTrackList().indices) {
-            track.add(testDBDao.getTrackList()[i].fromDao())
-        }
-        return Either.Right(track)
     }
 
     private fun readMediaStore(media1: SourceType) {

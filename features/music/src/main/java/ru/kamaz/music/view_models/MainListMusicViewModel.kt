@@ -10,14 +10,11 @@ import android.util.Log
 import android.widget.Toast
 import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.interactor.AllFolderWithMusicRV
 import ru.kamaz.music_api.interactor.CategoryLoadRV
-import ru.kamaz.music_api.interactor.LoadDiskData
 import ru.kamaz.music_api.models.AllFolderWithMusic
 import ru.kamaz.music_api.models.CategoryMusicModel
 import ru.kamaz.music_api.models.Track
@@ -28,7 +25,6 @@ import javax.inject.Inject
 
 class MainListMusicViewModel @Inject constructor(
     application: Application,
-    private val loadData: LoadDiskData,
     private val categoryData: CategoryLoadRV,
     private val rvAllFolderWithMusic: AllFolderWithMusicRV
 ) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel {
@@ -71,11 +67,12 @@ class MainListMusicViewModel @Inject constructor(
 
     override fun init() {
         _isLoading.value = true
-        loadData(None()) { it.either({}, ::onDataLoaded) }
         categoryData(None()) { it.either({}, ::onCategoryLoaded) }
         rvAllFolderWithMusic(None()) { it.either({}, ::onAllFolderWithMusic) }
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
+
+        Log.i("ReviewTest_MainListVM", "init")
     }
 
     private fun onDataLoaded(data: List<Track>) {

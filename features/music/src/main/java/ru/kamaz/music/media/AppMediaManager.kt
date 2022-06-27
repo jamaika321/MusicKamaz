@@ -36,7 +36,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
     fun getAllTracks(): Either<None, List<Track>> {
         val allTracks = ArrayList<Track>()
 
-        var sdCard = scanMediaFilesInSdCard()
+        var sdCard = scanMediaFilesInSdCard("all")
         if (sdCard is Either.Right){
             allTracks.addAll(sdCard.r)
         }
@@ -47,7 +47,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         return Either.Right(allTracks)
     }
 
-    private fun scanMediaFilesInSdCard(): Either<None, List<Track>> {
+    private fun scanMediaFilesInSdCard(mode: String): Either<None, List<Track>> {
         metaRetriver = MediaMetadataRetriever()
 
         val listWithTrackData = ArrayList<Track>()
@@ -55,25 +55,50 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
         if (trackPaths is Either.Right)
         {
-            for (i in 0 until trackPaths.r.size){
-                metaRetriver.setDataSource(trackPaths.r[i])
+            if (mode == "all") {
+                for (i in 0 until trackPaths.r.size) {
+                    metaRetriver.setDataSource(trackPaths.r[i])
 
-                val artist = metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST)) ?: ("unknown")
-                val album = metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))?: ("unknown")
-                val title = metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE))?: ("unknown")
-                val duration = metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))?.toLong() ?: (180)
-                val albumArtist = metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST))?: ("unknown")
-                val data = trackPaths.r[i]
+                    val artist =
+                        metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST))
+                            ?: ("unknown")
+                    val album =
+                        metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))
+                            ?: ("unknown")
+                    val title =
+                        metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE))
+                            ?: ("unknown")
+                    val duration =
+                        metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
+                            ?.toLong() ?: (180)
+                    val albumArtist =
+                        metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST))
+                            ?: ("unknown")
+                    val data = trackPaths.r[i]
 
+                    listWithTrackData.add(
+                        Track(
+                            Random.nextLong(),
+                            title,
+                            artist,
+                            data,
+                            duration,
+                            album,
+                            ""
+                        )
+                    )
+                }
+            } else {
+                metaRetriver.setDataSource(trackPaths.r[0])
                 listWithTrackData.add(
                     Track(
                         Random.nextLong(),
-                        title,
-                        artist,
-                        data,
-                        duration,
-                        album,
-                        ""
+                        "unknown",
+                        "unknown",
+                        "unknown",
+                        Random.nextLong(),
+                        "unknown",
+                        "unknown",
                     )
                 )
             }
@@ -114,10 +139,10 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    override fun getMediaFilesFromPath(path: String): Either<None, List<Track>> {
+    override fun getMediaFilesFromPath(path: String, mode: String): Either<None, List<Track>> {
         Log.i("ReviewTest", "getMediaFilesFromPath: $path ")
         return when (path) {
-            "sdCard" -> scanMediaFilesInSdCard()
+            "sdCard" -> scanMediaFilesInSdCard(mode)
             "storage" -> scanMediaFilesInStorage()
             "all" -> getAllTracks()
             else -> Either.Left(None())
@@ -316,7 +341,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             MediaStore.Audio.Media._ID
         )
         //выбор аудио файлов
-        var selection = "${MediaStore.Audio.Media.DATA} LIKE '/storage%'"
+        var selection = "${MediaStore.Audio.Media.DATA} LIKE '/storage/emul%'"
 
         var albumArt = File("")
 

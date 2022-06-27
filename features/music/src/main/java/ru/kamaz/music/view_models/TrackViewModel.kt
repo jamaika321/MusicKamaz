@@ -7,30 +7,28 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
-import android.widget.Toast
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.domain.GetFilesUseCase
-import ru.kamaz.music_api.interactor.GetTrackListFromDB
 import ru.kamaz.music_api.interactor.LoadDiskData
+import ru.kamaz.music_api.interactor.LoadUsbData
 import ru.kamaz.music_api.models.Track
-import ru.sir.core.Either
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseViewModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 class TrackViewModel @Inject constructor(
     application: Application,
-    private val loadTrackList: GetTrackListFromDB,
     private val loadDiskData: LoadDiskData,
+    private val loadUsbData: LoadUsbData,
     private val getFilesUseCase: GetFilesUseCase
 ) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel, MusicManagerListener{
 
@@ -47,9 +45,12 @@ class TrackViewModel @Inject constructor(
     private val _trackIsEmpty = MutableStateFlow(false)
     val trackIsEmpty = _trackIsEmpty.asStateFlow()
 
-    val isNotConnectedUsb: StateFlow<Boolean> by lazy {
-        service.value?.checkUSBConnection() ?: MutableStateFlow(false)
+    val isUsbModeOn: StateFlow<Boolean> by lazy {
+        service.value?.usbModeOn() ?: MutableStateFlow(false)
     }
+
+    private val _sourceEnum = MutableStateFlow("DISK")
+    var sourceEnum = _sourceEnum.asStateFlow()
 
     private val _lastMusic = MutableStateFlow("")
     val lastMusic = _lastMusic
@@ -68,15 +69,12 @@ class TrackViewModel @Inject constructor(
         Log.i("ReviewTest", "TrackViewModelInit")
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
-        loadDiskPlaylist()
-
-
     }
 
     fun lastMusic(title: String){
         _lastMusic.value = title
         if (itemsAll.value.isEmpty()){
-            loadDataFromDB()
+            loadDiskPlaylist()
         }else{
             convertToRecyclerViewItems(changedListTrack)
         }
@@ -104,29 +102,30 @@ class TrackViewModel @Inject constructor(
         convertToRecyclerViewItems(filterRecyclerList(music, listAllTrack))
     }
 
-    fun checkUsbConnection(){
-        service.value?.usbConnectionCheck()
-    }
-
     fun loadDiskPlaylist(){
         Log.i("ReviewTest", "loadDiskPlaylist: ")
-        loadDiskData(None()) { it.either({  }, ::onDiskDataLoaded) }
+        when(sourceEnum.value){
+            "USB"-> loadUsbData(None()) { it.either({  }, ::onDiskDataLoaded) }
+            "DISK"-> loadDiskData(None()) { it.either({  }, ::onDiskDataLoaded) }
+        }
     }
 
-    fun loadDataFromDB(){
-        loadTrackList(None()) { it.either({  }, ::onDiskDataLoaded)}
+    fun changeSource(sourceEnum: String){
+        when (sourceEnum) {
+            "USB" -> _sourceEnum.value = "USB"
+            "DISK" -> _sourceEnum.value = "DISK"
+        }
     }
 
     private fun convertToRecyclerViewItems(listTrack: ArrayList<Track>){
         listTrack.findPlayingMusic(lastMusic.value)
-        _itemsAll.value = listAllTrack.toRecyclerViewItems()
+        _itemsAll.value = listTrack.toRecyclerViewItems()
     }
 
     private fun onDiskDataLoaded(data: List<Track>) {
         if (data.isEmpty()) {
             Log.d("ReviewTest", "onDiskDataLoaded")
             _trackIsEmpty.value = true
-            loadDiskPlaylist()
         } else {
             _trackIsEmpty.value = false
         }
@@ -159,15 +158,6 @@ class TrackViewModel @Inject constructor(
         return newList
     }
 
-    override fun onPause() {
-        insertTrackListToDB()
-        super.onPause()
-    }
-
-    fun insertTrackListToDB(){
-        Log.i("ReviewTest", "insertTrackListToDB: ")
-        service.value?.insertTrackListToDB(listAllTrack)
-    }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Log.d("testPlayTrack", "onServiceConnected")

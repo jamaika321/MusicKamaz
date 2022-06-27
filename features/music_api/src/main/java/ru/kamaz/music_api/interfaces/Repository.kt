@@ -11,6 +11,7 @@ import java.io.File
 interface Repository: PathManager, SourceManager {
     fun getMusicDurationFlow(): Flow<Int>
     fun loadDiskData(): Either<None, List<Track>>
+    fun loadUsbData(): Either<None, List<Track>>
     fun rvArtist(): Either<None, List<Track>>
     fun rvPlayList():Flow<List<PlayListModel>>
     fun rvCategory():Either<None,List<CategoryMusicModel>>
@@ -29,9 +30,6 @@ interface Repository: PathManager, SourceManager {
     suspend fun rootFilesFromSource(source: SourceType):List<File>
     fun getFiles(path: String): List<File>
  //suspend fun getFilesFromDirectory(path: String): List<File
-
-    fun insertTrackList(track: List<Track>): Either<Failure, None>
-    fun getTrackList(): Either<Failure, List<Track>>
 
 
 }

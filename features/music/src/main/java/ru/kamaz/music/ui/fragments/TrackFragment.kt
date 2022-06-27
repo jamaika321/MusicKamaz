@@ -1,7 +1,6 @@
 package ru.kamaz.music.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,10 +49,24 @@ class TrackFragment() :
 
     private fun initServiceVars(){
         changeRVItems()
+        viewModel.isUsbModeOn.launchOn(lifecycleScope){
+            if (it){
+                viewModel.changeSource("USB")
+            } else {
+                viewModel.changeSource("DISK")
+            }
+            viewModel.loadDiskPlaylist()
+        }
 
         setFragmentResultListener("lastMusic") { key, bundle ->
             val result = bundle.getString("bundleKey")
             if (!result.isNullOrEmpty())  viewModel.lastMusic.value = result
+        }
+        setFragmentResultListener("sourceEnum") { key, bundle ->
+            when (bundle.getString("bundleKey")){
+                "USB" -> viewModel.changeSource("USB")
+                "DISK" -> viewModel.changeSource("DISK")
+            }
         }
 
 
@@ -68,12 +81,6 @@ class TrackFragment() :
                 super.onScrolled(recyclerView, dx, dy)
             }
         })
-
-        viewModel.checkUsbConnection()
-
-        viewModel.isNotConnectedUsb.launchWhenStarted(lifecycleScope){
-            viewModel.loadDiskPlaylist()
-        }
 
         viewModel.trackIsEmpty.launchOn(lifecycleScope) {
             musicListIsEmpty(it)

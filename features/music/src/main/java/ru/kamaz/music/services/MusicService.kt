@@ -33,7 +33,6 @@ import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.biozzlab.twmanager.managers.BluetoothManager
 import ru.biozzlab.twmanager.managers.MusicManager
-import ru.biozzlab.twmanager.servers.BluetoothServerConnector
 import ru.kamaz.music.cache.db.dao.Playback
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
@@ -45,7 +44,6 @@ import ru.kamaz.music_api.BaseConstants.ACTION_PREV
 import ru.kamaz.music_api.BaseConstants.ACTION_TOGGLE_PAUSE
 import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
 import ru.kamaz.music_api.BaseConstants.EXTRA_APP_WIDGET_NAME
-import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.SourceType
 import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.*
@@ -53,7 +51,6 @@ import ru.kamaz.music_api.models.FavoriteSongs
 import ru.kamaz.music_api.models.HistorySongs
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
-import ru.sir.core.None
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.extensions.launchOn
 import java.io.BufferedReader
@@ -94,9 +91,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     lateinit var deleteFavoriteMusic: DeleteFavoriteMusic
 
     @Inject
-    lateinit var insertTrackListToDB: InsertTrackListToDB
-
-    @Inject
     lateinit var getFilesUseCase: GetFilesUseCase
 
     val twManager = BluetoothManager()
@@ -130,15 +124,11 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     private var tracks = mutableListOf<Track>()
 
-//    private var usbTracks = mutableListOf<Track>()
-
     private var files = mutableListOf<File>()
 
-    private var randomTracks = ArrayList<Track>()
+    private var randomTracks = mutableListOf<Track>()
 
     private val binder = MyBinder()
-
-    private var likeTrack = ArrayList<FavoriteSongs>()
 
     private var mode = SourceEnum.DISK
 
@@ -250,11 +240,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     fun setShuffleMode() {
         when (isShuffleStatus.value) {
             true -> {
-                ShuffleHelper.makeShuffleList(tracks, currentTrackPosition)
-                Log.i("setShuffleMode", "setShuffleMode: ")
+                randomTracks = tracks
+                tracks.shuffle()
+//                ShuffleHelper.makeShuffleList(tracks, currentTrackPosition)
             }
             false -> {
-//                updateTracks()
+                tracks = randomTracks
             }
         }
     }
@@ -374,7 +365,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         Log.i("USBstatus", "onUsbStatusChanged:$path ")
         _isNotUSBConnected.value = isAdded
         if (isAdded) {
-            getFilesUseCase.getFiles(path)
+//            getFilesUseCase.getFiles(path)
             startUsbMode()
         } else {
             startDiskMode()
@@ -566,7 +557,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
 
     fun startBtMode() {
-        if (!btModeOn().value) {
+        if (!isBtModeOn.value) {
             changeSource(1)
             stopMediaPlayer()
             startBtListener()
@@ -652,6 +643,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     fun startBtListener() {
         onBluetoothMusicDataChanged("Name", "Artist")
         playOrPause()
+        _cover.value = ""
     }
 
     fun startMusicListener() {
@@ -853,6 +845,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private fun compilationMusic() {
         mediaPlayer.setOnCompletionListener(OnCompletionListener {
             Log.i("isPlayingAutoModeMain", "true${isPlaying.value}")
+            checkUsb()
             if (isNotUSBConnected.value && isUsbModeOn.value) {
                 nextTrack(1)
             } else if (isBtModeOn.value) {
@@ -863,6 +856,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                 startDiskMode()
             }
         })
+    }
+
+    private fun checkUsb(){
+        _isNotUSBConnected.value = mediaManager.getMediaFilesFromPath("sdCard", "one").isRight
     }
 
     private fun initMediaPlayer() {
@@ -1053,23 +1050,23 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         Log.i("ReviewTest", "updateTracks: ")
         when (mode) {
             SourceEnum.USB -> {
-                val result = mediaManager.getMediaFilesFromPath("sdCard")
+                val result = mediaManager.getMediaFilesFromPath("sdCard", "all")
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
                     _isNotUSBConnected.value = true
+                    _musicEmpty.value = false
                 } else {
                     _isNotUSBConnected.value = false
-                    startDiskMode()
-//                    tracks.clear()
                     _musicEmpty.value = true
+                    startDiskMode()
                 }
             }
             SourceEnum.DISK -> {
-                val result = mediaManager.getMediaFilesFromPath("storage")
+                val result = mediaManager.getMediaFilesFromPath("storage", "all")
                 if (result is Either.Right) {
                     replaceAllTracks(result.r)
+                    _musicEmpty.value = false
                 } else {
-//                    tracks.clear()
                     _musicEmpty.value = true
                 }
             }
@@ -1133,16 +1130,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
                     startUsbMode()
                 }
             }
-        }
-    }
-
-    override fun usbConnectionCheck() {
-        _isNotUSBConnected.value = mediaManager.getMediaFilesFromPath("sdCard").isRight
-    }
-
-    override fun insertTrackListToDB(tracks: List<Track>) {
-        CoroutineScope(Dispatchers.IO).launch {
-            insertTrackListToDB.run(InsertTrackListToDB.Params(tracks))
         }
     }
 
