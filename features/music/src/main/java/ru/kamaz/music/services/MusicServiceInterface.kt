@@ -36,7 +36,6 @@ interface MusicServiceInterface{
         fun auxModeOn():StateFlow<Boolean>
         fun diskModeOn():StateFlow<Boolean>
         fun usbModeOn():StateFlow<Boolean>
-        fun usbConnect():StateFlow<Boolean>
         fun howModeNow():Int
         fun dialogFragment():StateFlow<Boolean>
         fun musicEmpty():StateFlow<Boolean>
@@ -49,12 +48,11 @@ interface MusicServiceInterface{
         fun getRepeat(): StateFlow<Int>
         fun changeRepeatMode()
         fun isShuffleOn(): StateFlow<Boolean>
-        fun changeRv(): StateFlow<Int>
-        fun isChangeRv()
         fun initTrack(track: Track, data1: String)
         fun clearTrackData()
         fun appClosed()
         fun lastSavedState()
+        fun checkUsb()
     }
 
     interface ViewModel{

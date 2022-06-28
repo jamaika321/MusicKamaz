@@ -217,16 +217,8 @@ class CategoryViewModel @Inject constructor(
         return newList
     }
 
-
-
-
     private fun onCategoryLoaded(category: List<CategoryMusicModel>) {
         _huitems.value = category.toRecyclerViewItemsCategory()
         _itemClick.value = true
     }
-
-    /* private fun  onFavoriteLoaded(favorite: List<FavoriteSongs>){
-         _favorite.value = favorite.toRecyclerViewItemsFavorite()
-     }
- */
 }

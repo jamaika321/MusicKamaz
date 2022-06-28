@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.flow.StateFlow
 import ru.kamaz.music.databinding.FragmentCategoryMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.domain.GlobalConstants
@@ -18,11 +20,11 @@ import ru.kamaz.music.view_models.music_category.CategoryViewModel
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseFragment
 import ru.sir.presentation.base.recycler_view.RecyclerViewAdapter
+import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
 import ru.sir.presentation.extensions.launchWhenStarted
 import ru.sir.presentation.navigation.UiAction
 
-class CategoryFragment :
-    BaseFragment<CategoryViewModel, FragmentCategoryMusicBinding>(CategoryViewModel::class.java) {
+class CategoryFragment : BaseFragment<CategoryViewModel, FragmentCategoryMusicBinding>(CategoryViewModel::class.java) {
     override fun inject(app: BaseApplication) {
         app.getComponent<MusicComponent>().inject(this)
     }
@@ -48,9 +50,6 @@ class CategoryFragment :
         Log.i("category2", "initVars: ")
     }
 
-    override fun setListeners() {
-        super.setListeners()
-    }
     fun clickListener(id: Int) {
         Log.i("category2", "initVars:$id ")
         when (id) {
@@ -65,13 +64,17 @@ class CategoryFragment :
                 binding.rvCategory.adapter = recyclerViewAdapterGenres()
             }
             3 -> {
+                Log.i("ReviewTest_binddata", " 3button pressed ")
                 binding.rvCategory.adapter = recyclerViewAdapterAlbums()
             }
             4 -> {
-                binding.rvCategory.adapter = recyclerViewAdapterPlayList()
+                Log.i("ReviewTest_binddata", " 4button pressed ")
+                binding.rvCategory.adapter = recyclerViewAdapterFavorite()
+
             }
             5->{
-                binding.rvCategory.adapter = recyclerViewAdapterFavorite()
+                Log.i("ReviewTest_binddata", " 5button pressed ")
+                binding.rvCategory.adapter = recyclerViewAdapterPlayList()
             }
 
         }
@@ -101,7 +104,12 @@ class CategoryFragment :
         )
     }
 
-    private fun  recyclerViewAdapter2() = RecyclerViewAdapter.Builder(this, viewModel.huitems)
+    private fun getFavoritePlayList(){
+
+    }
+
+
+    private fun recyclerViewAdapter2() = RecyclerViewAdapter.Builder(this, viewModel.huitems)
         .addProducer(MusicCategoryViewHolder())
         .build { it }
 

@@ -174,7 +174,11 @@ class MusicFragmentViewModel @Inject constructor(
                 service.value?.sourceSelection(action)
             }
             MusicService.SourceEnum.USB -> {
-                service.value?.sourceSelection(action)
+                service.value?.checkUsb()
+                when(isNotConnectedUsb.value){
+                    true -> service.value?.sourceSelection(action)
+                    false -> Toast.makeText(context, "Файлы не найдены", Toast.LENGTH_LONG).show()
+                }
             }
         }
 

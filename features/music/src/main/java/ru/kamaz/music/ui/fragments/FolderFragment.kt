@@ -28,10 +28,6 @@ class FolderFragment:BaseFragment<ListViewModel, FragmentListBinding>(ListViewMo
         savedInstanceState: Bundle?
     )= FragmentListBinding.inflate(inflater, container, false)
 
-    override fun setListeners() {
-        super.setListeners()
-    }
-
     override fun onDestroy() {
         Log.i("fragmentState", "onDestroy:FolderFragment ")
         super.onDestroy()
@@ -45,6 +41,7 @@ class FolderFragment:BaseFragment<ListViewModel, FragmentListBinding>(ListViewMo
         binding.folderWithMusicRv.layoutManager = GridLayoutManager(context, 5)
         binding.folderWithMusicRv.adapter = recyclerViewAdapter()
     }
+
 
 
 

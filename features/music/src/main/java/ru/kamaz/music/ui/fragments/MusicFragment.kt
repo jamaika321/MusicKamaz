@@ -285,7 +285,7 @@ class MusicFragment :
             if (it) dialog()
         }
 
-        viewModel.lastMusic.launchWhenStarted(lifecycleScope){
+        viewModel.lastMusic.launchWhenStarted(lifecycleScope) {
             setFragmentResult("lastMusic", bundleOf("bundleKey" to it))
         }
     }
@@ -298,7 +298,7 @@ class MusicFragment :
                 .into(binding.picture)
             Picasso.with(context)
                 .load(Uri.fromFile(File(coverPath.trim())))
-                .transform(BlurTransformation(context, 40,2))
+                .transform(BlurTransformation(context, 40, 2))
                 .resize(1100, 600)
                 .into(binding.pictureDevice)
             binding.pictureBucket.visibility = View.VISIBLE
@@ -342,32 +342,40 @@ class MusicFragment :
 
 
     fun btModeActivation() {
-        binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        //Invisible
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
         binding.controlPanel.repeat.visibility = View.INVISIBLE
         binding.controlPanel.rotate.visibility = View.INVISIBLE
         binding.controlPanel.like.visibility = View.INVISIBLE
         binding.controlPanel.addToFolder.visibility = View.INVISIBLE
-        binding.controlPanel.playPause.visibility = View.VISIBLE
         binding.openListFragment.visibility = View.INVISIBLE
-        binding.seek.visibility = View.INVISIBLE
+        binding.seekLayout.visibility = View.INVISIBLE
+        binding.times.visibility = View.INVISIBLE
+        binding.textUsb.visibility = View.INVISIBLE
+        //Visible
+        binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        binding.controlPanel.playPause.visibility = View.VISIBLE
         binding.nextPrev.visibility = View.VISIBLE
         binding.artist.visibility = View.VISIBLE
         binding.song.visibility = View.VISIBLE
-        binding.times.visibility = View.INVISIBLE
         binding.pictureDevice.visibility = View.VISIBLE
+        //Background
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        binding.pictureDevice.setBackgroundResource(R.drawable.bluetooth_back)
-        binding.textUsb.visibility = View.INVISIBLE
+        binding.pictureDevice.setImageResource(R.drawable.bluetooth_back)
+        binding.musicButtons.setBackgroundResource(R.color.test2)
+        binding.artist.setBackgroundResource(R.color.test2)
 
     }
 
     fun diskModeActivation() {
-        binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        //Invisible
+        binding.textUsb.visibility = View.INVISIBLE
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
+        //Visible
+        binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
         binding.controlPanel.addToFolder.visibility = View.VISIBLE
         binding.controlPanel.repeat.visibility = View.VISIBLE
         binding.controlPanel.rotate.visibility = View.VISIBLE
@@ -375,23 +383,28 @@ class MusicFragment :
         binding.controlPanel.playPause.visibility = View.VISIBLE
         binding.openListFragment.visibility = View.VISIBLE
         binding.controlPanel.addToFolder.visibility = View.VISIBLE
-        binding.seek.visibility = View.VISIBLE
+        binding.seekLayout.visibility = View.VISIBLE
         binding.nextPrev.visibility = View.VISIBLE
         binding.artist.visibility = View.VISIBLE
         binding.song.visibility = View.VISIBLE
         binding.times.visibility = View.VISIBLE
+        binding.picture.visibility = View.VISIBLE
+        binding.pictureDevice.visibility = View.VISIBLE
+        //Background
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        binding.picture.visibility = View.VISIBLE
-        binding.pictureDevice.visibility = View.VISIBLE
-        binding.pictureDevice.setBackgroundResource(R.drawable.music_png_bg)
-        binding.textUsb.visibility = View.INVISIBLE
+        binding.pictureDevice.setImageResource(R.drawable.music_png_bg)
+        binding.musicButtons.setBackgroundResource(R.color.blurred_black_background)
+        binding.artist.setBackgroundResource(R.drawable.black_gradient)
     }
 
     fun auxModeActivation() {
+        //Visible
+        binding.picture.visibility = View.VISIBLE
         binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        //Invisible
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
         binding.controlPanel.repeat.visibility = View.INVISIBLE
         binding.controlPanel.rotate.visibility = View.INVISIBLE
@@ -404,20 +417,23 @@ class MusicFragment :
         binding.artist.visibility = View.INVISIBLE
         binding.song.visibility = View.INVISIBLE
         binding.times.visibility = View.INVISIBLE
-        binding.picture.visibility = View.VISIBLE
         binding.pictureDevice.visibility = View.INVISIBLE
+        binding.textUsb.visibility = View.INVISIBLE
+        //Background
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        binding.picture.setBackgroundResource(R.drawable.auxx)
-        binding.textUsb.visibility = View.INVISIBLE
+        binding.picture.setImageResource(R.drawable.auxx)
 
     }
 
     fun usbModeActivation() {
-        binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        //Invisible
+        binding.picture.visibility = View.INVISIBLE
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
+        //Visible
+        binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
         binding.controlPanel.addToFolder.visibility = View.VISIBLE
         binding.controlPanel.repeat.visibility = View.VISIBLE
         binding.controlPanel.rotate.visibility = View.VISIBLE
@@ -425,19 +441,21 @@ class MusicFragment :
         binding.controlPanel.playPause.visibility = View.VISIBLE
         binding.openListFragment.visibility = View.VISIBLE
         binding.controlPanel.addToFolder.visibility = View.VISIBLE
-        binding.seek.visibility = View.VISIBLE
+        binding.seekLayout.visibility = View.VISIBLE
         binding.nextPrev.visibility = View.VISIBLE
         binding.artist.visibility = View.VISIBLE
         binding.song.visibility = View.VISIBLE
         binding.times.visibility = View.VISIBLE
         binding.textUsb.visibility = View.VISIBLE
         binding.pictureDevice.visibility = View.VISIBLE
-        binding.picture.visibility = View.INVISIBLE
+        //Background
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
-        binding.pictureDevice.setBackgroundResource(R.drawable.music_png_bg)
+        binding.pictureDevice.setImageResource(R.drawable.music_png_bg)
+        binding.musicButtons.setBackgroundResource(R.color.blurred_black_background)
+        binding.artist.setBackgroundResource(R.drawable.black_gradient)
     }
 
 

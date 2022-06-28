@@ -62,6 +62,11 @@ abstract class BaseFragment<T : BaseViewModel, B : ViewBinding>(private val type
         onBackPressedCallback.isEnabled = enable
     }
 
+    override fun onDestroy() {
+        lifecycle.removeObserver(viewModel)
+        super.onDestroy()
+    }
+
 
     protected fun hideKeyBoard() {
         activity?.currentFocus?.let { view ->

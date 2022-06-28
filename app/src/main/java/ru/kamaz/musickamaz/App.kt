@@ -1,6 +1,7 @@
 package ru.kamaz.musickamaz
 
 
+import leakcanary.LeakCanary
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.di.modules.CacheModule
 import ru.kamaz.musickamaz.di.components.AppComponent
@@ -25,11 +26,10 @@ class App : BaseApplication() {
     override fun onCreate() {
         super.onCreate()
         initAppComponent()
+
     }
 
     private fun initAppComponent() {
         appComponent = DaggerAppComponent.builder().build()
-
     }
-
 }

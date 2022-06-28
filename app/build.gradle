@@ -69,5 +69,6 @@ dependencies {
     implementation dagger
     kapt daggerCompiler
 
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 
 }

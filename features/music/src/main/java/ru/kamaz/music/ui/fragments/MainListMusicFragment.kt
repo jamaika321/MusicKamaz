@@ -55,7 +55,6 @@ class MainListMusicFragment
         parentFragmentManager
             .beginTransaction()
             .replace(R.id.fragment, CategoryFragment())
-            .addToBackStack("CategoryFragment")
             .commit()
     }
 
@@ -63,7 +62,6 @@ class MainListMusicFragment
         parentFragmentManager
             .beginTransaction()
             .replace(R.id.fragment, TrackFragment())
-            .addToBackStack("TrackFragment")
             .commit()
     }
 
@@ -71,7 +69,6 @@ class MainListMusicFragment
         parentFragmentManager
             .beginTransaction()
             .replace(R.id.fragment, FolderFragment())
-            .addToBackStack("FolderFragment")
             .commit()
     }
 

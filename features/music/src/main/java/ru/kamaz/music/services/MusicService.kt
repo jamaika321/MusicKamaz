@@ -152,15 +152,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private val _isPlaying = MutableStateFlow<Boolean>(false)
     val isPlaying = _isPlaying.asStateFlow()
 
-    private val _btPlaying = MutableStateFlow<Boolean>(false)
-    val btPlaying = _btPlaying.asStateFlow()
-
-    private val _buttonStateSaved = MutableStateFlow<Boolean>(false)
-    val buttonStateSaved = _buttonStateSaved.asStateFlow()
-
-    private val _rvChange = MutableStateFlow(0)
-    val rvChange = _rvChange.asStateFlow()
-
     private val _isAuxModeOn = MutableStateFlow<Boolean>(false)
     val isAuxModeOn = _isAuxModeOn.asStateFlow()
 
@@ -218,12 +209,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     private val _lastMusic = MutableStateFlow("")
     val lastMusic = _lastMusic.asStateFlow()
 
-    private val _tickFlow = MutableSharedFlow<Unit>(replay = 0)
-    val tickFlow: MutableSharedFlow<Unit> = _tickFlow
-
-    private val _maxSeek = MutableStateFlow(0)
-    val maxSeek = _maxSeek.asStateFlow()
-
     private val _isFavorite = MutableStateFlow<Boolean>(false)
     val isFavorite = _isFavorite.asStateFlow()
 
@@ -251,30 +236,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
 
-    private val scopeIO = CoroutineScope(Dispatchers.IO + Job())
-    private fun getRootFilesFromSource(source: SourceType = SourceType.DEVICE) {
-        scopeIO.launch {
-            getFilesUseCase.getFilesFromSource(source).let {
-                Log.i("UsbfileList", "getRootFilesFromSource $it")
-                files.addAll(it)
-                withContext(Dispatchers.Main) {
-
-                }
-            }
-        }
-    }
-
-
     override fun getMusicName(): StateFlow<String> = title
     override fun getArtistName(): StateFlow<String> = artist
     override fun getRepeat(): StateFlow<Int> = repeatHowNow
     override fun getMusicDuration(): StateFlow<Int> = duration
     override fun isFavoriteMusic(): StateFlow<Boolean> = isFavorite
     override fun isShuffleOn(): StateFlow<Boolean> = isShuffleStatus
-    override fun changeRv(): StateFlow<Int> = rvChange
-    override fun isChangeRv() {
-        _rvChange.value = 4
-    }
 
     override fun checkDeviceConnection(): StateFlow<Boolean> = isNotConnected
     override fun checkUSBConnection(): StateFlow<Boolean> = isNotUSBConnected
@@ -284,7 +251,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun auxModeOn(): StateFlow<Boolean> = isAuxModeOn
     override fun diskModeOn(): StateFlow<Boolean> = isDiskModeOn
     override fun usbModeOn(): StateFlow<Boolean> = isUsbModeOn
-    override fun usbConnect(): StateFlow<Boolean> = isNotUSBConnected
     override fun howModeNow(): Int = 2
     override fun isPlay(): StateFlow<Boolean> = isPlaying
     override fun lastMusic(): StateFlow<String> = lastMusic
@@ -345,9 +311,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             widgettest.updatePlayPauseImg(this, it)
         }
 
-//        isPlaying.launchOn(lifecycleScope) {
-//            widgettest.updatePlayPauseImg(this, it)
-//        }
         compilationMusic()
         // queryLastMusic()
     }
@@ -370,23 +333,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         } else {
             startDiskMode()
         }
-    }
-
-    private fun queryLastMusic() {
-//        CoroutineScope(Dispatchers.IO).launch {
-//
-//            val it = queryLastMusic.run(None())
-//
-//            it.either({
-//
-//            }, {
-//                (if (it.isEmpty()) initTrack(
-//                    tracks[currentTrackPosition],
-//                    data.value
-//                ) else checkCurrentPosition(it))
-//
-//            })
-//        }
     }
 
     private fun queryFavoriteMusic() {
@@ -635,7 +581,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun appClosed() {
-//        stopMediaPlayer()
+        stopMediaPlayer()
         twManager.stopMonitoring(applicationContext)
 //        twManagerMusic.close()
     }
@@ -858,7 +804,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         })
     }
 
-    private fun checkUsb(){
+    override fun checkUsb(){
         _isNotUSBConnected.value = mediaManager.getMediaFilesFromPath("sdCard", "one").isRight
     }
 
@@ -1047,6 +993,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun updateTracks() {
+
         Log.i("ReviewTest", "updateTracks: ")
         when (mode) {
             SourceEnum.USB -> {
@@ -1082,20 +1029,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         tracks.addAll(trackList)
         _musicEmpty.value = tracks.isEmpty()
     }
-
-    fun updateUsbTracks() {
-        when (_isUsbModeOn.value) {
-            true -> {
-                val result = getFilesUseCase.getFiles("/storage/usbdisk0")
-                files.addAll(result)
-                Log.i("result", "updateUsbTracks: $result")
-            }
-            false -> {
-
-            }
-        }
-    }
-
 
     override fun intMediaPlayer() {
         Log.d(TAG, "init")
