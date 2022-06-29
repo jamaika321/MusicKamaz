@@ -52,8 +52,7 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
                 .into(binding.image)
         }
         if (image.value == ""){
-            binding.image.setBackgroundResource(R.drawable.back_item)
-            binding.image.setBackgroundResource(R.drawable.music_png_bg)
+            binding.image.setImageResource(R.drawable.music_png_bg)
         }
 
         binding.root.setOnClickListener {

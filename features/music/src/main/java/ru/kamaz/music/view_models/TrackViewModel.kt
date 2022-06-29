@@ -8,10 +8,13 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.launch
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
@@ -28,8 +31,7 @@ import javax.inject.Inject
 class TrackViewModel @Inject constructor(
     application: Application,
     private val loadDiskData: LoadDiskData,
-    private val loadUsbData: LoadUsbData,
-    private val getFilesUseCase: GetFilesUseCase
+    private val loadUsbData: LoadUsbData
 ) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel, MusicManagerListener{
 
     companion object {
@@ -74,7 +76,7 @@ class TrackViewModel @Inject constructor(
     fun lastMusic(title: String){
         _lastMusic.value = title
         if (itemsAll.value.isEmpty()){
-            loadDiskPlaylist()
+            loadDiskPlaylist("5")
         }else{
             convertToRecyclerViewItems(changedListTrack)
         }
@@ -102,19 +104,25 @@ class TrackViewModel @Inject constructor(
         convertToRecyclerViewItems(filterRecyclerList(music, listAllTrack))
     }
 
-    fun loadDiskPlaylist(){
+    fun loadDiskPlaylist(mode: String){
         Log.i("ReviewTest", "loadDiskPlaylist: ")
-        when(sourceEnum.value){
-            "USB"-> loadUsbData(None()) { it.either({  }, ::onDiskDataLoaded) }
-            "DISK"-> loadDiskData(None()) { it.either({  }, ::onDiskDataLoaded) }
+//        when(sourceEnum.value){
+//            "USB"-> loadUsbData(mode) { it.either({  }, ::onDiskDataLoaded) }
+//            "DISK"-> loadDiskData(mode) { it.either({  }, ::onDiskDataLoaded) }
+//        }
+        if (mode != "all") loadPlayListInCoroutine()
+    }
+
+    private fun loadPlayListInCoroutine(){
+        CoroutineScope(Dispatchers.IO).launch {
+            Thread.sleep(2000)
+            loadDiskPlaylist("all")
         }
     }
 
+
     fun changeSource(sourceEnum: String){
-        when (sourceEnum) {
-            "USB" -> _sourceEnum.value = "USB"
-            "DISK" -> _sourceEnum.value = "DISK"
-        }
+        _sourceEnum.value = sourceEnum
     }
 
     private fun convertToRecyclerViewItems(listTrack: ArrayList<Track>){

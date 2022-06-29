@@ -12,22 +12,71 @@
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/mediator/src/main/res/drawable/ic_prev_on_circle_blue.xml" value="0.3365" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/mediator/src/main/res/drawable/next_switch.xml" value="0.3365" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/mediator/src/main/res/drawable/prev_switch.xml" value="0.3365" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable-nodpi/ic_arrow_left.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable-nodpi/toggle_divider.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable-nodpi/toggle_selector_media.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable-nodpi/toggle_selector_source.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/back_category_music_off.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/back_category_music_on.xml" value="0.308" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/back_item.xml" value="0.358" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/back_item_true.xml" value="0.257" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/black_gradient.xml" value="0.2745" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/border_shadow.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/bt_background_settings.xml" value="0.308" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/button.xml" value="0.3365" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/button_click.xml" value="0.3365" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/button_click_gradient.xml" value="0.3365" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/circle.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/custom_thumb.xml" value="0.308" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/default_img_music.xml" value="0.3105" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/dialog_border.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_add_folder.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_back.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_baseline_person.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_baseline_skip_previous_24.xml" value="0.308" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_btn_background.xml" value="0.3365" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_btn_background_blue.xml" value="0.3365" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_btn_background_white.xml" value="0.3365" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_dialog_music.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_folder_mini.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_folder_music.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_icon2.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_launcher_background.xml" value="0.308" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_like_false.xml" value="0.3365" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_like_true.xml" value="0.3365" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_menu.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_menu_camera.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_menu_gallery.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_menu_slideshow.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_next.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_next_arrow.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_next_music.xml" value="0.308" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_pause_circle.xml" value="0.358" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_pause_music.xml" value="0.358" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_picture_mini.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_play.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_play_circle.xml" value="0.308" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_plus_music.xml" value="0.3365" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_prew_music.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_repeat.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_rotate_music.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_seek_line_blue.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_seek_line_grey.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_shuffle.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_shuffle_music.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_star.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_three_dots.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/ic_three_point.xml" value="0.308" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/image_for_back.xml" value="0.3105" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/image_seekbar.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/item_bg_list_music.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/line.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/open_track_list.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/pipka.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/progress_seekbar.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/seek_stile.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/seekbar_style.xml" value="0.308" />
+        <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/side_nav_bar.xml" value="0.308" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/drawable/test2.xml" value="0.2745" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/layout/bt_dialog_fragment.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/developer/Downloads/MusicKamaz-KR_Copy/features/music/src/main/res/layout/buttons_fragment.xml" value="0.31354166666666666" />

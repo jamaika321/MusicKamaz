@@ -166,6 +166,9 @@ class CategoryViewModel @Inject constructor(
         return newList
     }
 
+    override fun onCleared() {
+        super.onCleared()
+    }
 
     private fun List<FavoriteSongs>.toRecyclerViewItemsFavorite(): List<RecyclerViewBaseDataModel> {
         val newList = mutableListOf<RecyclerViewBaseDataModel>()

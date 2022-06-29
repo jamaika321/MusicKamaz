@@ -1,21 +1,12 @@
 package ru.kamaz.musickamaz.ui
 
-import android.app.AlertDialog
-import android.content.Context
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.EditText
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.navigation.findNavController
-import leakcanary.LeakCanary
 import ru.kamaz.music.ui.NavAction
 import ru.kamaz.music.ui.PermissionUtils
 import ru.kamaz.musickamaz.R
 import ru.sir.presentation.base.BaseActivity
 import ru.sir.presentation.navigation.UiAction
-import shark.Leak
 
 class MainActivity : BaseActivity() {
     private val CODE_PERMISSION = 1337
@@ -43,7 +34,6 @@ class MainActivity : BaseActivity() {
     override fun onActivityCreated() {
         checkPermission()
     }
-
 
     private fun checkPermission() {
         when (PermissionUtils.isPermissionsGranted(this)) {

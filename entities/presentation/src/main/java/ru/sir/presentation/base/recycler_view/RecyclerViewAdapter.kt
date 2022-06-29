@@ -26,6 +26,7 @@ class RecyclerViewAdapter<D>(private val producers: SparseArray<ViewHolderProduc
         }
     }
 
+
     class Builder<VM : Fragment, D>(private val parent: VM, private val dataFlow: StateFlow<D>) {
         private val producers = SparseArray<ViewHolderProducer<*, *, *>>()
 

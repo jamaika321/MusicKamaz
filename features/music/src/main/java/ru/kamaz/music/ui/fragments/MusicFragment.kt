@@ -56,8 +56,7 @@ class MusicFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) =
-        FragmentPlayerBinding.inflate(inflater, container, false)
+    ) = FragmentPlayerBinding.inflate(inflater, container, false)
 
     override fun onResume() {
         //      viewModel.startTrack()
@@ -430,7 +429,7 @@ class MusicFragment :
 
     fun usbModeActivation() {
         //Invisible
-        binding.picture.visibility = View.INVISIBLE
+        binding.picture.visibility = View.VISIBLE
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
         //Visible
         binding.controlPanel.viewPlayPause.visibility = View.VISIBLE

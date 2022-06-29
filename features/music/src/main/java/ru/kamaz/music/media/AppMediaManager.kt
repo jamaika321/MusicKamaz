@@ -3,6 +3,7 @@ package ru.kamaz.music.media
 import android.content.ContentUris
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.os.Build
 import android.os.Environment
@@ -31,78 +32,32 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
     private lateinit var metaRetriver: MediaMetadataRetriever
 
-
     @RequiresApi(Build.VERSION_CODES.Q)
-    fun getAllTracks(): Either<None, List<Track>> {
-        val allTracks = ArrayList<Track>()
-
-        var sdCard = scanMediaFilesInSdCard("all")
-        if (sdCard is Either.Right){
-            allTracks.addAll(sdCard.r)
+    override fun getMediaFilesFromPath(path: String, mode: String): Either<None, List<Track>> {
+        Log.i("ReviewTest", "getMediaFilesFromPath: $path ")
+        return when (path) {
+            "sdCard" -> scanMediaFilesInSdCard(mode)
+            "storage" -> scanMediaFilesInStorage(mode)
+            "all" -> getAllTracks(mode)
+            else -> Either.Left(None())
         }
-        sdCard = scanMediaFilesInStorage()
-        if (sdCard is Either.Right){
-            allTracks.addAll(sdCard.r)
-        }
-        return Either.Right(allTracks)
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     private fun scanMediaFilesInSdCard(mode: String): Either<None, List<Track>> {
         metaRetriver = MediaMetadataRetriever()
 
-        val listWithTrackData = ArrayList<Track>()
+        var listWithTrackData = ArrayList<Track>()
         val trackPaths = scanTracksPath()
 
-        if (trackPaths is Either.Right)
-        {
-            if (mode == "all") {
-                for (i in 0 until trackPaths.r.size) {
-                    metaRetriver.setDataSource(trackPaths.r[i])
-
-                    val artist =
-                        metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST))
-                            ?: ("unknown")
-                    val album =
-                        metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))
-                            ?: ("unknown")
-                    val title =
-                        metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE))
-                            ?: ("unknown")
-                    val duration =
-                        metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
-                            ?.toLong() ?: (180)
-                    val albumArtist =
-                        metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST))
-                            ?: ("unknown")
-                    val data = trackPaths.r[i]
-
-                    listWithTrackData.add(
-                        Track(
-                            Random.nextLong(),
-                            title,
-                            artist,
-                            data,
-                            duration,
-                            album,
-                            ""
-                        )
-                    )
-                }
-            } else {
-                metaRetriver.setDataSource(trackPaths.r[0])
-                listWithTrackData.add(
-                    Track(
-                        Random.nextLong(),
-                        "unknown",
-                        "unknown",
-                        "unknown",
-                        Random.nextLong(),
-                        "unknown",
-                        "unknown",
-                    )
-                )
+        if (trackPaths is Either.Right) {
+            listWithTrackData = when (mode) {
+                "all" -> metaDataRetriver((trackPaths.r.size), trackPaths.r)
+                "5" -> metaDataRetriver(5, trackPaths.r)
+                else -> metaDataRetriver(1, trackPaths.r)
             }
         }
+
         return if (listWithTrackData.isEmpty()) {
             Either.Left(None())
         }else{
@@ -110,6 +65,67 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         }
 
     }
+
+    private fun metaDataRetriver (cycleNum: Int, trackPaths: List<String>): ArrayList<Track> {
+        val listWithTrackData = ArrayList<Track>()
+        for (i in 0 until cycleNum) {
+            metaRetriver.setDataSource(trackPaths[i])
+
+            val artist =
+                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST))
+                    ?: ("unknown")
+            val album =
+                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))
+                    ?: ("unknown")
+            val title =
+                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE))
+                    ?: ("unknown")
+            val duration =
+                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
+                    ?.toLong() ?: (180)
+            val albumArtist =
+                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST))
+                    ?: ("unknown")
+            val data = trackPaths[i]
+            var albumArt = File("")
+
+            val art = metaRetriver.embeddedPicture
+            if (art != null) {
+                val bitMap = BitmapFactory.decodeByteArray(art, 0, art.size)
+                albumArt = getAlbumArt(bitMap, title)
+            }
+
+            listWithTrackData.add(
+                Track(
+                    Random.nextLong(),
+                    title,
+                    artist,
+                    data,
+                    duration,
+                    album,
+                    albumArt.toString()
+                )
+            )
+        }
+        return listWithTrackData
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun getAllTracks(mode: String): Either<None, List<Track>> {
+        val allTracks = ArrayList<Track>()
+
+        var sdCard = scanMediaFilesInSdCard(mode)
+        if (sdCard is Either.Right){
+            allTracks.addAll(sdCard.r)
+        }
+        sdCard = scanMediaFilesInStorage(mode)
+        if (sdCard is Either.Right){
+            allTracks.addAll(sdCard.r)
+        }
+        return Either.Right(allTracks)
+    }
+
 
 
     private fun scanTracksPath(): Either<None, List<String>> {
@@ -136,17 +152,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             list.add(it)
         }
         return list
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun getMediaFilesFromPath(path: String, mode: String): Either<None, List<Track>> {
-        Log.i("ReviewTest", "getMediaFilesFromPath: $path ")
-        return when (path) {
-            "sdCard" -> scanMediaFilesInSdCard(mode)
-            "storage" -> scanMediaFilesInStorage()
-            "all" -> getAllTracks()
-            else -> Either.Left(None())
-        }
     }
 
     override fun getAlbumImagePath(albumID: Long): Either<None, String> {
@@ -261,71 +266,8 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             .toList()
     }
 
-
-    fun convertFileSizeToMB(sizeInBytes: Long): Double {
-        return (sizeInBytes.toDouble()) / (1024 * 1024)
-    }
-
-    fun createNewFile(
-        fileName: String,
-        path: String,
-        callback: (result: Boolean, message: String) -> Unit
-    ) {
-        val fileAlreadyExists = File(path).listFiles().map { it.name }.contains(fileName)
-        if (fileAlreadyExists) {
-            callback(false, "'${fileName}' already exists.")
-        } else {
-            val file = File(path, fileName)
-            try {
-                val result = file.createNewFile()
-                if (result) {
-                    callback(result, "File '${fileName}' created successfully.")
-                } else {
-                    callback(result, "Unable to create file '${fileName}'.")
-                }
-            } catch (e: Exception) {
-                callback(false, "Unable to create file. Please try again.")
-                e.printStackTrace()
-            }
-        }
-    }
-
-    fun createNewFolder(
-        folderName: String,
-        path: String,
-        callback: (result: Boolean, message: String) -> Unit
-    ) {
-        val folderAlreadyExists = File(path).listFiles().map { it.name }.contains(folderName)
-        if (folderAlreadyExists) {
-            callback(false, "'${folderName}' already exists.")
-        } else {
-            val file = File(path, folderName)
-            try {
-                val result = file.mkdir()
-                if (result) {
-                    callback(result, "Folder '${folderName}' created successfully.")
-                } else {
-                    callback(result, "Unable to create folder '${folderName}'.")
-                }
-            } catch (e: Exception) {
-                callback(false, "Unable to create folder. Please try again.")
-                e.printStackTrace()
-            }
-        }
-    }
-
-    fun deleteFile(path: String) {
-        val file = File(path)
-        if (file.isDirectory) {
-            file.deleteRecursively()
-        } else {
-            file.delete()
-        }
-    }
-
-
     @RequiresApi(Build.VERSION_CODES.Q)
-    fun scanMediaFilesInStorage(): Either<None, List<Track>> {
+    fun scanMediaFilesInStorage(mode: String): Either<None, List<Track>> {
 
         val array = ArrayList<Track>()
 

@@ -1,7 +1,7 @@
 package ru.kamaz.musickamaz
 
 
-import leakcanary.LeakCanary
+
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.di.modules.CacheModule
 import ru.kamaz.musickamaz.di.components.AppComponent

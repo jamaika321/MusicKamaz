@@ -42,7 +42,7 @@ class CategoryFragment : BaseFragment<CategoryViewModel, FragmentCategoryMusicBi
 
     override fun initVars() {
         binding.rvCategory.layoutManager = GridLayoutManager(context, 5)
-        binding.rvCategory.adapter = recyclerViewAdapter2()
+//        binding.rvCategory.adapter = recyclerViewAdapter2()
         viewModel.closeBack.launchWhenStarted(lifecycleScope){
             if (it) super.onBackPressed()
             Log.i("resBack", "buttonListener")
@@ -88,6 +88,11 @@ class CategoryFragment : BaseFragment<CategoryViewModel, FragmentCategoryMusicBi
 
     fun clickAddNewPlayList() {
         dialog()
+    }
+
+    override fun onStop() {
+        binding.rvCategory.layoutManager = null
+        super.onStop()
     }
 
     override fun onDestroy() {

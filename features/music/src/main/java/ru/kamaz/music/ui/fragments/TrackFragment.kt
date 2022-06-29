@@ -1,6 +1,7 @@
 package ru.kamaz.music.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,10 +34,7 @@ class TrackFragment() :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): FragmentListMusicBinding {
-        val mBinding = FragmentListMusicBinding.inflate(inflater, container, false)
-
-//
-        return mBinding
+        return FragmentListMusicBinding.inflate(inflater, container, false)
     }
 
     override fun initVars(){
@@ -55,7 +53,7 @@ class TrackFragment() :
             } else {
                 viewModel.changeSource("DISK")
             }
-            viewModel.loadDiskPlaylist()
+//            viewModel.loadDiskPlaylist("5")
         }
 
         setFragmentResultListener("lastMusic") { key, bundle ->
@@ -134,6 +132,11 @@ class TrackFragment() :
 
         }
         )
+    }
+
+    override fun onStop() {
+        binding.rvAllMusic.layoutManager = null
+        super.onStop()
     }
 
 
