@@ -19,6 +19,7 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
     private val title =MutableStateFlow("")
     private val image = MutableStateFlow("")
     private val playing = MutableStateFlow(false)
+    private val favorite = MutableStateFlow(false)
     private lateinit var data: Track
 
     override fun bindData(data: Track) {
@@ -27,10 +28,26 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
         title.value= data.title
         image.value = data.albumArt
         playing.value = data.playing
-
+        favorite.value = data.favorite
     }
 
     override fun initVars() {
+        artist.launchWhenStarted(parent.lifecycleScope){
+            binding.artistName.text=it
+        }
+        title.launchWhenStarted(parent.lifecycleScope){
+            binding.musicName.text=it
+        }
+        image.launchWhenStarted(parent.lifecycleScope){
+            if (it != "") {
+                Picasso.with(parent.context)
+                    .load(Uri.fromFile(File(image.value)))
+                    .into(binding.image)
+            } else {
+                binding.image.setImageResource(R.drawable.music_png_bg)
+            }
+        }
+
         playing.launchWhenStarted(parent.lifecycleScope){
             if (it){
                 binding.foregroundImage.visibility = View.VISIBLE
@@ -40,26 +57,22 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
                 binding.mainLayoutMusicItem.setBackgroundResource(R.drawable.ic_back_item)
             }
         }
-        artist.launchWhenStarted(parent.lifecycleScope){
-            binding.artistName.text=it
-        }
-        title.launchWhenStarted(parent.lifecycleScope){
-            binding.musicName.text=it
-        }
-        image.launchWhenStarted(parent.lifecycleScope){
-            Picasso.with(parent.context)
-                .load(Uri.fromFile(File(image.value)))
-                .into(binding.image)
-        }
-        if (image.value == ""){
-            binding.image.setImageResource(R.drawable.music_png_bg)
+
+        favorite.launchWhenStarted(parent.lifecycleScope){
+            if (it){
+                binding.like.setImageResource(R.drawable.ic_like_true)
+            } else {
+                binding.like.setImageResource(R.drawable.ic_like_false)
+            }
         }
 
         binding.root.setOnClickListener {
            (parent as TrackFragment).onTrackClicked(data)
             Log.i("onTrackClicked", "onTrackClickedItemViewModel ")
         }
+
+        binding.like.setOnClickListener {
+            (parent as TrackFragment).onLikeClicked(data)
+        }
     }
-
-
 }

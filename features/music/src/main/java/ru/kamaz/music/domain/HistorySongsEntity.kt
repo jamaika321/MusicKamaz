@@ -19,7 +19,7 @@ class    HistorySongsEntity (
     @ColumnInfo(name = "date_modified")
     val dateModified: Long,
     @ColumnInfo(name = "album_id")
-    val albumId: Long,
+    val albumArt: String,
     @ColumnInfo(name = "album_name")
     val albumName: String,
     @ColumnInfo(name = "artist_id")

@@ -19,20 +19,26 @@ import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.domain.GetFilesUseCase
+import ru.kamaz.music_api.interactor.FavoriteMusicRV
 import ru.kamaz.music_api.interactor.LoadDiskData
 import ru.kamaz.music_api.interactor.LoadUsbData
 import ru.kamaz.music_api.models.Track
+import ru.sir.core.Either
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseViewModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
+import ru.sir.presentation.extensions.launchOn
 import java.util.*
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 class TrackViewModel @Inject constructor(
     application: Application,
     private val loadDiskData: LoadDiskData,
-    private val loadUsbData: LoadUsbData
-) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel, MusicManagerListener{
+    private val loadUsbData: LoadUsbData,
+    private val rvFavorite: FavoriteMusicRV
+) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel,
+    MusicManagerListener {
 
     companion object {
         private const val RV_ITEM = 2
@@ -57,15 +63,12 @@ class TrackViewModel @Inject constructor(
     private val _lastMusic = MutableStateFlow("")
     val lastMusic = _lastMusic
 
-    private val _isPlaying = MutableStateFlow(false)
-    val isPlaying = _isPlaying
-
-    val lastMusicChanged : StateFlow<String> by lazy {
+    val lastMusicChanged: StateFlow<String> by lazy {
         service.value?.lastMusic() ?: MutableStateFlow("")
     }
 
-    lateinit var listAllTrack : ArrayList<Track>
-    lateinit var changedListTrack : ArrayList<Track>
+    lateinit var listAllTrack: ArrayList<Track>
+    lateinit var changedListTrack: ArrayList<Track>
 
     override fun init() {
         Log.i("ReviewTest", "TrackViewModelInit")
@@ -73,18 +76,18 @@ class TrackViewModel @Inject constructor(
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
     }
 
-    fun lastMusic(title: String){
+    fun lastMusic(title: String) {
         _lastMusic.value = title
-        if (itemsAll.value.isEmpty()){
+        if (itemsAll.value.isEmpty()) {
             loadDiskPlaylist("5")
-        }else{
+        } else {
             convertToRecyclerViewItems(changedListTrack)
         }
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    fun filterRecyclerList (constraint: String, listTrack: ArrayList<Track>) : ArrayList<Track> {
-        val musicFilterList : ArrayList<Track>
+    fun filterRecyclerList(constraint: String, listTrack: ArrayList<Track>): ArrayList<Track> {
+        val musicFilterList: ArrayList<Track>
         if (constraint.isEmpty()) {
             musicFilterList = listTrack
         } else {
@@ -100,20 +103,20 @@ class TrackViewModel @Inject constructor(
         return musicFilterList
     }
 
-    fun searchMusic(music: String){
+    fun searchMusic(music: String) {
         convertToRecyclerViewItems(filterRecyclerList(music, listAllTrack))
     }
 
-    fun loadDiskPlaylist(mode: String){
+    fun loadDiskPlaylist(mode: String) {
         Log.i("ReviewTest", "loadDiskPlaylist: ")
-//        when(sourceEnum.value){
-//            "USB"-> loadUsbData(mode) { it.either({  }, ::onDiskDataLoaded) }
-//            "DISK"-> loadDiskData(mode) { it.either({  }, ::onDiskDataLoaded) }
-//        }
+        when (sourceEnum.value) {
+            "USB" -> loadUsbData(mode) { it.either({ }, ::onDiskDataLoaded) }
+            "DISK" -> loadDiskData(mode) { it.either({ }, ::onDiskDataLoaded) }
+        }
         if (mode != "all") loadPlayListInCoroutine()
     }
 
-    private fun loadPlayListInCoroutine(){
+    private fun loadPlayListInCoroutine() {
         CoroutineScope(Dispatchers.IO).launch {
             Thread.sleep(2000)
             loadDiskPlaylist("all")
@@ -121,13 +124,12 @@ class TrackViewModel @Inject constructor(
     }
 
 
-    fun changeSource(sourceEnum: String){
+    fun changeSource(sourceEnum: String) {
         _sourceEnum.value = sourceEnum
     }
 
-    private fun convertToRecyclerViewItems(listTrack: ArrayList<Track>){
-        listTrack.findPlayingMusic(lastMusic.value)
-        _itemsAll.value = listTrack.toRecyclerViewItems()
+    private fun convertToRecyclerViewItems(listTrack: ArrayList<Track>) {
+        _itemsAll.value = listTrack.findFavoriteMusic().findPlayingMusic(lastMusic.value).toRecyclerViewItems()
     }
 
     private fun onDiskDataLoaded(data: List<Track>) {
@@ -142,10 +144,25 @@ class TrackViewModel @Inject constructor(
         convertToRecyclerViewItems(data)
     }
 
-    private fun List<Track>.findPlayingMusic(title:String): List<Track>{
-        for (i in this.indices){
+    private fun List<Track>.findPlayingMusic(title: String): List<Track> {
+        for (i in this.indices) {
             this[i].playing = this[i].title == title
         }
+        return this
+    }
+
+    private fun List<Track>.findFavoriteMusic(): List<Track> {
+            rvFavorite.run(None()).launchOn(viewModelScope) {
+                if (it.isNotEmpty()) {
+                    for (track in this.indices) {
+                        for (i in it.indices) {
+                            if (this[track].title == it[i].title) {
+                                this[track].favorite = true
+                            }
+                        }
+                    }
+                }
+            }
         return this
     }
 
@@ -156,6 +173,14 @@ class TrackViewModel @Inject constructor(
             service.value?.resume()
         } else {
             service.value?.playOrPause()
+        }
+    }
+
+    fun onLikeClicked(track: Track) {
+        if (track.favorite) {
+            TODO()
+        } else {
+            TODO()
         }
     }
 

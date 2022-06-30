@@ -103,7 +103,7 @@ class RepositoryImpl(
         this.duration,
         this.data,
         this.dateModified,
-        this.albumId,
+        this.albumArt,
         this.albumName,
         this.artistId,
         this.artistName,

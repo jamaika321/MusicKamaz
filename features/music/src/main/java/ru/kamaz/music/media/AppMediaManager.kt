@@ -34,7 +34,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun getMediaFilesFromPath(path: String, mode: String): Either<None, List<Track>> {
-        Log.i("ReviewTest", "getMediaFilesFromPath: $path ")
+        Log.i("ReviewTest_GetMedia", "getMediaFilesFromPath: $path ")
         return when (path) {
             "sdCard" -> scanMediaFilesInSdCard(mode)
             "storage" -> scanMediaFilesInStorage(mode)
@@ -83,13 +83,11 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             val duration =
                 metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
                     ?.toLong() ?: (180)
-            val albumArtist =
-                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST))
-                    ?: ("unknown")
             val data = trackPaths[i]
+
             var albumArt = File("")
 
-            val art = metaRetriver.embeddedPicture
+            var art = metaRetriver.embeddedPicture
             if (art != null) {
                 val bitMap = BitmapFactory.decodeByteArray(art, 0, art.size)
                 albumArt = getAlbumArt(bitMap, title)
@@ -285,33 +283,28 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         //выбор аудио файлов
         var selection = "${MediaStore.Audio.Media.DATA} LIKE '/storage/emul%'"
 
-        var albumArt = File("")
-
         val cursor = context.contentResolver.query(uri, projection, selection, null, null)
 
         if (cursor != null) {
             cursor.moveToFirst()
             while (!cursor.isAfterLast) {
+                var albumArt = File("")
                 val artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
                 val album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
                 val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
-                val duration =
-                    cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION))
-                        .toLong()
+                val duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)).toLong()
                 val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
-
-                val id: Long =
-                    cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
-                val contentUri =
-                    ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
+                val contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
 
                 try {
                     val picture =
                         context.contentResolver.loadThumbnail(contentUri, Size(500, 350), null)
-                    albumArt = getAlbumArt(picture, id.toString())
+                    albumArt = getAlbumArt(picture, title)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
+
 
                 array.add(
                     Track(
@@ -346,9 +339,14 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         //create a file to write bitmap data
         var file: File? = null
         return try {
+
             file = File(
-                Environment.getExternalStorageDirectory()
-                    .toString() + File.separator + fileNameToSave
+                Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator
+            )
+            file.mkdirs()
+
+            file = File(
+                Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator + fileNameToSave
             )
             file.createNewFile()
 

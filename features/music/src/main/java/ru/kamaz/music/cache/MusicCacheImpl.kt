@@ -1,6 +1,5 @@
 package ru.kamaz.music.cache
 
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.kamaz.music.cache.db.AppDatabase
@@ -68,10 +67,9 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         } catch (e: Exception) {
             Either.Left(Failure.AuthorizationError(ErrorMessage(404, e.message.toString(), e.localizedMessage ?: "")))
         }
-
     }
 
-    override fun  getAllFavoriteSongs():  Flow<List<FavoriteSongs>>{
+    override fun getAllFavoriteSongs(): Flow<List<FavoriteSongs>> {
         return db.userDao().getData().map { convertEntityListFavoriteModelList(it) }
     }
 
@@ -79,10 +77,9 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         return db.playListDao().getData().map { convertEntityPlayListModelList(it) }
     }
 
-    private fun convertEntityListFavoriteModelList(entity: List<FavoriteSongsEntity>):List<FavoriteSongs>{
+    private fun convertEntityListFavoriteModelList(entity: List<FavoriteSongsEntity>): List<FavoriteSongs>{
         val data = mutableListOf<FavoriteSongs>()
-        entity.forEach {
-            data.add(FavoriteSongs(it.idSong,it.data,it.title,it.artist)) }
+        entity.forEach { data.add(FavoriteSongs(it.idSong,it.data,it.title,it.artist)) }
         return data
     }
 

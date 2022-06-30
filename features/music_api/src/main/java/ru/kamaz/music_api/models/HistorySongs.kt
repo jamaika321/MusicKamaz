@@ -11,7 +11,7 @@ data class HistorySongs (
     val duration: Long,
     val data: String,
     val dateModified: Long,
-    val albumId: Long,
+    val albumArt: String,
     val albumName: String,
     val artistId: Long,
     val artistName: String,

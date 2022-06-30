@@ -107,6 +107,10 @@ class TrackFragment() :
         viewModel.onItemClick(track , track.data)
     }
 
+    fun onLikeClicked(track: Track) {
+        viewModel.onLikeClicked(track)
+    }
+
     private fun recyclerViewAdapter(items : StateFlow<List<RecyclerViewBaseDataModel>>) = RecyclerViewAdapter.Builder(this, items)
         .addProducer(MusicListViewHolderProducer())
         .build { it }

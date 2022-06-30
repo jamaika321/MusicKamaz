@@ -21,7 +21,7 @@ interface MusicCache {
     fun deletePlayList(song: PlayListEntity): Either<Failure, None>
     fun insertHistorySong(song: HistorySongsEntity): Either<Failure, None>
     fun queryFavoriteSongs(data:String) :  Either<Failure, String>
-    fun getAllFavoriteSongs():  Flow<List<FavoriteSongs>>
+    fun getAllFavoriteSongs(): Flow<List<FavoriteSongs>>
     fun getAllPlayList(): Flow<List<PlayListModel>>
     fun queryHistorySongs(): Either<Failure, String>
 

@@ -25,7 +25,6 @@
         app:layout_constraintTop_toTopOf="parent">
         <ImageView
             android:id="@+id/image"
-            android:src="@drawable/music_png_bg"
             android:layout_gravity="center"
             android:layout_width="280dp"
             android:layout_height="160dp">
@@ -34,7 +33,7 @@
             android:id="@+id/foreground_image"
             android:visibility="invisible"
             android:padding="30dp"
-            android:background="#80000000"
+            android:background="@color/blurred_black_background"
             android:src="@drawable/ic_music_white"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>

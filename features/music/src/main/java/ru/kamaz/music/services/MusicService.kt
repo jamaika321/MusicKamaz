@@ -512,7 +512,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     fun startDiskMode() {
         if (!isDiskModeOn.value) {
             changeSource(2)
-            updateTracks("1")
+            updateTracks("all")
             nextTrack(2)
         }
     }
@@ -615,23 +615,25 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         _isFavorite.value = false
         val currentTrack = track
         _lastMusic.value = currentTrack.title
-        Log.i("getLastMusic", "initTrack: ${currentTrack.title}")
 //        updateTracks(mediaManager)
         _idSong.value = currentTrack.id.toInt()
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
         _data.value = track.data
         _duration.value = track.duration.toInt()
-        Log.i("checkTrackCover", "initTrack: ${track.albumArt}")
-        _cover.value = track.albumArt
+        Log.i("TrackAlbumArt", "${track.albumArt} ")
+        if (track.albumArt != "") {
+            _cover.value = track.albumArt
+        } else {
+            _cover.value = ""
+        }
+
         mediaPlayer.apply {
             stop()
             reset()
             setDataSource(
                 if (data1.isEmpty()) {
-                    Log.i("init", "initTrack:$track.data ")
                     track.data
                 } else {
-                    Log.i("initdata1", "initTrack:$data1 ")
                     data1
                 }
             )
@@ -992,7 +994,8 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun updateTracks(loadMode: String) {
-        Log.i("ReviewTest", "updateTracks: ")
+        Log.i("ReviewTest_Mode", "${this.mode.value} ")
+
         when (mode) {
             SourceEnum.USB -> {
                 val result = mediaManager.getMediaFilesFromPath("sdCard", loadMode)
@@ -1119,9 +1122,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    val twMusic: TWMusic = TWMusic.open()
-    val usbManager: UsbManager? = null
-
     override fun insertLastMusic() {
         val music = HistorySongs(
             18,
@@ -1129,10 +1129,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             title.value,
             228,
             1,
-            1,
+            duration.value.toLong(),
             data.value,
             1,
-            1,
+            cover.value,
             title.value,
             1,
             artist.value,
