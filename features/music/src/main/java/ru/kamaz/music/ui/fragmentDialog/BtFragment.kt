@@ -1,4 +1,4 @@
-package ru.kamaz.music.ui.bt
+package ru.kamaz.music.ui.fragmentDialog
 
 import android.os.Bundle
 import android.view.LayoutInflater

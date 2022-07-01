@@ -95,7 +95,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
             listWithTrackData.add(
                 Track(
-                    Random.nextLong(),
+                    i.toLong(),
                     title,
                     artist,
                     data,

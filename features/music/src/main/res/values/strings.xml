@@ -5,9 +5,11 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="add_new_playlist">Добавить новый плайлист</string>
-    <string name="playlist">Плайлист</string>
+    <string name="playlist">Плейлист</string>
     <string name="artist">Artist</string>
     <string name="song">Song</string>
     <string name="connect_bt">Подключите телефон в</string>
     <string name="bt_question">Перейдти в настройки?</string>
+    <string name="add_to_playlist">Добавить в плейлист</string>
+    <string name="delete">Удалить</string>
 </resources>

@@ -22,7 +22,7 @@ class ItemPlayListViewModel : RecyclerViewBaseItem<PlayListModel, MainCategoryIt
 
         }
     }
-    override fun bindData(data: PlayListModel) {
+    override fun bindData(data: PlayListModel, position: Int) {
         this.data = data
         playlist.value = data.title
     }

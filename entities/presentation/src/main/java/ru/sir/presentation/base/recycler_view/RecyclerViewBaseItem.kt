@@ -15,5 +15,5 @@ abstract class RecyclerViewBaseItem<M : Any?, B : ViewBinding> {
     }
 
     abstract fun initVars()
-    abstract fun bindData(data: M)
+    abstract fun bindData(data: M, position: Int)
 }

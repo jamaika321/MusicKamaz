@@ -46,7 +46,7 @@ class RecyclerViewAdapter<D>(private val producers: SparseArray<ViewHolderProduc
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<in Any, *, *>, position: Int) {
-        holder.bindData(_data[position].getData())
+        holder.bindData(_data[position].getData(), position)
     }
 
     override fun getItemCount(): Int = _data.size

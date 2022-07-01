@@ -1,4 +1,4 @@
-package ru.kamaz.music.ui.category.dialog
+package ru.kamaz.music.ui.fragmentDialog
 
 import android.app.AlertDialog
 import android.app.Dialog

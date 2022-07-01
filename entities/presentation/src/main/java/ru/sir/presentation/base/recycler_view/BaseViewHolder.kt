@@ -8,7 +8,7 @@ class BaseViewHolder<M : Any?, I : RecyclerViewBaseItem<M, B>, B : ViewBinding>(
     private val viewModel: I
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bindData(item: M) {
-        viewModel.bindData(item)
+    fun bindData(item: M, position: Int) {
+        viewModel.bindData(item, position)
     }
 }

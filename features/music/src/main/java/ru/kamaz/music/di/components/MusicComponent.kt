@@ -7,10 +7,10 @@ import ru.kamaz.music.ui.fragments.FolderFragment
 import ru.kamaz.music.ui.fragments.MainListMusicFragment
 import ru.kamaz.music.ui.fragments.TrackFragment
 import ru.kamaz.music.ui.fragments.MusicFragment
-import ru.kamaz.music.ui.bt.BtFragment
+import ru.kamaz.music.ui.fragmentDialog.BtFragment
 import ru.kamaz.music.ui.fragments.CategoryFragment
-import ru.kamaz.music.ui.category.dialog.DialogAddPlaylistFragment
-import ru.kamaz.music.ui.dialog_windows.DialogBtSettings
+import ru.kamaz.music.ui.fragmentDialog.DialogAddPlaylistFragment
+import ru.kamaz.music.ui.fragmentDialog.DialogBtSettings
 import ru.sir.presentation.base.BaseDaggerComponent
 import javax.inject.Singleton
 

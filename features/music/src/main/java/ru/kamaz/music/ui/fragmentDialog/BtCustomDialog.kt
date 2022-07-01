@@ -1,4 +1,4 @@
-package ru.kamaz.music.ui.bt
+package ru.kamaz.music.ui.fragmentDialog
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +12,7 @@ class BtCustomDialog: DialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         getDialog()!!.getWindow()?.setBackgroundDrawableResource(R.drawable.albom);
-        return inflater.inflate(R.layout.bt_dialog_fragment, container, false)
+        return inflater.inflate(R.layout.bt_dialog_fragment, container, false);
     }
 
     override fun onStart() {

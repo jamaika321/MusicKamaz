@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,9 +20,8 @@ import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.domain.GetFilesUseCase
-import ru.kamaz.music_api.interactor.FavoriteMusicRV
-import ru.kamaz.music_api.interactor.LoadDiskData
-import ru.kamaz.music_api.interactor.LoadUsbData
+import ru.kamaz.music_api.interactor.*
+import ru.kamaz.music_api.models.FavoriteSongs
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.core.None
@@ -36,7 +36,9 @@ class TrackViewModel @Inject constructor(
     application: Application,
     private val loadDiskData: LoadDiskData,
     private val loadUsbData: LoadUsbData,
-    private val rvFavorite: FavoriteMusicRV
+    private val rvFavorite: FavoriteMusicRV,
+    private val insertFavoriteMusic: InsertFavoriteMusic,
+    private val deleteFavoriteMusic: DeleteFavoriteMusic
 ) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel,
     MusicManagerListener {
 
@@ -63,6 +65,9 @@ class TrackViewModel @Inject constructor(
     private val _lastMusic = MutableStateFlow("")
     val lastMusic = _lastMusic
 
+    private val _playListLoaded = MutableStateFlow(false)
+    val playListLoaded = _playListLoaded
+
     val lastMusicChanged: StateFlow<String> by lazy {
         service.value?.lastMusic() ?: MutableStateFlow("")
     }
@@ -80,6 +85,7 @@ class TrackViewModel @Inject constructor(
         _lastMusic.value = title
         if (itemsAll.value.isEmpty()) {
             loadDiskPlaylist("5")
+            _playListLoaded.value = false
         } else {
             convertToRecyclerViewItems(changedListTrack)
         }
@@ -129,7 +135,8 @@ class TrackViewModel @Inject constructor(
     }
 
     private fun convertToRecyclerViewItems(listTrack: ArrayList<Track>) {
-        _itemsAll.value = listTrack.findFavoriteMusic().findPlayingMusic(lastMusic.value).toRecyclerViewItems()
+        _itemsAll.value =
+            listTrack.findFavoriteMusic().findPlayingMusic(lastMusic.value).toRecyclerViewItems()
     }
 
     private fun onDiskDataLoaded(data: List<Track>) {
@@ -152,17 +159,18 @@ class TrackViewModel @Inject constructor(
     }
 
     private fun List<Track>.findFavoriteMusic(): List<Track> {
-            rvFavorite.run(None()).launchOn(viewModelScope) {
-                if (it.isNotEmpty()) {
-                    for (track in this.indices) {
-                        for (i in it.indices) {
-                            if (this[track].title == it[i].title) {
-                                this[track].favorite = true
-                            }
+        rvFavorite.run(None()).launchOn(viewModelScope) {
+            if (it.isNotEmpty()) {
+                for (track in this.indices) {
+                    for (i in it.indices) {
+                        if (this[track].title == it[i].title) {
+                            this[track].favorite = true
                         }
                     }
                 }
             }
+            _playListLoaded.value = true
+        }
         return this
     }
 
@@ -177,10 +185,30 @@ class TrackViewModel @Inject constructor(
     }
 
     fun onLikeClicked(track: Track) {
-        if (track.favorite) {
-            TODO()
-        } else {
-            TODO()
+        CoroutineScope(Dispatchers.IO).launch {
+            if (track.favorite) {
+                deleteFavoriteMusic.run(
+                    DeleteFavoriteMusic.Params(
+                        FavoriteSongs(
+                            track.id.toInt(),
+                            track.data,
+                            track.title,
+                            track.artist
+                        )
+                    )
+                )
+            } else {
+                insertFavoriteMusic.run(
+                    InsertFavoriteMusic.Params(
+                        FavoriteSongs(
+                            track.id.toInt(),
+                            track.data,
+                            track.title,
+                            track.artist
+                        )
+                    )
+                )
+            }
         }
     }
 

@@ -2,7 +2,12 @@ package ru.kamaz.music.view_models
 
 import android.net.Uri
 import android.util.Log
+import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
+import android.widget.PopupMenu
+import android.widget.PopupWindow
+import androidx.core.widget.PopupWindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,15 +25,17 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
     private val image = MutableStateFlow("")
     private val playing = MutableStateFlow(false)
     private val favorite = MutableStateFlow(false)
+    private val _position = MutableStateFlow(0)
     private lateinit var data: Track
 
-    override fun bindData(data: Track) {
+    override fun bindData(data: Track, position: Int) {
         this.data = data
         artist.value= data.artist
         title.value= data.title
         image.value = data.albumArt
         playing.value = data.playing
         favorite.value = data.favorite
+        _position.value = position
     }
 
     override fun initVars() {
@@ -66,13 +73,17 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
             }
         }
 
+        binding.settings.setOnClickListener {
+            (parent as TrackFragment).onOptionsItemClicked(_position.value, data)
+        }
+
         binding.root.setOnClickListener {
            (parent as TrackFragment).onTrackClicked(data)
-            Log.i("onTrackClicked", "onTrackClickedItemViewModel ")
         }
 
         binding.like.setOnClickListener {
             (parent as TrackFragment).onLikeClicked(data)
+            favorite.value = !favorite.value
         }
     }
 }

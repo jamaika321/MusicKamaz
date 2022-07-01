@@ -13,11 +13,11 @@
         android:label="TrackFragment" />
     <fragment
         android:id="@+id/btFragment"
-        android:name="ru.kamaz.music.ui.bt.BtFragment"
+        android:name="ru.kamaz.music.ui.fragmentDialog.BtFragment"
         android:label="BtFragment" />
     <dialog
         android:id="@+id/fragment_dialog"
-        android:name="ru.kamaz.music.ui.dialog_windows.DialogBtSettings"
+        android:name="ru.kamaz.music.ui.fragmentDialog.DialogBtSettings"
         android:label="DialogBtSettings" />
     <fragment
         android:id="@+id/mainListMusicFragment"
@@ -25,7 +25,7 @@
         android:label="MainListMusicFragment" />
     <dialog
         android:id="@+id/dialogAddPlaylistFragment"
-        android:name="ru.kamaz.music.ui.category.dialog.DialogAddPlaylistFragment"
+        android:name="ru.kamaz.music.ui.fragmentDialog.DialogAddPlaylistFragment"
         android:label="DialogAddPlaylistFragment" />
 
 

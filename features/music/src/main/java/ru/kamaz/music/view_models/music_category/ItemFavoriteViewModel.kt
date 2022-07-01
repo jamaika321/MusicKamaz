@@ -22,7 +22,7 @@ class ItemFavoriteViewModel : RecyclerViewBaseItem<FavoriteSongs, MainCategoryIt
         }
     }
 
-    override fun bindData(data: FavoriteSongs) {
+    override fun bindData(data: FavoriteSongs, position: Int) {
         this.data = data
         title.value = data.title
         artist.value = data.artist

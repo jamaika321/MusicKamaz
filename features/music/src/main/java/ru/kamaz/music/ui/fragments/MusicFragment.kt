@@ -29,6 +29,7 @@ import ru.kamaz.music.view_models.MusicFragmentViewModel
 import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseFragment
+import ru.sir.presentation.extensions.launchOn
 import ru.sir.presentation.extensions.launchWhenStarted
 import ru.sir.presentation.navigation.UiAction
 import java.io.File
@@ -257,7 +258,6 @@ class MusicFragment :
         viewModel.isShuffleOn.launchWhenStarted(lifecycleScope) {
             randomSongStatus(it)
         }
-
         viewModel.isNotConnectedUsb.launchWhenStarted(lifecycleScope) {
             if (it) {
                 usbModeActivation()
@@ -265,11 +265,9 @@ class MusicFragment :
                 diskModeActivation()
             }
         }
-
         viewModel.isFavoriteMusic.launchWhenStarted(lifecycleScope) {
             likeStatus(it)
         }
-
         viewModel.isBtModeOn.launchWhenStarted(lifecycleScope) {
             if (it) btModeActivation()
         }
@@ -279,7 +277,6 @@ class MusicFragment :
         viewModel.isUsbModeOn.launchWhenStarted(lifecycleScope) {
             if (it) usbModeActivation()
         }
-
         viewModel.isDeviceNotConnectFromBt.launchWhenStarted(lifecycleScope) {
             if (it) dialog()
         }
@@ -394,7 +391,6 @@ class MusicFragment :
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        binding.pictureDevice.setImageResource(R.drawable.music_png_bg)
         binding.musicButtons.setBackgroundResource(R.color.blurred_black_background)
         binding.artist.setBackgroundResource(R.drawable.black_gradient)
     }

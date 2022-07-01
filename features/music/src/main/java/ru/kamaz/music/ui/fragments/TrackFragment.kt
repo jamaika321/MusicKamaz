@@ -103,13 +103,6 @@ class TrackFragment() :
 
         super.setListeners()
     }
-    fun onTrackClicked(track: Track) {
-        viewModel.onItemClick(track , track.data)
-    }
-
-    fun onLikeClicked(track: Track) {
-        viewModel.onLikeClicked(track)
-    }
 
     private fun recyclerViewAdapter(items : StateFlow<List<RecyclerViewBaseDataModel>>) = RecyclerViewAdapter.Builder(this, items)
         .addProducer(MusicListViewHolderProducer())
@@ -141,6 +134,20 @@ class TrackFragment() :
     override fun onStop() {
         binding.rvAllMusic.layoutManager = null
         super.onStop()
+    }
+
+    //RecyclerViewClickListeners||
+
+    fun onTrackClicked(track: Track) {
+        viewModel.onItemClick(track , track.data)
+    }
+
+    fun onLikeClicked(track: Track) {
+        viewModel.onLikeClicked(track)
+    }
+
+    fun onOptionsItemClicked(position: Int, track: Track) {
+
     }
 
 

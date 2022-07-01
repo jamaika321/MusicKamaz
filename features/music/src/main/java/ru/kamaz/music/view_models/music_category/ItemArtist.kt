@@ -23,7 +23,7 @@ class ItemArtist : RecyclerViewBaseItem<Track, FolderItemRvBinding>(){
 
         }
     }
-    override fun bindData(data: Track) {
+    override fun bindData(data: Track, position: Int) {
         this.data = data
         artist.value = data.artist
 

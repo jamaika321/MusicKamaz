@@ -23,7 +23,7 @@ class ItemPlayListAddNewViewModel: RecyclerViewBaseItem<AddNewPlayListModel, Mai
         }
     }
 
-    override fun bindData(data: AddNewPlayListModel) {
+    override fun bindData(data: AddNewPlayListModel, position: Int) {
         this.data = data
         addPlayList.value = data.text
     }

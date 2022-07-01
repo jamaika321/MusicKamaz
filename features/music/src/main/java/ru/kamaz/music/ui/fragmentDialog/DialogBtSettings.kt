@@ -1,4 +1,4 @@
-package ru.kamaz.music.ui.dialog_windows
+package ru.kamaz.music.ui.fragmentDialog
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.Window
 import androidx.fragment.app.DialogFragment
 import ru.kamaz.music.databinding.BtDialogFragmentBinding
