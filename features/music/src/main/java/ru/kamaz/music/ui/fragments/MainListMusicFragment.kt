@@ -7,11 +7,13 @@ import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentMainListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.domain.GlobalConstants
+import ru.kamaz.music.ui.NavAction
 import ru.kamaz.music.ui.enums.PlayListFlow
 import ru.kamaz.music.ui.getTypedSerializable
 import ru.kamaz.music.view_models.MainListMusicViewModel
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseFragment
+import ru.sir.presentation.navigation.UiAction
 
 
 class MainListMusicFragment

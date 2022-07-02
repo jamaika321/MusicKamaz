@@ -7,7 +7,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.Gravity
 import android.view.Window
 import androidx.fragment.app.DialogFragment
 import ru.kamaz.music.databinding.BtDialogFragmentBinding

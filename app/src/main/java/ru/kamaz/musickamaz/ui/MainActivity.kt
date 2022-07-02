@@ -28,6 +28,9 @@ class MainActivity : BaseActivity() {
             NavAction.OPEN_ADD_PLAY_LIST_DIALOG -> {
                 navigator.navigate(R.id.dialogAddPlaylistFragment)
             }
+            NavAction.OPEN_DIALOG_TRACK_OPTION -> {
+                navigator.navigate(R.id.trackOptionFragment)
+            }
         }
     }
 

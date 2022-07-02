@@ -29,12 +29,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_question_bt_connection"
-        app:layout_constraintBottom_toTopOf="@+id/info_text_bt_connect"
+        app:layout_constraintBottom_toTopOf="@+id/add_to_playlist"
         >
     </View>
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/info_text_bt_connect"
+        android:id="@+id/add_to_playlist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/bt_question"
@@ -56,7 +56,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/info_text_bt_connect"
+        app:layout_constraintTop_toBottomOf="@+id/add_to_playlist"
         >
 
         <Button

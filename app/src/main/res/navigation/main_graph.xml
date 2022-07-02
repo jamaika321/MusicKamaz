@@ -8,10 +8,6 @@
         android:name="ru.kamaz.music.ui.fragments.MusicFragment"
         android:label="MusicFragment" />
     <fragment
-        android:id="@+id/trackFragment"
-        android:name="ru.kamaz.music.ui.fragments.TrackFragment"
-        android:label="TrackFragment" />
-    <fragment
         android:id="@+id/btFragment"
         android:name="ru.kamaz.music.ui.fragmentDialog.BtFragment"
         android:label="BtFragment" />
@@ -27,6 +23,10 @@
         android:id="@+id/dialogAddPlaylistFragment"
         android:name="ru.kamaz.music.ui.fragmentDialog.DialogAddPlaylistFragment"
         android:label="DialogAddPlaylistFragment" />
+    <dialog
+        android:id="@+id/trackOptionFragment"
+        android:name="ru.kamaz.music.ui.fragmentDialog.TrackOptionFragment"
+        android:label="TrackOptionFragment" />
 
 
 </navigation>

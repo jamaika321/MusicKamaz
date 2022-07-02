@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.StateFlow
 import ru.kamaz.music.databinding.FragmentListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
+import ru.kamaz.music.ui.NavAction
 import ru.kamaz.music.ui.producers.MusicListViewHolderProducer
 import ru.kamaz.music.view_models.TrackViewModel
 import ru.kamaz.music_api.models.Track
@@ -21,6 +22,7 @@ import ru.sir.presentation.base.recycler_view.RecyclerViewAdapter
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
 import ru.sir.presentation.extensions.launchOn
 import ru.sir.presentation.extensions.launchWhenStarted
+import ru.sir.presentation.navigation.UiAction
 
 class TrackFragment() :
     BaseFragment<TrackViewModel, FragmentListMusicBinding>(TrackViewModel::class.java ) {
@@ -147,7 +149,11 @@ class TrackFragment() :
     }
 
     fun onOptionsItemClicked(position: Int, track: Track) {
-
+        navigator.navigateTo(
+            UiAction(
+                NavAction.OPEN_DIALOG_TRACK_OPTION
+            )
+        )
     }
 
 

@@ -13,6 +13,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.TestTextItemBinding
+import ru.kamaz.music.ui.fragments.MainListMusicFragment
 import ru.kamaz.music.ui.fragments.TrackFragment
 import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
