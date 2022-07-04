@@ -45,25 +45,6 @@ class MusicCategoryViewModel :RecyclerViewBaseItem<CategoryMusicModel, MainCateg
 
     }
 
-    override fun addListener() {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeListener() {
-        TODO("Not yet implemented")
-    }
-
-    override fun onCheckPosition(position: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onUpdateSeekBar(duration: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun selectBtMode() {
-        TODO("Not yet implemented")
-    }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Log.d("testPlayTrack", "onServiceConnected")

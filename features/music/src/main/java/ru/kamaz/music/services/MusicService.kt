@@ -512,7 +512,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     fun startDiskMode() {
         if (!isDiskModeOn.value) {
             changeSource(2)
-            updateTracks("all")
+            updateTracks("5")
             nextTrack(2)
         }
     }
@@ -973,8 +973,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun updateTracks(loadMode: String) {
-        Log.i("ReviewTest_Mode", "${this.mode.value} ")
-
         when (mode) {
             SourceEnum.USB -> {
                 val result = mediaManager.getMediaFilesFromPath("sdCard", loadMode)

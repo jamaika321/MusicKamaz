@@ -19,7 +19,7 @@ class ItemPlayListAddNewViewModel: RecyclerViewBaseItem<AddNewPlayListModel, Mai
         }
 
         binding.root.setOnClickListener {
-            data?.let { (parent as CategoryFragment).clickAddNewPlayList() }
+            data?.let { (parent as CategoryFragment).dialog() }
         }
     }
 

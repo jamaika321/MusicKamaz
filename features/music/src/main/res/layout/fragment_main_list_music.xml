@@ -6,18 +6,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/fragment"
-        android:layout_width="match_parent"
+    <include
+        android:id="@+id/playlist_fragment"
+        layout="@layout/fragment_list_music"
+        android:layout_height="0dp"
         android:layout_marginStart="@dimen/margin_list_frag2"
         android:layout_marginEnd="@dimen/margin_list_frag2"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:visibility="invisible"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/source_selection"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_weight="9">
-    </FrameLayout>
+        app:layout_constraintVertical_weight="9"/>
 
     <include
         android:id="@+id/source_selection"
@@ -25,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintVertical_weight="2"
-        app:layout_constraintTop_toBottomOf="@+id/fragment"
+        app:layout_constraintTop_toBottomOf="@+id/playlist_fragment"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

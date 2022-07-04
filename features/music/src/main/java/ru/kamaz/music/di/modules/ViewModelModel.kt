@@ -8,11 +8,10 @@ import dagger.multibindings.IntoMap
 import ru.kamaz.music.view_models.*
 import ru.kamaz.music.view_models.bt.BtDialogFragmentViewModel
 import ru.kamaz.music.view_models.bt.BtFragmentViewModel
-import ru.kamaz.music.view_models.list.ListViewModel
+import ru.kamaz.music.view_models.list.FolderViewModel
 import ru.kamaz.music.view_models.music_category.CategoryViewModel
 import ru.sir.presentation.annotations.ViewModelKey
 import ru.sir.presentation.factories.ViewModelFactory
-import javax.inject.Singleton
 
 @Module
 abstract class ViewModelModel() {
@@ -41,8 +40,8 @@ abstract class ViewModelModel() {
 
     @Binds
     @IntoMap
-    @ViewModelKey(ListViewModel::class)
-    abstract fun bindListViewModel(model: ListViewModel): ViewModel
+    @ViewModelKey(FolderViewModel::class)
+    abstract fun bindListViewModel(model: FolderViewModel): ViewModel
 
     @Binds
     @IntoMap

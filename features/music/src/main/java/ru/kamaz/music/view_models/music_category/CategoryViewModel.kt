@@ -55,18 +55,15 @@ class CategoryViewModel @Inject constructor(
     }
 
     fun onClickBack() {
-        Log.i("resBack", "onClickBack")
         checkRootPathOfSource()
     }
 
     private fun checkRootPathOfSource() {
         when (itemClick.value) {
             true -> {
-                Log.i("resBack", "checkRootPathOfSourcet$itemClick")
                 _closeBack.value = true
             }
             false -> {
-                Log.i("resBack", "checkRootPathOfSource$itemClick")
                 _closeBack.value = false
             }
         }
@@ -148,13 +145,6 @@ class CategoryViewModel @Inject constructor(
 
     private fun List<PlayListModel>.toRecyclerViewItemsPlayList(): List<RecyclerViewBaseDataModel> {
         val newList = mutableListOf<RecyclerViewBaseDataModel>()
-     /*   newList.add(
-            0,
-            RecyclerViewBaseDataModel(
-                AddNewPlayListModel("Добавить новый Плейлист"),
-                RV_ITEM_MUSIC_PLAYLIST_ADD_NEW
-            )
-        )*/
         this.forEach {
             newList.add(
                 RecyclerViewBaseDataModel(
@@ -164,10 +154,6 @@ class CategoryViewModel @Inject constructor(
             )
         }
         return newList
-    }
-
-    override fun onCleared() {
-        super.onCleared()
     }
 
     private fun List<FavoriteSongs>.toRecyclerViewItemsFavorite(): List<RecyclerViewBaseDataModel> {

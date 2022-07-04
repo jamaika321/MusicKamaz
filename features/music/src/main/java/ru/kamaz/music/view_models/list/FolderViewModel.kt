@@ -10,7 +10,7 @@ import ru.sir.presentation.base.BaseViewModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
 import javax.inject.Inject
 
-class ListViewModel @Inject constructor(
+class FolderViewModel @Inject constructor(
     application: Application,
     private val rvAllFolderWithMusic: AllFolderWithMusicRV
 ):BaseViewModel(application) {

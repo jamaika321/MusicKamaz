@@ -54,7 +54,7 @@ class CategoryFragment : BaseFragment<CategoryViewModel, FragmentCategoryMusicBi
         Log.i("category2", "initVars:$id ")
         when (id) {
             0 -> {
-                clickAddNewPlayList()
+                dialog()
             }
             1 -> {
                 binding.rvCategory.layoutManager = GridLayoutManager(context, 4)
@@ -81,11 +81,6 @@ class CategoryFragment : BaseFragment<CategoryViewModel, FragmentCategoryMusicBi
         viewModel.onClickBack()
     }
 
-
-    fun clickAddNewPlayList() {
-        dialog()
-    }
-
     override fun onStop() {
         binding.rvCategory.layoutManager = null
         super.onStop()
@@ -96,8 +91,7 @@ class CategoryFragment : BaseFragment<CategoryViewModel, FragmentCategoryMusicBi
         super.onDestroy()
     }
 
-    private fun dialog(){
-
+    fun dialog(){
         navigator.navigateTo(
             UiAction(
                 NavAction.OPEN_ADD_PLAY_LIST_DIALOG

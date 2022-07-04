@@ -9,18 +9,16 @@ import kotlinx.coroutines.*
 import ru.kamaz.music.databinding.FragmentListBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.ui.producers.MusicFoldersViewHolder
-import ru.kamaz.music.view_models.list.ListViewModel
+import ru.kamaz.music.view_models.list.FolderViewModel
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseFragment
 import ru.sir.presentation.base.recycler_view.RecyclerViewAdapter
 
 
-class FolderFragment:BaseFragment<ListViewModel, FragmentListBinding>(ListViewModel::class.java) {
+class FolderFragment:BaseFragment<FolderViewModel, FragmentListBinding>(FolderViewModel::class.java) {
     override fun inject(app: BaseApplication) {
         app.getComponent<MusicComponent>().inject(this)
     }
-
-    private val scopeIO = CoroutineScope(Dispatchers.IO + Job())
 
     override fun initBinding(
         inflater: LayoutInflater,
