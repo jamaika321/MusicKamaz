@@ -92,6 +92,7 @@
         style="@style/controlButton"
         android:src="@drawable/ic_three_point"
         android:layout_margin="10dp"
+        android:background="@drawable/button_click"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/like"

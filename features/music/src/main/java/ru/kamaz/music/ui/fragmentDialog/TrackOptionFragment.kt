@@ -5,9 +5,12 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Window
 import androidx.fragment.app.DialogFragment
 import ru.kamaz.music.databinding.FragmentTrackOptionBinding
+import ru.kamaz.music.ui.NavAction
+import ru.sir.presentation.navigation.UiAction
 
 class TrackOptionFragment : DialogFragment() {
 
@@ -30,18 +33,25 @@ class TrackOptionFragment : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
+//        dialog!!.window?.attributes?.x = 222
+//        dialog!!.window?.attributes?.y = 85
         val width = (resources.displayMetrics.widthPixels * 0.40).toInt()
         val height = (resources.displayMetrics.heightPixels * 0.40).toInt()
         dialog!!.window?.setLayout(width, height)
         setListener()
     }
 
+    override fun onPause() {
+        super.onPause()
+        dialog?.dismiss()
+    }
+
     private fun setListener(){
         binding.btnDelete.setOnClickListener {
-            //TODO
+            dialog?.dismiss()
         }
         binding.btnAddToPlaylist.setOnClickListener {
-            onDestroyView()
+            dialog?.dismiss()
         }
 
     }

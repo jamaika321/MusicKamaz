@@ -59,14 +59,14 @@ class TrackViewModel @Inject constructor(
         service.value?.usbModeOn() ?: MutableStateFlow(false)
     }
 
+    val _rvPosition = MutableStateFlow(0)
+    val rvPosition = _rvPosition
+
     private val _sourceEnum = MutableStateFlow("DISK")
     var sourceEnum = _sourceEnum.asStateFlow()
 
     private val _lastMusic = MutableStateFlow("")
     val lastMusic = _lastMusic
-
-    private val _playListLoaded = MutableStateFlow(false)
-    val playListLoaded = _playListLoaded
 
     val lastMusicChanged: StateFlow<String> by lazy {
         service.value?.lastMusic() ?: MutableStateFlow("")
@@ -76,16 +76,15 @@ class TrackViewModel @Inject constructor(
     lateinit var changedListTrack: ArrayList<Track>
 
     override fun init() {
-        Log.i("ReviewTest", "TrackViewModelInit")
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
+        Log.i("TrackFragmentView", "init: ")
     }
 
     fun lastMusic(title: String) {
         _lastMusic.value = title
         if (itemsAll.value.isEmpty()) {
             loadDiskPlaylist("5")
-            _playListLoaded.value = false
         } else {
             convertToRecyclerViewItems(changedListTrack)
         }
@@ -115,10 +114,7 @@ class TrackViewModel @Inject constructor(
 
     fun loadDiskPlaylist(mode: String) {
         Log.i("ReviewTest", "loadDiskPlaylist: ")
-        when (sourceEnum.value) {
-            "USB" -> loadUsbData(mode) { it.either({ }, ::onDiskDataLoaded) }
-            "DISK" -> loadDiskData(mode) { it.either({ }, ::onDiskDataLoaded) }
-        }
+        loadDiskData(mode) { it.either({ }, ::onDiskDataLoaded) }
         if (mode != "all") loadPlayListInCoroutine()
     }
 
@@ -135,8 +131,7 @@ class TrackViewModel @Inject constructor(
     }
 
     private fun convertToRecyclerViewItems(listTrack: ArrayList<Track>) {
-        _itemsAll.value =
-            listTrack.findFavoriteMusic().findPlayingMusic(lastMusic.value).toRecyclerViewItems()
+        _itemsAll.value = listTrack.findFavoriteMusic().findPlayingMusic(lastMusic.value).toRecyclerViewItems()
     }
 
     private fun onDiskDataLoaded(data: List<Track>) {
@@ -153,7 +148,7 @@ class TrackViewModel @Inject constructor(
 
     private fun List<Track>.findPlayingMusic(title: String): List<Track> {
         for (i in this.indices) {
-            this[i].playing = this[i].title == title
+            this[i].playing = this[i].id == title.toLong()
         }
         return this
     }
@@ -169,7 +164,6 @@ class TrackViewModel @Inject constructor(
                     }
                 }
             }
-            _playListLoaded.value = true
         }
         return this
     }
@@ -179,6 +173,10 @@ class TrackViewModel @Inject constructor(
         if (track.title != lastMusic.value) {
             service.value?.initTrack(track, data)
             service.value?.resume()
+            when (track.source) {
+                "disk" -> service.value?.sourceSelection(MusicService.SourceEnum.DISK)
+                "usb" -> service.value?.sourceSelection(MusicService.SourceEnum.USB)
+            }
         } else {
             service.value?.playOrPause()
         }

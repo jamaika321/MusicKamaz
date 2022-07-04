@@ -72,10 +72,6 @@ class CategoryFragment : BaseFragment<CategoryViewModel, FragmentCategoryMusicBi
                 binding.rvCategory.adapter = recyclerViewAdapterFavorite()
 
             }
-            5->{
-                Log.i("ReviewTest_binddata", " 5button pressed ")
-                binding.rvCategory.adapter = recyclerViewAdapterPlayList()
-            }
 
         }
     }

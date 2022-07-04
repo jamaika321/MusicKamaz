@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.kamaz.music.databinding.FragmentListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.ui.NavAction
+import ru.kamaz.music.ui.fragmentDialog.TrackOptionFragment
 import ru.kamaz.music.ui.producers.MusicListViewHolderProducer
 import ru.kamaz.music.view_models.TrackViewModel
 import ru.kamaz.music_api.models.Track
@@ -23,9 +24,12 @@ import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
 import ru.sir.presentation.extensions.launchOn
 import ru.sir.presentation.extensions.launchWhenStarted
 import ru.sir.presentation.navigation.UiAction
+import kotlin.concurrent.fixedRateTimer
 
 class TrackFragment() :
     BaseFragment<TrackViewModel, FragmentListMusicBinding>(TrackViewModel::class.java ) {
+
+    val TAG = "TrackFragment"
 
     override fun inject(app: BaseApplication) {
         app.getComponent<MusicComponent>().inject(this)
@@ -55,27 +59,20 @@ class TrackFragment() :
             } else {
                 viewModel.changeSource("DISK")
             }
-//            viewModel.loadDiskPlaylist("5")
         }
 
         setFragmentResultListener("lastMusic") { key, bundle ->
             val result = bundle.getString("bundleKey")
             if (!result.isNullOrEmpty())  viewModel.lastMusic.value = result
         }
-        setFragmentResultListener("sourceEnum") { key, bundle ->
-            when (bundle.getString("bundleKey")){
-                "USB" -> viewModel.changeSource("USB")
-                "DISK" -> viewModel.changeSource("DISK")
-            }
-        }
 
 
         binding.rvAllMusic.addOnScrollListener(object: RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy > 5){
+                viewModel._rvPosition.value = viewModel.rvPosition.value + dy
+                if (viewModel.rvPosition.value > 5){
                     binding.search.visibility = View.INVISIBLE
-                }
-                if (dy < -1){
+                } else {
                     binding.search.visibility = View.VISIBLE
                 }
                 super.onScrolled(recyclerView, dx, dy)
@@ -93,6 +90,7 @@ class TrackFragment() :
 
     private fun changeRVItems(){
         binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.itemsAll)
+        Log.i(TAG, "changeRVItems: ")
     }
 
     override fun setListeners() {
@@ -133,6 +131,11 @@ class TrackFragment() :
         )
     }
 
+    override fun onResume() {
+        changeRVItems()
+        super.onResume()
+    }
+
     override fun onStop() {
         binding.rvAllMusic.layoutManager = null
         super.onStop()
@@ -149,11 +152,8 @@ class TrackFragment() :
     }
 
     fun onOptionsItemClicked(position: Int, track: Track) {
-        navigator.navigateTo(
-            UiAction(
-                NavAction.OPEN_DIALOG_TRACK_OPTION
-            )
-        )
+        Log.i("RVPosition", "${viewModel.rvPosition.value}")
+        TrackOptionFragment().show(childFragmentManager, "TrackOptionFragment")
     }
 
 

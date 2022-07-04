@@ -52,11 +52,13 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
         if (trackPaths is Either.Right) {
             listWithTrackData = when (mode) {
-                "all" -> metaDataRetriver((trackPaths.r.size), trackPaths.r)
-                "5" -> metaDataRetriver(5, trackPaths.r)
+                "all" -> metaDataRetriver(15, trackPaths.r)
+                "5" -> metaDataRetriver(3, trackPaths.r)
                 else -> metaDataRetriver(1, trackPaths.r)
             }
         }
+        //TODO
+        //Переделать количество загружаемых треков
 
         return if (listWithTrackData.isEmpty()) {
             Either.Left(None())
@@ -84,24 +86,26 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
                     ?.toLong() ?: (180)
             val data = trackPaths[i]
+            val id = i.toLong()
 
             var albumArt = File("")
 
             var art = metaRetriver.embeddedPicture
             if (art != null) {
                 val bitMap = BitmapFactory.decodeByteArray(art, 0, art.size)
-                albumArt = getAlbumArt(bitMap, title)
+                albumArt = getAlbumArt(bitMap, id.toString())
             }
 
             listWithTrackData.add(
                 Track(
-                    i.toLong(),
+                    id,
                     title,
                     artist,
                     data,
                     duration,
                     album,
-                    albumArt.toString()
+                    albumArt.toString(),
+                    source = "usb"
                 )
             )
         }
@@ -113,11 +117,11 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
     fun getAllTracks(mode: String): Either<None, List<Track>> {
         val allTracks = ArrayList<Track>()
 
-        var sdCard = scanMediaFilesInSdCard(mode)
+        var sdCard = scanMediaFilesInStorage(mode)
         if (sdCard is Either.Right){
             allTracks.addAll(sdCard.r)
         }
-        sdCard = scanMediaFilesInStorage(mode)
+        sdCard = scanMediaFilesInSdCard(mode)
         if (sdCard is Either.Right){
             allTracks.addAll(sdCard.r)
         }
@@ -177,7 +181,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         val array = ArrayList<CategoryMusicModel>()
 
         val category = listOf(
-
             CategoryMusicModel(R.drawable.ic_songers, "Исполнители", 0),
             CategoryMusicModel(R.drawable.ic_guitar, "Жанры", 1),
             CategoryMusicModel(R.drawable.ic_albom, "Альбомы", 2),
@@ -294,13 +297,14 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
                 val duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)).toLong()
                 val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
-                val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
-                val contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                val id = Random.nextInt(3000, 4000).toLong()
+                val pictureId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID))
+                val contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, pictureId)
 
                 try {
                     val picture =
                         context.contentResolver.loadThumbnail(contentUri, Size(500, 350), null)
-                    albumArt = getAlbumArt(picture, title)
+                    albumArt = getAlbumArt(picture, id.toString())
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
