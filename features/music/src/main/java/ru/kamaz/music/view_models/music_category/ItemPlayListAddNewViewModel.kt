@@ -18,9 +18,9 @@ class ItemPlayListAddNewViewModel: RecyclerViewBaseItem<AddNewPlayListModel, Mai
             binding.imageCategory.setImageResource(R.drawable.ic_plus)
         }
 
-        binding.root.setOnClickListener {
-            data?.let { (parent as CategoryFragment).dialog() }
-        }
+//        binding.root.setOnClickListener {
+//            data?.let { (parent as CategoryFragment).dialog() }
+//        }
     }
 
     override fun bindData(data: AddNewPlayListModel, position: Int) {

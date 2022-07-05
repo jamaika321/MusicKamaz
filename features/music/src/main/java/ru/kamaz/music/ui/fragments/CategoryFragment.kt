@@ -29,10 +29,6 @@ class CategoryFragment : BaseFragment<CategoryViewModel, FragmentCategoryMusicBi
         app.getComponent<MusicComponent>().inject(this)
     }
 
-    private val main: PlayListFlow by lazy {
-        arguments?.getTypedSerializable( GlobalConstants.MAIN) ?: PlayListFlow.MAIN_WINDOW
-    }
-
 
     override fun initBinding(
         inflater: LayoutInflater,
@@ -40,95 +36,95 @@ class CategoryFragment : BaseFragment<CategoryViewModel, FragmentCategoryMusicBi
         savedInstanceState: Bundle?
     ) = FragmentCategoryMusicBinding.inflate(inflater, container, false)
 
-    override fun initVars() {
-        binding.rvCategory.layoutManager = GridLayoutManager(context, 5)
-        binding.rvCategory.adapter = recyclerViewAdapter2()
-        viewModel.closeBack.launchWhenStarted(lifecycleScope){
-            if (it) super.onBackPressed()
-            Log.i("resBack", "buttonListener")
-        }
-        Log.i("category2", "initVars: ")
-    }
-
-    fun clickListener(id: Int) {
-        Log.i("category2", "initVars:$id ")
-        when (id) {
-            0 -> {
-                dialog()
-            }
-            1 -> {
-                binding.rvCategory.layoutManager = GridLayoutManager(context, 4)
-                binding.rvCategory.adapter = recyclerViewAdapterArtist()
-            }
-            2 -> {
-                binding.rvCategory.adapter = recyclerViewAdapterGenres()
-            }
-            3 -> {
-                Log.i("ReviewTest_binddata", " 3button pressed ")
-                binding.rvCategory.adapter = recyclerViewAdapterAlbums()
-            }
-            4 -> {
-                Log.i("ReviewTest_binddata", " 4button pressed ")
-                binding.rvCategory.adapter = recyclerViewAdapterFavorite()
-
-            }
-
-        }
-    }
-
-    override fun onBackPressed() {
-        Log.i("resBack", "onBackPressed")
-        viewModel.onClickBack()
-    }
-
-    override fun onStop() {
-        binding.rvCategory.layoutManager = null
-        super.onStop()
-    }
-
-    override fun onDestroy() {
-        Log.i("fragmentState", "onDestroy:CategoryFragment ")
-        super.onDestroy()
-    }
-
-    fun dialog(){
-        navigator.navigateTo(
-            UiAction(
-                NavAction.OPEN_ADD_PLAY_LIST_DIALOG
-            )
-        )
-    }
-
-    private fun getFavoritePlayList(){
-
-    }
-
-
-    private fun recyclerViewAdapter2() = RecyclerViewAdapter.Builder(this, viewModel.huitems)
-        .addProducer(MusicCategoryViewHolder())
-        .build { it }
-
-    private fun recyclerViewAdapterFavorite() =
-        RecyclerViewAdapter.Builder(this, viewModel.favorite)
-            .addProducer(MusicFavoriteViewHolder())
-            .build { it }
-
-    private fun recyclerViewAdapterArtist() = RecyclerViewAdapter.Builder(this, viewModel.artist)
-        .addProducer(MusicArtistViewHolder())
-        .build { it }
-
-    private fun recyclerViewAdapterPlayList() =
-        RecyclerViewAdapter.Builder(this, viewModel.playlist)
-            .addProducer(MusicPlayListViewHolder())
-            .build { it }
-
-    private fun recyclerViewAdapterGenres() =
-        RecyclerViewAdapter.Builder(this, viewModel.genres)
-            .addProducer(MusicGenresViewHolder())
-            .build { it }
-    private fun recyclerViewAdapterAlbums() =
-        RecyclerViewAdapter.Builder(this, viewModel.albums)
-            .addProducer(MusicAlbumsViewHolder())
-            .build { it }
+//    override fun initVars() {
+//        binding.rvCategory.layoutManager = GridLayoutManager(context, 5)
+//        binding.rvCategory.adapter = recyclerViewAdapter2()
+//        viewModel.closeBack.launchWhenStarted(lifecycleScope){
+//            if (it) super.onBackPressed()
+//            Log.i("resBack", "buttonListener")
+//        }
+//        Log.i("category2", "initVars: ")
+//    }
+//
+//    fun clickListener(id: Int) {
+//        Log.i("category2", "initVars:$id ")
+//        when (id) {
+//            0 -> {
+//                dialog()
+//            }
+//            1 -> {
+//                binding.rvCategory.layoutManager = GridLayoutManager(context, 4)
+//                binding.rvCategory.adapter = recyclerViewAdapterArtist()
+//            }
+//            2 -> {
+//                binding.rvCategory.adapter = recyclerViewAdapterGenres()
+//            }
+//            3 -> {
+//                Log.i("ReviewTest_binddata", " 3button pressed ")
+//                binding.rvCategory.adapter = recyclerViewAdapterAlbums()
+//            }
+//            4 -> {
+//                Log.i("ReviewTest_binddata", " 4button pressed ")
+//                binding.rvCategory.adapter = recyclerViewAdapterFavorite()
+//
+//            }
+//
+//        }
+//    }
+//
+//    override fun onBackPressed() {
+//        Log.i("resBack", "onBackPressed")
+//        viewModel.onClickBack()
+//    }
+//
+//    override fun onStop() {
+//        binding.rvCategory.layoutManager = null
+//        super.onStop()
+//    }
+//
+//    override fun onDestroy() {
+//        Log.i("fragmentState", "onDestroy:CategoryFragment ")
+//        super.onDestroy()
+//    }
+//
+//    fun dialog(){
+//        navigator.navigateTo(
+//            UiAction(
+//                NavAction.OPEN_ADD_PLAY_LIST_DIALOG
+//            )
+//        )
+//    }
+//
+//    private fun getFavoritePlayList(){
+//
+//    }
+//
+//
+//    private fun recyclerViewAdapter2() = RecyclerViewAdapter.Builder(this, viewModel.huitems)
+//        .addProducer(MusicCategoryViewHolder())
+//        .build { it }
+//
+//    private fun recyclerViewAdapterFavorite() =
+//        RecyclerViewAdapter.Builder(this, viewModel.favorite)
+//            .addProducer(MusicFavoriteViewHolder())
+//            .build { it }
+//
+//    private fun recyclerViewAdapterArtist() = RecyclerViewAdapter.Builder(this, viewModel.artist)
+//        .addProducer(MusicArtistViewHolder())
+//        .build { it }
+//
+//    private fun recyclerViewAdapterPlayList() =
+//        RecyclerViewAdapter.Builder(this, viewModel.playlist)
+//            .addProducer(MusicPlayListViewHolder())
+//            .build { it }
+//
+//    private fun recyclerViewAdapterGenres() =
+//        RecyclerViewAdapter.Builder(this, viewModel.genres)
+//            .addProducer(MusicGenresViewHolder())
+//            .build { it }
+//    private fun recyclerViewAdapterAlbums() =
+//        RecyclerViewAdapter.Builder(this, viewModel.albums)
+//            .addProducer(MusicAlbumsViewHolder())
+//            .build { it }
 
 }

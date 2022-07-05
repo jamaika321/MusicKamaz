@@ -26,19 +26,19 @@ class FolderFragment:BaseFragment<FolderViewModel, FragmentListBinding>(FolderVi
         savedInstanceState: Bundle?
     )= FragmentListBinding.inflate(inflater, container, false)
 
-    override fun onDestroy() {
-        Log.i("fragmentState", "onDestroy:FolderFragment ")
-        super.onDestroy()
-    }
-
-    private fun recyclerViewAdapter() = RecyclerViewAdapter.Builder(this, viewModel.items)
-        .addProducer(MusicFoldersViewHolder())
-        .build { it }
-
-    override fun initVars() {
-        binding.folderWithMusicRv.layoutManager = GridLayoutManager(context, 5)
-        binding.folderWithMusicRv.adapter = recyclerViewAdapter()
-    }
+//    override fun onDestroy() {
+//        Log.i("fragmentState", "onDestroy:FolderFragment ")
+//        super.onDestroy()
+//    }
+//
+//    private fun recyclerViewAdapter() = RecyclerViewAdapter.Builder(this, viewModel.items)
+//        .addProducer(MusicFoldersViewHolder())
+//        .build { it }
+//
+//    override fun initVars() {
+//        binding.folderWithMusicRv.layoutManager = GridLayoutManager(context, 5)
+//        binding.folderWithMusicRv.adapter = recyclerViewAdapter()
+//    }
 
 
 

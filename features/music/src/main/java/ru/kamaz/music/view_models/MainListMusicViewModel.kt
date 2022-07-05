@@ -7,9 +7,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.viewModelScope
-import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
+import ru.kamaz.music.view_models.list.FolderViewModel
 import ru.kamaz.music_api.interactor.*
 import ru.kamaz.music_api.models.AllFolderWithMusic
 import ru.kamaz.music_api.models.CategoryMusicModel
@@ -32,16 +31,18 @@ import javax.inject.Inject
 
 class MainListMusicViewModel @Inject constructor(
     application: Application,
+    private val categoryData: CategoryLoadRV,
     private val loadAllMusic: LoadDiskData,
     private val rvFavorite: FavoriteMusicRV,
     private val insertFavoriteMusic: InsertFavoriteMusic,
-    private val deleteFavoriteMusic: DeleteFavoriteMusic
+    private val deleteFavoriteMusic: DeleteFavoriteMusic,
+    private val rvAllFolderWithMusic: AllFolderWithMusicRV
 ) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel {
 
     companion object {
         private const val RV_ITEM = 2
         private const val RV_ITEM_MUSIC_CATEGORY = 3
-        private const val RV_ITEM_MUSIC_FOLDER = 4
+        private const val RV_ITEM_MUSIC_FOLDER = 5
     }
 
     private val _allMusic = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
@@ -49,6 +50,12 @@ class MainListMusicViewModel @Inject constructor(
 
     val lastMusicChanged: StateFlow<String> by lazy {
         service.value?.lastMusic() ?: MutableStateFlow("")
+    }
+
+    init {
+        loadDiskPlaylist("5")
+        categoryData(None()) { it.either({}, ::onCategoryLoaded) }
+        rvAllFolderWithMusic(None()) { it.either({}, ::onAllFolderWithMusic) }
     }
 
     //////////////////////////////////////////////
@@ -96,7 +103,7 @@ class MainListMusicViewModel @Inject constructor(
 
     private fun List<Track>.findPlayingMusic(title: String): List<Track> {
         for (i in this.indices) {
-            this[i].playing = this[i].id == title.toLong()
+            if (title != "")  this[i].playing = this[i].id == title.toLong()
         }
         return this
     }
@@ -175,6 +182,39 @@ class MainListMusicViewModel @Inject constructor(
     ///////////////////////////////////////////
     ////////////////////////////////////////////
 
+    //CategoryMusic
+
+    private val _categoryOfMusic = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
+    var categoryOfMusic = _categoryOfMusic.asStateFlow()
+
+
+
+    /////////////////////////////////////////
+    //////////////////////////////////////////
+    ///////////////////////////////////////////
+
+    //FolderMusic
+
+    private val _foldersMusic = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
+    val foldersMusic = _foldersMusic
+
+    private fun onAllFolderWithMusic(folderMusic: List<AllFolderWithMusic>){
+        _foldersMusic.value = folderMusic.toRecyclerViewItemsFolder()
+    }
+    private fun List<AllFolderWithMusic>.toRecyclerViewItemsFolder(): List<RecyclerViewBaseDataModel> {
+        val newList = mutableListOf<RecyclerViewBaseDataModel>()
+        this.forEach { newList.add(RecyclerViewBaseDataModel(it,
+            RV_ITEM_MUSIC_FOLDER
+        )) }
+        return newList
+    }
+
+
+
+    ///////////////////////////////////////////
+    ///////////////////////////////////////////
+    //////////////////////////////////////////
+
 
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
     val service = _service.asStateFlow()
@@ -222,13 +262,6 @@ class MainListMusicViewModel @Inject constructor(
     }
 
 
-    private fun List<AllFolderWithMusic>.toRecyclerViewItemsFolder(): List<RecyclerViewBaseDataModel> {
-        val newList = mutableListOf<RecyclerViewBaseDataModel>()
-        this.forEach { newList.add(RecyclerViewBaseDataModel(it, RV_ITEM_MUSIC_FOLDER)) }
-        return newList
-    }
-
-
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         _service.value = (service as MusicService.MyBinder).getService()
         this.service.value?.setViewModel(this)
@@ -236,5 +269,9 @@ class MainListMusicViewModel @Inject constructor(
 
     override fun onServiceDisconnected(name: ComponentName?) {
         _service.value = null
+    }
+
+    private fun onCategoryLoaded(category: List<CategoryMusicModel>) {
+        _categoryOfMusic.value = category.toRecyclerViewItemsCategory()
     }
 }
