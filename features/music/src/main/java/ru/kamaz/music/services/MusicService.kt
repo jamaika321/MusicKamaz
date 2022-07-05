@@ -512,7 +512,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     fun startDiskMode() {
         if (!isDiskModeOn.value) {
             changeSource(2)
-            updateTracks("all")
+            updateTracks("5")
             nextTrack(2)
         }
     }
@@ -614,8 +614,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun initTrack(track: Track, data1: String) {
         _isFavorite.value = false
         val currentTrack = track
-        _lastMusic.value = currentTrack.title
-//        updateTracks(mediaManager)
+        _lastMusic.value = currentTrack.id.toString()
         _idSong.value = currentTrack.id.toInt()
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
         _data.value = track.data
@@ -626,7 +625,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         } else {
             _cover.value = ""
         }
-
         mediaPlayer.apply {
             stop()
             reset()
@@ -647,26 +645,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 //        tracks.clear()
     }
 
-    private fun checkCurrentPosition(data: String) {
-//        var i = 0
-//        var q = 0
-//        CoroutineScope(Dispatchers.IO).launch {
-//            while (i in tracks.indices) {
-//                if (tracks[q].data != data) {
-//                    q++
-//                    i++
-//                } else {
-//                    Log.i(TAG, "checkCurrentPosition $q$data")
-//                    initTrack(tracks[q], data)
-//                    break
-//                }
-//            }
-//        }
-//        currentTrackPosition = q
-    }
-
     override fun lastSavedState() {
-//        updateSeekBar(mediaPlayer.duration.toLong())
         twManager.startMonitoring(applicationContext) {
             twManagerMusic.addListener(this)
             twManager.requestConnectionInfo()
@@ -994,8 +973,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun updateTracks(loadMode: String) {
-        Log.i("ReviewTest_Mode", "${this.mode.value} ")
-
         when (mode) {
             SourceEnum.USB -> {
                 val result = mediaManager.getMediaFilesFromPath("sdCard", loadMode)

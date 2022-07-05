@@ -75,15 +75,15 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
         }
 
         binding.settings.setOnClickListener {
-            (parent as TrackFragment).onOptionsItemClicked(_position.value, data)
+            (parent as MainListMusicFragment).onOptionsItemClicked(_position.value, data)
         }
 
         binding.root.setOnClickListener {
-           (parent as TrackFragment).onTrackClicked(data)
+           (parent as MainListMusicFragment).onTrackClicked(data)
         }
 
         binding.like.setOnClickListener {
-            (parent as TrackFragment).onLikeClicked(data)
+            (parent as MainListMusicFragment).onLikeClicked(data)
             favorite.value = !favorite.value
         }
     }

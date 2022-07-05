@@ -56,11 +56,6 @@ interface MusicServiceInterface{
     }
 
     interface ViewModel{
-        fun addListener()
-        fun removeListener()
-        fun onCheckPosition(position: Int)
-        fun onUpdateSeekBar(duration:Int)
-        fun selectBtMode()
     }
 
 }

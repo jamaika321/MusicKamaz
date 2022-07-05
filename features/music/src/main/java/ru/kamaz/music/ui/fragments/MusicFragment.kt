@@ -60,7 +60,6 @@ class MusicFragment :
     ) = FragmentPlayerBinding.inflate(inflater, container, false)
 
     override fun onResume() {
-        //      viewModel.startTrack()
         viewModel.lastSavedState()
         val presenter = MusicPresenter(context)
         presenter.openUSBList()
@@ -88,10 +87,6 @@ class MusicFragment :
             addEvent()
         }
         binding.openListFragment.setOnClickListener {
-            when (viewModel.isUsbModeOn.value) {
-                false -> setFragmentResult("sourceEnum", bundleOf("bundleKey" to "DISK"))
-                true -> setFragmentResult("sourceEnum", bundleOf("bundleKey" to "USB"))
-            }
             navigator.navigateTo(
                 UiAction(
                     OPEN_TRACK_LIST_FRAGMENT,
@@ -280,7 +275,6 @@ class MusicFragment :
         viewModel.isDeviceNotConnectFromBt.launchWhenStarted(lifecycleScope) {
             if (it) dialog()
         }
-
         viewModel.lastMusic.launchWhenStarted(lifecycleScope) {
             setFragmentResult("lastMusic", bundleOf("bundleKey" to it))
         }
@@ -448,7 +442,7 @@ class MusicFragment :
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
-        binding.pictureDevice.setImageResource(R.drawable.music_png_bg)
+//        binding.pictureDevice.setImageResource(R.drawable.music_png_bg)
         binding.musicButtons.setBackgroundResource(R.color.blurred_black_background)
         binding.artist.setBackgroundResource(R.drawable.black_gradient)
     }

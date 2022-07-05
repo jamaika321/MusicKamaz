@@ -26,9 +26,7 @@ import javax.inject.Inject
 class MusicFragmentViewModel @Inject constructor(
     application: Application,
     private val testSettings: TestSettings,
-    private val mediaManager: MediaManager,
     private val getMusicPosition: GetMusicPosition,
-    private val getFilesUseCase: GetFilesUseCase
 ) : BaseViewModel(application), MediaPlayer.OnCompletionListener, ServiceConnection,
     MusicServiceInterface.ViewModel,MusicManagerListener {
 
@@ -207,21 +205,6 @@ class MusicFragmentViewModel @Inject constructor(
         _service.value = null
     }
 
-    override fun addListener() {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeListener() {
-        TODO("Not yet implemented")
-    }
-
-    override fun onCheckPosition(position: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onUpdateSeekBar(duration: Int) {
-
-    }
 
 
     override fun onSdStatusChanged(path: String, isAdded: Boolean) {
@@ -230,10 +213,6 @@ class MusicFragmentViewModel @Inject constructor(
 
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
         "USB status changed: value = $path status = $isAdded".easyLog(this)
-    }
-
-    override fun selectBtMode() {
-
     }
 
 
