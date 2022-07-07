@@ -17,6 +17,6 @@ interface LikeMusicDao {
     fun loadAll(data:String): FavoriteSongsEntity
 
     @Query("SELECT * FROM like_songs ")
-      fun getData(): Flow<List<FavoriteSongsEntity>>
+    fun getData(): List<FavoriteSongsEntity>
 
 }

@@ -6,19 +6,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/playlist_fragment"
-        layout="@layout/fragment_list_music"
-        android:layout_height="0dp"
-        android:layout_marginStart="@dimen/margin_list_frag2"
-        android:layout_marginEnd="@dimen/margin_list_frag2"
-        android:layout_width="match_parent"
-        android:visibility="invisible"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_all_music"
+        android:paddingTop="60dp"
+        android:clipToPadding="false"
+        android:layout_marginHorizontal="@dimen/margin_list_frag2"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/source_selection"
+        app:layout_constraintBottom_toTopOf="@id/source_selection"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_weight="9"/>
+        android:layout_width="match_parent"
+        app:layout_constraintVertical_weight="9"
+        android:layout_height="0dp">
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search"
+        android:layout_width="match_parent"
+        android:theme="@style/ThemeOverlay.SearchView"
+        android:outlineAmbientShadowColor="@color/white"
+        android:layout_marginTop="10dp"
+        android:layout_height="50dp"
+        android:layoutDirection="rtl"
+        android:background="@drawable/ic_back_search"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_weight="1.5"
+        android:queryHint="Поиск..."
+        android:textColorHint="@color/white"
+        android:outlineSpotShadowColor="@color/white"
+        android:textSize="@dimen/marginTop"
+        app:goIcon="@drawable/ic_music_white"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/margin_list_frag"
+        android:layout_marginEnd="@dimen/margin_list_frag"
+        >
+    </androidx.appcompat.widget.SearchView>
 
     <include
         android:id="@+id/source_selection"
@@ -26,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintVertical_weight="2"
-        app:layout_constraintTop_toBottomOf="@+id/playlist_fragment"
+        app:layout_constraintTop_toBottomOf="@+id/rv_all_music"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

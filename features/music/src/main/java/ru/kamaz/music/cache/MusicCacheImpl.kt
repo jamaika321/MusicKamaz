@@ -69,8 +69,12 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         }
     }
 
-    override fun getAllFavoriteSongs(): Flow<List<FavoriteSongs>> {
-        return db.userDao().getData().map { convertEntityListFavoriteModelList(it) }
+    override fun getAllFavoriteSongs(): Either<None, List<FavoriteSongs>> {
+        return try {
+            Either.Right( convertEntityListFavoriteModelList(db.userDao().getData()) )
+        } catch (e: Exception) {
+            Either.Left(None())
+        }
     }
 
     override fun getAllPlayList(): Flow<List<PlayListModel>> {

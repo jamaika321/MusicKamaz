@@ -87,6 +87,7 @@ class MusicFragment :
             addEvent()
         }
         binding.openListFragment.setOnClickListener {
+            setFragmentResult("lastMusic", bundleOf("bundleKey" to viewModel.lastMusic.value))
             navigator.navigateTo(
                 UiAction(
                     OPEN_TRACK_LIST_FRAGMENT,
@@ -261,6 +262,7 @@ class MusicFragment :
             }
         }
         viewModel.isFavoriteMusic.launchWhenStarted(lifecycleScope) {
+            Log.i("ReviewTest_Favorite", " : ${it} ")
             likeStatus(it)
         }
         viewModel.isBtModeOn.launchWhenStarted(lifecycleScope) {
@@ -276,7 +278,7 @@ class MusicFragment :
             if (it) dialog()
         }
         viewModel.lastMusic.launchWhenStarted(lifecycleScope) {
-            setFragmentResult("lastMusic", bundleOf("bundleKey" to it))
+//            setFragmentResult("lastMusic", bundleOf("bundleKey" to it))
         }
     }
 
@@ -329,6 +331,8 @@ class MusicFragment :
             binding.controlPanel.like.setImageResource(R.drawable.ic_like_false)
         }
     }
+
+
 
 
     fun btModeActivation() {

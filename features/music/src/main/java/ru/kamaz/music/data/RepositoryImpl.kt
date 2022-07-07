@@ -30,7 +30,7 @@ class RepositoryImpl(
     override fun rvArtist(): Either<None, List<Track>> = media.getMediaFilesFromPath("storage", "all")
     override fun rvPlayList(): Flow<List<PlayListModel>> = testDBDao.getAllPlayList()
     override fun rvCategory(): Either<None, List<CategoryMusicModel>> = media.getCategory()
-    override fun rvFavorite(): Flow<List<FavoriteSongs>> = testDBDao.getAllFavoriteSongs()
+    override fun rvFavorite(): Either<None, List<FavoriteSongs>> = testDBDao.getAllFavoriteSongs()
     override fun rvAllFolderWithMusic(): Either<None, List<AllFolderWithMusic>> =
         media.getAllFolder()
 

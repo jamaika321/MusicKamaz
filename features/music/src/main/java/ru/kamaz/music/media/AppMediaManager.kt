@@ -52,8 +52,8 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
         if (trackPaths is Either.Right) {
             listWithTrackData = when (mode) {
-                "all" -> metaDataRetriver(15, trackPaths.r)
-                "5" -> metaDataRetriver(3, trackPaths.r)
+                "all" -> metaDataRetriver(trackPaths.r.size, trackPaths.r)
+                "5" -> metaDataRetriver(trackPaths.r.size/2, trackPaths.r)
                 else -> metaDataRetriver(1, trackPaths.r)
             }
         }
@@ -93,7 +93,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             var art = metaRetriver.embeddedPicture
             if (art != null) {
                 val bitMap = BitmapFactory.decodeByteArray(art, 0, art.size)
-                albumArt = getAlbumArt(bitMap, id.toString())
+                albumArt = getAlbumArt(bitMap, title.replace("/",""))
             }
 
             listWithTrackData.add(
@@ -297,14 +297,14 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
                 val duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)).toLong()
                 val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
-                val id = Random.nextInt(3000, 4000).toLong()
+                val id = 5000 + cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID))
                 val pictureId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID))
                 val contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, pictureId)
 
                 try {
                     val picture =
                         context.contentResolver.loadThumbnail(contentUri, Size(500, 350), null)
-                    albumArt = getAlbumArt(picture, id.toString())
+                    albumArt = getAlbumArt(picture, title.replace("/",""))
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
@@ -339,8 +339,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
     private fun bitmapToFile(
         bitmap: Bitmap,
         fileNameToSave: String
-    ): File? { // File name like "image.png"
-        //create a file to write bitmap data
+    ): File? {
         var file: File? = null
         return try {
 
@@ -354,12 +353,12 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             )
             file.createNewFile()
 
-            //Convert bitmap to byte array
+
             val bos = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos) // YOU can also save it in JPEG
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos)
             val bitmapdata = bos.toByteArray()
 
-            //write the bytes in file
+
             val fos = FileOutputStream(file)
             fos.write(bitmapdata)
             fos.flush()
@@ -367,7 +366,19 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             file
         } catch (e: Exception) {
             e.printStackTrace()
-            file // it will return null
+            file
+        }
+    }
+
+    override fun deleteAlbumArtDir(){
+        var file : File? = null
+        try {
+            file = File(
+                Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator
+            )
+            file.deleteRecursively()
+        } catch (e: Exception){
+            e.printStackTrace()
         }
     }
 

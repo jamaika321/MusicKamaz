@@ -15,7 +15,7 @@ interface Repository: PathManager, SourceManager {
     fun rvArtist(): Either<None, List<Track>>
     fun rvPlayList():Flow<List<PlayListModel>>
     fun rvCategory():Either<None,List<CategoryMusicModel>>
-    fun rvFavorite(): Flow<List<FavoriteSongs>>
+    fun rvFavorite(): Either<None, List<FavoriteSongs>>
     fun rvAllFolderWithMusic():Either<None, List<AllFolderWithMusic>>
     fun getMusicCover(albumId: Long): Either<None, String>
     fun getMusicPositionFlow(): Flow<Int>

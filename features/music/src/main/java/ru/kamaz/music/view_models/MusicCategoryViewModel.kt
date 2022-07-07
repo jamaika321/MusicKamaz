@@ -21,9 +21,9 @@ class MusicCategoryViewModel :RecyclerViewBaseItem<CategoryMusicModel, MainCateg
         category.launchWhenStarted(parent.lifecycleScope){
             binding.textCategory.text = it
         }
-//        binding.clAllItem.setOnClickListener {
-//            data?.let { (parent as MainListMusicFragment).clickListener(it.id) }
-//        }
+        binding.clAllItem.setOnClickListener {
+            data?.let { (parent as MainListMusicFragment).categoryItemClicked(it.id) }
+        }
 
     }
 

@@ -10,7 +10,6 @@ import android.bluetooth.BluetoothDevice
 import android.content.*
 import android.content.ContentValues.TAG
 import android.graphics.Color
-import android.hardware.usb.UsbManager
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -37,27 +36,25 @@ import ru.kamaz.music.cache.db.dao.Playback
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.receiver.BrReceiver
-import ru.kamaz.music.services.music.ShuffleHelper
 import ru.kamaz.music.ui.TestWidget
 import ru.kamaz.music_api.BaseConstants.ACTION_NEXT
 import ru.kamaz.music_api.BaseConstants.ACTION_PREV
 import ru.kamaz.music_api.BaseConstants.ACTION_TOGGLE_PAUSE
 import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
 import ru.kamaz.music_api.BaseConstants.EXTRA_APP_WIDGET_NAME
-import ru.kamaz.music_api.SourceType
 import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.*
 import ru.kamaz.music_api.models.FavoriteSongs
 import ru.kamaz.music_api.models.HistorySongs
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
+import ru.sir.core.None
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.extensions.launchOn
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 
 class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener,
@@ -86,6 +83,9 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
     @Inject
     lateinit var queryFavoriteMusic: QueryFavoriteMusic
+
+    @Inject
+    lateinit var getAllFavoriteSongs: FavoriteMusicRV
 
     @Inject
     lateinit var deleteFavoriteMusic: DeleteFavoriteMusic
@@ -334,13 +334,13 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         }
     }
 
-    private fun queryFavoriteMusic() {
+    private fun getFavoriteMusicList() {
         CoroutineScope(Dispatchers.IO).launch {
-            val it = queryFavoriteMusic.run(QueryFavoriteMusic.Params(data.value))
+            val it = getAllFavoriteSongs.run(None())
             it.either({
             }, {
                 (if (it.isEmpty()) Log.i("queryFavoriteMusic", "duration${it}")
-                else checkFavoriteMusic(it))
+                else changeFavoriteStatus(it))
             })
         }
     }
@@ -582,6 +582,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun appClosed() {
         stopMediaPlayer()
         twManager.stopMonitoring(applicationContext)
+        mediaManager.deleteAlbumArtDir()
 //        twManagerMusic.close()
     }
 
@@ -612,14 +613,14 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
 
 
     override fun initTrack(track: Track, data1: String) {
-        _isFavorite.value = false
+        _isFavorite.value = track.favorite
         val currentTrack = track
         _lastMusic.value = currentTrack.id.toString()
         _idSong.value = currentTrack.id.toInt()
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
         _data.value = track.data
         _duration.value = track.duration.toInt()
-        Log.i("TrackAlbumArt", "${track.albumArt} ")
+        Log.i("ReviewTest_Duration", "${track.duration} ")
         if (track.albumArt != "") {
             _cover.value = track.albumArt
         } else {
@@ -637,7 +638,6 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             )
             prepare()
         }
-        queryFavoriteMusic()
     }
 
     private fun stopMediaPlayer() {
@@ -1011,9 +1011,14 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     private fun loadTracksOnCoroutine(loadMode : String){
-        CoroutineScope(Dispatchers.IO).launch {
+        val scope = CoroutineScope(Job() + Dispatchers.IO)
+        val job = scope.launch {
             updateTracks(loadMode)
+            val result = async {
+                getFavoriteMusicList()
+            }.await()
         }
+        job.start()
     }
 
     private fun replaceAllTracks(trackList: List<Track>) {
@@ -1064,11 +1069,12 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun insertFavoriteMusic() {
-        queryFavoriteMusic()
         if (isFavorite.value) {
             deleteFavoriteMusic()
+            tracks[currentTrackPosition].favorite = false
         } else {
             _isFavorite.value = true
+            tracks[currentTrackPosition].favorite = true
             val music = FavoriteSongs(idSong.value, data.value, title.value, artist.value)
             insertFavoriteMusic(InsertFavoriteMusic.Params(music))
         }
@@ -1080,20 +1086,19 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun deleteFavoriteMusic() {
+        Log.i("ReviewTest_Favorite", " : -----delete ")
         _isFavorite.value = false
         val music = FavoriteSongs(idSong.value, data.value, title.value, artist.value)
         deleteFavoriteMusic(DeleteFavoriteMusic.Params(music))
     }
 
-    fun checkFavoriteMusic(data: String) {
-        var i = 0
+    private fun changeFavoriteStatus(list: List<FavoriteSongs>) {
         CoroutineScope(Dispatchers.IO).launch {
-            while (i in tracks.indices) {
-                if (tracks[i].data != data) {
-                    i++
-                } else {
-                    _isFavorite.value = true
-                    break
+            tracks.forEach{ track ->
+                list.forEach{ list ->
+                    if (track.title == list.title && track.data == list.data){
+                        track.favorite = true
+                    }
                 }
             }
         }
