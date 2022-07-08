@@ -1,5 +1,6 @@
 package ru.kamaz.music.view_models
 
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.kamaz.music.databinding.MainCategoryItemBinding
@@ -22,7 +23,10 @@ class MusicCategoryViewModel :RecyclerViewBaseItem<CategoryMusicModel, MainCateg
             binding.textCategory.text = it
         }
         binding.clAllItem.setOnClickListener {
-            data?.let { (parent as MainListMusicFragment).categoryItemClicked(it.id) }
+            data.let {item ->
+                (parent as MainListMusicFragment).categoryItemClicked(item.id)
+            }
+
         }
 
     }

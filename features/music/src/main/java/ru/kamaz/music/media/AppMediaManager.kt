@@ -82,6 +82,9 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             val title =
                 metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE))
                     ?: ("unknown")
+            val genre =
+                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_GENRE))
+                    ?: ("unknown")
             val duration =
                 metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
                     ?.toLong() ?: (180)
@@ -90,11 +93,22 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
             var albumArt = File("")
 
-            var art = metaRetriver.embeddedPicture
-            if (art != null) {
-                val bitMap = BitmapFactory.decodeByteArray(art, 0, art.size)
-                albumArt = getAlbumArt(bitMap, title.replace("/",""))
+            var file : File? = null
+            file = File(
+                Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator + title.replace("/", "")
+            )
+            if (!file.exists()) {
+                var art = metaRetriver.embeddedPicture
+                if (art != null) {
+                    val bitMap = BitmapFactory.decodeByteArray(art, 0, art.size)
+                    albumArt = getAlbumArt(bitMap, title.replace("/",""))
+                    Log.i("ReviewTest_Embedded", " i am saved: $albumArt ")
+                }
+            } else {
+                albumArt = file
             }
+
+
 
             listWithTrackData.add(
                 Track(
@@ -102,6 +116,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                     title,
                     artist,
                     data,
+                    genre,
                     duration,
                     album,
                     albumArt.toString(),
@@ -279,6 +294,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.TITLE,
+//            MediaStore.Audio.Media.GENRE,
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media._ID
@@ -295,6 +311,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 val artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
                 val album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
                 val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
+                val genre = ""
                 val duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)).toLong()
                 val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
                 val id = 5000 + cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID))
@@ -316,6 +333,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                         title,
                         artist,
                         data,
+                        genre,
                         duration,
                         album,
                         albumArt.toString()
@@ -348,10 +366,11 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             )
             file.mkdirs()
 
+
             file = File(
                 Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator + fileNameToSave
             )
-            file.createNewFile()
+            if (!file.exists()) file.createNewFile()
 
 
             val bos = ByteArrayOutputStream()

@@ -1,5 +1,6 @@
 package ru.kamaz.music.view_models
 
+import android.media.MediaPlayer
 import android.net.Uri
 import android.util.Log
 import android.view.Gravity
@@ -19,6 +20,7 @@ import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
 import java.io.File
+import javax.inject.Inject
 
 class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
     private val artist = MutableStateFlow("")
@@ -39,6 +41,9 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
         _position.value = position
     }
 
+    @Inject
+    lateinit var mediaPlayer : MediaPlayer
+
     override fun initVars() {
         artist.launchWhenStarted(parent.lifecycleScope){
             binding.artistName.text=it
@@ -55,6 +60,8 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
                 binding.image.setImageResource(R.drawable.music_png_bg)
             }
         }
+
+//        mediaPlayer.seekTo()//TODO
 
         playing.launchWhenStarted(parent.lifecycleScope){
             if (it){

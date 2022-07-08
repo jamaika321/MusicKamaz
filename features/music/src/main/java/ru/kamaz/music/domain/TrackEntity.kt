@@ -13,6 +13,7 @@ class TrackEntity (
     val title: String,
     val artist: String,
     val data: String,
+    val genre: String,
     val duration: Long,
     val album: String,
     val albumArt: String,

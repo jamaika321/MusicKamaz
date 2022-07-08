@@ -580,6 +580,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     }
 
     override fun appClosed() {
+        Log.i("ReviewTest_Closed", "appClosed: ")
         stopMediaPlayer()
         twManager.stopMonitoring(applicationContext)
         mediaManager.deleteAlbumArtDir()

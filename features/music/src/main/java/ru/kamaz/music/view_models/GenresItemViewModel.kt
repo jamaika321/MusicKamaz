@@ -10,14 +10,14 @@ import ru.sir.presentation.extensions.launchWhenStarted
 
 
 class GenresItemViewModel: RecyclerViewBaseItem<Track, GenresItemBinding>(){
-    private val artist = MutableStateFlow("")
-    private val title = MutableStateFlow(0)
+    private val genres = MutableStateFlow("")
+    private val title = MutableStateFlow("")
     private lateinit var data: Track
 
 
     override fun initVars() {
-        artist.launchWhenStarted(parent.lifecycleScope){
-            binding.textCategory.text= it.toString()
+        genres.launchWhenStarted(parent.lifecycleScope){
+            binding.textCategory.text = it
         }
         title.launchWhenStarted(parent.lifecycleScope){
 
@@ -30,7 +30,7 @@ class GenresItemViewModel: RecyclerViewBaseItem<Track, GenresItemBinding>(){
 
     override fun bindData(data: Track, position: Int) {
         this.data = data
-        artist.value= data.album
+        genres.value= data.genre
     }
 
 
