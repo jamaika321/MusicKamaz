@@ -1,10 +1,8 @@
 package ru.kamaz.music.view_models
 
-import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.kamaz.music.databinding.MainCategoryItemBinding
-import ru.kamaz.music.ui.fragments.CategoryFragment
 import ru.kamaz.music.ui.fragments.MainListMusicFragment
 import ru.kamaz.music_api.models.CategoryMusicModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
@@ -28,6 +26,7 @@ class MusicCategoryViewModel :RecyclerViewBaseItem<CategoryMusicModel, MainCateg
             }
 
         }
+
 
     }
 

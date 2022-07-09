@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import ru.kamaz.music.databinding.MainCategoryItemBinding
 import ru.kamaz.music.ui.producers.ItemType.RV_ITEM_MUSIC_PLAYLIST
-
 import ru.kamaz.music.view_models.music_category.ItemPlayListViewModel
 import ru.kamaz.music_api.models.PlayListModel
 import ru.sir.presentation.base.recycler_view.ViewHolderProducer

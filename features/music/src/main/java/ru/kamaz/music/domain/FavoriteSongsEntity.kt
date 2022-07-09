@@ -6,14 +6,17 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "like_songs")
 data class FavoriteSongsEntity(
+    @ColumnInfo(name = "track_id")
+    val id: Long,
     @PrimaryKey
-    @ColumnInfo(name = "id_song")
-    var idSong: Int,
-    @ColumnInfo(name = "data")
-    var data: String,
-    @ColumnInfo(name = "title")
     val title: String,
-    @ColumnInfo(name = "artist")
-    val artist: String
+    val artist: String,
+    val data: String,
+    val genre: String,
+    val duration: Long,
+    val album: String,
+    val albumArt: String,
+    var playing: Boolean,
+    var favorite: Boolean
 )
 

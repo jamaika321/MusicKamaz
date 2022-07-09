@@ -12,6 +12,7 @@ import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.models.ErrorMessage
 import ru.kamaz.music_api.models.FavoriteSongs
 import ru.kamaz.music_api.models.PlayListModel
+import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.core.None
 import java.lang.Exception
@@ -69,7 +70,7 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         }
     }
 
-    override fun getAllFavoriteSongs(): Either<None, List<FavoriteSongs>> {
+    override fun getAllFavoriteSongs(): Either<None, List<Track>> {
         return try {
             Either.Right( convertEntityListFavoriteModelList(db.userDao().getData()) )
         } catch (e: Exception) {
@@ -81,9 +82,19 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         return db.playListDao().getData().map { convertEntityPlayListModelList(it) }
     }
 
-    private fun convertEntityListFavoriteModelList(entity: List<FavoriteSongsEntity>): List<FavoriteSongs>{
-        val data = mutableListOf<FavoriteSongs>()
-        entity.forEach { data.add(FavoriteSongs(it.idSong,it.data,it.title,it.artist)) }
+    private fun convertEntityListFavoriteModelList(entity: List<FavoriteSongsEntity>): List<Track>{
+        val data = mutableListOf<Track>()
+        entity.forEach { data.add(Track(
+            it.id,
+            it.title,
+            it.artist,
+            it.data,
+            it.genre,
+            it.duration,
+            it.album,
+            it.albumArt,
+            it.playing,
+            it.favorite)) }
         return data
     }
 

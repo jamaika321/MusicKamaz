@@ -1076,8 +1076,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         } else {
             _isFavorite.value = true
             tracks[currentTrackPosition].favorite = true
-            val music = FavoriteSongs(idSong.value, data.value, title.value, artist.value)
-            insertFavoriteMusic(InsertFavoriteMusic.Params(music))
+            insertFavoriteMusic(InsertFavoriteMusic.Params(tracks[currentTrackPosition]))
         }
     }
 
@@ -1089,11 +1088,10 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
     override fun deleteFavoriteMusic() {
         Log.i("ReviewTest_Favorite", " : -----delete ")
         _isFavorite.value = false
-        val music = FavoriteSongs(idSong.value, data.value, title.value, artist.value)
-        deleteFavoriteMusic(DeleteFavoriteMusic.Params(music))
+        deleteFavoriteMusic(DeleteFavoriteMusic.Params(tracks[currentTrackPosition]))
     }
 
-    private fun changeFavoriteStatus(list: List<FavoriteSongs>) {
+    private fun changeFavoriteStatus(list: List<Track>) {
         CoroutineScope(Dispatchers.IO).launch {
             tracks.forEach{ track ->
                 list.forEach{ list ->

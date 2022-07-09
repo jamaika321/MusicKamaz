@@ -30,7 +30,7 @@ class RepositoryImpl(
     override fun rvArtist(): Either<None, List<Track>> = media.getMediaFilesFromPath("storage", "all")
     override fun rvPlayList(): Flow<List<PlayListModel>> = testDBDao.getAllPlayList()
     override fun rvCategory(): Either<None, List<CategoryMusicModel>> = media.getCategory()
-    override fun rvFavorite(): Either<None, List<FavoriteSongs>> = testDBDao.getAllFavoriteSongs()
+    override fun rvFavorite(): Either<None, List<Track>> = testDBDao.getAllFavoriteSongs()
     override fun rvAllFolderWithMusic(): Either<None, List<AllFolderWithMusic>> =
         media.getAllFolder()
 
@@ -57,11 +57,11 @@ class RepositoryImpl(
         TODO("Not yet implemented")
     }
 
-    override fun insertFavoriteSong(song: FavoriteSongs): Either<Failure, None> =
-        testDBDao.insertFavoriteSong(song.toDao())
+    override fun insertFavoriteSong(song: Track): Either<Failure, None> =
+        testDBDao.insertFavoriteSong(song.toFavoriteDao())
 
-    override fun deleteFavoriteSong(song: FavoriteSongs): Either<Failure, None> =
-        testDBDao.deleteFavoriteSong(song.toDao())
+    override fun deleteFavoriteSong(song: Track): Either<Failure, None> =
+        testDBDao.deleteFavoriteSong(song.toFavoriteDao())
 
     override fun insertPlayList(song: PlayListModel): Either<Failure, None> =
         testDBDao.insertPlayList(song.toDao())
@@ -92,7 +92,17 @@ class RepositoryImpl(
         TODO("Not yet implemented")
     }
 
-    private fun FavoriteSongs.toDao() = FavoriteSongsEntity(this.idSong, this.data,this.title,this.artist)
+    private fun Track.toFavoriteDao() = FavoriteSongsEntity(
+        this.id,
+        this.title,
+        this.artist,
+        this.data,
+        this.genre,
+        this.duration,
+        this.album,
+        this.albumArt,
+        this.playing,
+        this.favorite)
     private fun PlayListModel.toDao() = PlayListEntity(this.id, this.title)
     private fun HistorySongs.toDao() = HistorySongsEntity(
         this.dbID,

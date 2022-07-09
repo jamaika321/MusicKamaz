@@ -15,13 +15,13 @@ interface Repository: PathManager, SourceManager {
     fun rvArtist(): Either<None, List<Track>>
     fun rvPlayList():Flow<List<PlayListModel>>
     fun rvCategory():Either<None,List<CategoryMusicModel>>
-    fun rvFavorite(): Either<None, List<FavoriteSongs>>
+    fun rvFavorite(): Either<None, List<Track>>
     fun rvAllFolderWithMusic():Either<None, List<AllFolderWithMusic>>
     fun getMusicCover(albumId: Long): Either<None, String>
     fun getMusicPositionFlow(): Flow<Int>
     fun lastTrack(): Either<None, String>
-    fun insertFavoriteSong(song: FavoriteSongs): Either<Failure, None>
-    fun deleteFavoriteSong(song: FavoriteSongs): Either<Failure, None>
+    fun insertFavoriteSong(song: Track): Either<Failure, None>
+    fun deleteFavoriteSong(song: Track): Either<Failure, None>
     fun insertPlayList(song: PlayListModel): Either<Failure, None>
     fun deletePlayList(song: PlayListModel): Either<Failure, None>
     fun insertHistorySong(song: HistorySongs): Either<Failure, None>

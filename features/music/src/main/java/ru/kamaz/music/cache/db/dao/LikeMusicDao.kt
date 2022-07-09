@@ -3,6 +3,7 @@ package ru.kamaz.music.cache.db.dao
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import ru.kamaz.music.domain.FavoriteSongsEntity
+import ru.kamaz.music.domain.TrackEntity
 
 @Dao
 interface LikeMusicDao {

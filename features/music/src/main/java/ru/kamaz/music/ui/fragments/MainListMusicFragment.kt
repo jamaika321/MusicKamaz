@@ -1,6 +1,7 @@
 package ru.kamaz.music.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,37 +26,43 @@ import ru.sir.presentation.extensions.launchWhenStarted
 
 
 class MainListMusicFragment
-    :BaseFragment<MainListMusicViewModel, FragmentMainListMusicBinding>(MainListMusicViewModel::class.java) {
+    :
+    BaseFragment<MainListMusicViewModel, FragmentMainListMusicBinding>(MainListMusicViewModel::class.java) {
     override fun inject(app: BaseApplication) {
         app.getComponent<MusicComponent>().inject(this)
     }
 
     companion object {
-        private const val RV_ITEM = 2
-        private const val RV_ITEM_MUSIC_CATEGORY = 3
-        private const val RV_ITEM_MUSIC_FOLDER = 5
+        const val RV_ITEM_MUSIC_ARTIST = 0
+        const val RV_ITEM_MUSIC_GENRES = 1
+        const val RV_ITEM_MUSIC_ALBUMS = 2
+        const val RV_ITEM_MUSIC_PLAYLIST = 3
+        const val RV_ITEM_MUSIC_FAVORITE = 4
+        const val RV_ITEM = 5
+        const val RV_ITEM_MUSIC_CATEGORY = 6
+        const val RV_ITEM_MUSIC_FOLDER = 7
+        const val RV_ITEM_MUSIC_PLAYLIST_ADD_NEW = 8
     }
 
     override fun initVars() {
-        startListAllMusic()
+        categoryItemClicked(RV_ITEM)
         initServiceVars()
     }
 
-    private fun initServiceVars(){
-        viewModel.lastMusicChanged.launchWhenStarted(lifecycleScope){
+    private fun initServiceVars() {
+        viewModel.lastMusicChanged.launchWhenStarted(lifecycleScope) {
             viewModel.lastMusic(it)
-            startListAllMusic()
         }
 
         setFragmentResultListener("lastMusic") { key, bundle ->
             val result = bundle.getString("bundleKey")
-            if (!result.isNullOrEmpty())  viewModel.lastMusic.value = result
+            if (!result.isNullOrEmpty()) viewModel.lastMusic.value = result
         }
 
-        binding.rvAllMusic.addOnScrollListener(object: RecyclerView.OnScrollListener(){
+        binding.rvAllMusic.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 viewModel.rvPosition.value += dy
-                if (viewModel.rvPosition.value > 5){
+                if (viewModel.rvPosition.value > 5) {
                     binding.search.visibility = View.INVISIBLE
                 } else {
                     binding.search.visibility = View.VISIBLE
@@ -66,7 +73,6 @@ class MainListMusicFragment
     }
 
 
-
     override fun initBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -75,15 +81,13 @@ class MainListMusicFragment
 
     override fun setListeners() {
         binding.sourceSelection.listMusic.setOnClickListener {
-            binding.rvAllMusic.adapter = null
-            startListAllMusic()
+            categoryItemClicked(RV_ITEM)
         }
         binding.sourceSelection.folderMusic.setOnClickListener {
-            startFolderListFragment()
+            categoryItemClicked(RV_ITEM_MUSIC_FOLDER)
         }
         binding.sourceSelection.categoryMusic.setOnClickListener {
-            binding.rvAllMusic.adapter = null
-            startCategoryMusic()
+            categoryItemClicked(RV_ITEM_MUSIC_CATEGORY)
         }
         binding.search.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
@@ -94,26 +98,29 @@ class MainListMusicFragment
         super.setListeners()
     }
 
-
-    private fun startCategoryMusic(){
-        binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
-        binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryOfMusic)
-    }
-
-    private fun startListAllMusic(){
-        binding.rvAllMusic.layoutManager  = LinearLayoutManager(context)
-        binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.allMusic)
-    }
-
-    private fun startFolderListFragment(){
-        binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
-        binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.foldersMusic)
-    }
-    private fun recyclerViewAdapter(items: StateFlow<List<RecyclerViewBaseDataModel>>) : RecyclerViewAdapter<List<RecyclerViewBaseDataModel>>{
-        return when (items.value[0].getType()){
+    private fun recyclerViewAdapter(
+        items: StateFlow<List<RecyclerViewBaseDataModel>>,
+        id: Int
+    ): RecyclerViewAdapter<List<RecyclerViewBaseDataModel>> {
+        return when (id) {
+            0 -> {
+                RecyclerViewAdapter.Builder(this, items)
+                    .addProducer(MusicArtistViewHolder())
+                    .build { it }
+            }
+            1 -> {
+                RecyclerViewAdapter.Builder(this, items)
+                    .addProducer(MusicGenresViewHolder())
+                    .build { it }
+            }
+            2 -> {
+                RecyclerViewAdapter.Builder(this, items)
+                    .addProducer(MusicAlbumsViewHolder())
+                    .build { it }
+            }
             3 -> {
                 RecyclerViewAdapter.Builder(this, items)
-                    .addProducer(MusicCategoryViewHolder())
+                    .addProducer(MusicPlayListViewHolder())
                     .build { it }
             }
             4 -> {
@@ -123,41 +130,30 @@ class MainListMusicFragment
             }
             5 -> {
                 RecyclerViewAdapter.Builder(this, items)
-                    .addProducer(MusicFoldersViewHolder())
+                    .addProducer(MusicListViewHolderProducer())
                     .build { it }
             }
             6 -> {
                 RecyclerViewAdapter.Builder(this, items)
-                    .addProducer(MusicArtistViewHolder())
+                    .addProducer(MusicCategoryViewHolder())
                     .build { it }
             }
             7 -> {
                 RecyclerViewAdapter.Builder(this, items)
-                    .addProducer(MusicListViewHolderProducer())
+                    .addProducer(MusicFoldersViewHolder())
                     .build { it }
             }
-            9 -> {
-                RecyclerViewAdapter.Builder(this, items)
-                    .addProducer(MusicGenresViewHolder())
-                    .build { it }
-            }
-            10 -> {
-                RecyclerViewAdapter.Builder(this, items)
-                    .addProducer(MusicAlbumsViewHolder())
-                    .build { it }
-            } else -> {
+            else -> {
                 RecyclerViewAdapter.Builder(this, items)
                     .addProducer(MusicListViewHolderProducer())
                     .build { it }
             }
-
         }
     }
 
-    private fun searchActive(){
+    private fun searchActive() {
         val searchView = binding.search
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener
-        {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
@@ -171,7 +167,7 @@ class MainListMusicFragment
     }
 
     fun onTrackClicked(track: Track) {
-        viewModel.onItemClick(track , track.data)
+        viewModel.onItemClick(track, track.data)
     }
 
     fun onLikeClicked(track: Track) {
@@ -189,42 +185,70 @@ class MainListMusicFragment
         binding.rvAllMusic.layoutManager = null
     }
 
-    fun categoryItemClicked(id: Int){
-        viewModel._categoryList.value = viewModel.loadingMusic.value.toRecyclerViewItemOfList()
-        when (id){
-            0 -> {
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList)
-            }
-            1 -> {
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList)
-            }
-            2 -> {
-
+    fun categoryItemClicked(id: Int) {
+        when (id) {
+            in 0..2 -> {
+                viewModel._categoryList.value =
+                    viewModel.loadingMusic.value.toRecyclerViewItemOfList(id)
+                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList, id)
             }
             3 -> {
-
+                //TODO
             }
             4 -> {
-
+                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.favoriteSongs, id)
+            }
+            5 -> {
+                binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.allMusic, id)
+            }
+            6 -> {
+                binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
+                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryOfMusic, id)
+            }
+            7 -> {
+                binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
+                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.foldersMusic, id)
+            }
+            8 -> {
+                //TODO
             }
         }
     }
 
-    fun getCategoryLists(category: String, playlist: List<Track>): List<Track>{
+
+    fun getCategoryLists(category: String, playlist: List<Track>): List<Track> {
         val categoryList: MutableList<Track> = mutableListOf()
         playlist.forEach {
-            if (it.artist == category && !categoryList.contains(it.artist)){
+            if (it.artist == category && !categoryList.contains(it.artist)) {
                 categoryList.add(it)
             }
         }
         return categoryList
     }
 
-    private fun List<Track>.toRecyclerViewItemOfList(): List<RecyclerViewBaseDataModel>{
+    private fun List<Track>.toRecyclerViewItemOfList(id: Int): List<RecyclerViewBaseDataModel> {
+        var listType = RV_ITEM
+        when (id) {
+            0 -> listType = RV_ITEM_MUSIC_ARTIST
+            1 -> listType = RV_ITEM_MUSIC_GENRES
+            2 -> listType = RV_ITEM_MUSIC_ALBUMS
+            3 -> listType = RV_ITEM_MUSIC_PLAYLIST
+            4 -> listType = RV_ITEM_MUSIC_FAVORITE
+            5 -> listType = RV_ITEM
+            6 -> listType = RV_ITEM_MUSIC_CATEGORY
+            7 -> listType = RV_ITEM_MUSIC_FOLDER
+            8 -> listType = RV_ITEM_MUSIC_PLAYLIST_ADD_NEW
+        }
         val newList = mutableListOf<RecyclerViewBaseDataModel>()
-        this.forEach { newList.add(RecyclerViewBaseDataModel(it,
-            RV_ITEM_MUSIC_GENRES
-        )) }
+        this.forEach {
+            newList.add(
+                RecyclerViewBaseDataModel(
+                    it,
+                    listType
+                )
+            )
+        }
         return newList
     }
 
