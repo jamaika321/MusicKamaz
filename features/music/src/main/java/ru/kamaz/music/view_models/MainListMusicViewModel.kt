@@ -8,12 +8,10 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music.ui.producers.ItemType.RV_ITEM_MUSIC_FAVORITE
@@ -58,7 +56,6 @@ class MainListMusicViewModel @Inject constructor(
     }
 
     init {
-        loadDiskPlaylist("5")
         categoryData(None()) { it.either({}, ::onCategoryLoaded) }
         rvAllFolderWithMusic(None()) { it.either({}, ::onAllFolderWithMusic) }
         val intent = Intent(context, MusicService::class.java)
@@ -74,7 +71,6 @@ class MainListMusicViewModel @Inject constructor(
 
     val rvPosition = MutableStateFlow(0)
 
-
     private val _loadingMusic = MutableStateFlow<List<Track>>(emptyList())
     val loadingMusic = _loadingMusic
 
@@ -88,16 +84,21 @@ class MainListMusicViewModel @Inject constructor(
     val lastMusic = _lastMusic
 
     private fun loadDiskPlaylist(mode: String) {
-        Log.i("ReviewTest", "loadDiskPlaylist: ")
+        Log.i("ReviewTest", "loadDiskPlaylist: $mode ")
         loadAllMusic(mode) { it.either({ }, ::onDiskDataLoaded) }
-        if (mode != "all") loadPlayListInCoroutine()
+        if (mode != "all") loadPlayListInCoroutine("all")
     }
 
-    private fun loadPlayListInCoroutine() {
+    private fun loadPlayListInCoroutine(loadMode : String){
         CoroutineScope(Dispatchers.IO).launch {
-            Thread.sleep(2000)
-            loadDiskPlaylist("all")
+            Thread.sleep(5000)
+            loadDiskPlaylist(loadMode)
         }
+//        val scope = CoroutineScope(Job() + Dispatchers.IO)
+//        val job = scope.launch {
+//            loadDiskPlaylist(loadMode)
+//        }
+//        job.start()
     }
 
     private fun onDiskDataLoaded(data: List<Track>) {

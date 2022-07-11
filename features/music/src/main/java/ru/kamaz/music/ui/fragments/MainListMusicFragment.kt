@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.StateFlow
 import ru.kamaz.music.databinding.FragmentMainListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
+import ru.kamaz.music.services.MusicService
+import ru.kamaz.music.ui.NavAction.OPEN_MUSIC_FRAGMENT
 import ru.kamaz.music.ui.producers.*
 import ru.kamaz.music.ui.producers.ItemType.RV_ITEM_MUSIC_GENRES
 import ru.kamaz.music.view_models.MainListMusicViewModel
@@ -23,6 +25,7 @@ import ru.sir.presentation.base.BaseFragment
 import ru.sir.presentation.base.recycler_view.RecyclerViewAdapter
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
 import ru.sir.presentation.extensions.launchWhenStarted
+import ru.sir.presentation.navigation.UiAction
 
 
 class MainListMusicFragment
@@ -31,6 +34,8 @@ class MainListMusicFragment
     override fun inject(app: BaseApplication) {
         app.getComponent<MusicComponent>().inject(this)
     }
+
+    private var mode = ListState.PLAYLIST
 
     companion object {
         const val RV_ITEM_MUSIC_ARTIST = 0
@@ -45,13 +50,56 @@ class MainListMusicFragment
     }
 
     override fun initVars() {
-        categoryItemClicked(RV_ITEM)
+//        categoryItemClicked(RV_ITEM)
         initServiceVars()
+    }
+
+    override fun onBackPressed() {
+        Log.i("ReviewTest_OnBack", " Fragment: ")
+        when(mode) {
+            ListState.PLAYLIST -> {
+                backToPlayer()
+            }
+            ListState.FOLDER -> {
+                backToPlayer()
+            }
+            ListState.CATEGORY -> {
+                backToPlayer()
+            }
+            ListState.CATPLAYLIST -> {
+                categoryItemClicked(RV_ITEM_MUSIC_CATEGORY)
+            }
+            ListState.FOLDPLAYLIST -> {
+                categoryItemClicked(RV_ITEM_MUSIC_FOLDER)
+
+            }
+        }
+        super.onBackPressed()
+    }
+
+    private fun backToPlayer(){
+        navigator.navigateTo(
+            UiAction(
+                OPEN_MUSIC_FRAGMENT
+            )
+        )
+    }
+
+    enum class ListState(val value: Int){
+        PLAYLIST(0),
+        CATEGORY(1),
+        CATPLAYLIST(2),
+        FOLDER(3),
+        FOLDPLAYLIST(4)
     }
 
     private fun initServiceVars() {
         viewModel.lastMusicChanged.launchWhenStarted(lifecycleScope) {
             viewModel.lastMusic(it)
+        }
+
+        viewModel.allMusic.launchWhenStarted(lifecycleScope){
+            if (mode == ListState.PLAYLIST) categoryItemClicked(RV_ITEM)
         }
 
         setFragmentResultListener("lastMusic") { key, bundle ->
@@ -191,29 +239,35 @@ class MainListMusicFragment
                 viewModel._categoryList.value =
                     viewModel.loadingMusic.value.toRecyclerViewItemOfList(id)
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList, id)
+                this.mode = ListState.CATPLAYLIST
             }
             3 -> {
                 //TODO
             }
             4 -> {
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.favoriteSongs, id)
+                this.mode = ListState.CATPLAYLIST
             }
             5 -> {
                 binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.allMusic, id)
+                this.mode = ListState.PLAYLIST
             }
             6 -> {
                 binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryOfMusic, id)
+                this.mode = ListState.CATEGORY
             }
             7 -> {
                 binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.foldersMusic, id)
+                this.mode = ListState.FOLDER
             }
             8 -> {
                 //TODO
             }
         }
+        viewModel.rvPosition.value = 0
     }
 
 

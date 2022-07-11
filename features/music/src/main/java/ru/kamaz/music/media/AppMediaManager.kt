@@ -34,7 +34,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun getMediaFilesFromPath(path: String, mode: String): Either<None, List<Track>> {
-        Log.i("ReviewTest_GetMedia", "getMediaFilesFromPath: $path ")
+        Log.i("ReviewTest_GetMedia", "getMediaFilesFromPath: $path and $mode ")
         return when (path) {
             "sdCard" -> scanMediaFilesInSdCard(mode)
             "storage" -> scanMediaFilesInStorage(mode)
@@ -53,7 +53,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         if (trackPaths is Either.Right) {
             listWithTrackData = when (mode) {
                 "all" -> metaDataRetriver(trackPaths.r.size, trackPaths.r)
-                "5" -> metaDataRetriver(trackPaths.r.size/2, trackPaths.r)
+                "5" -> metaDataRetriver(trackPaths.r.size/4, trackPaths.r)
                 else -> metaDataRetriver(1, trackPaths.r)
             }
         }
@@ -95,7 +95,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
             var file : File? = null
             file = File(
-                Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator + title.replace("/", "")
+                Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator + title.replace("/", "") + ".png"
             )
             if (!file.exists()) {
                 var art = metaRetriver.embeddedPicture
@@ -318,12 +318,21 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 val pictureId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID))
                 val contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, pictureId)
 
-                try {
-                    val picture =
-                        context.contentResolver.loadThumbnail(contentUri, Size(500, 350), null)
-                    albumArt = getAlbumArt(picture, title.replace("/",""))
-                } catch (e: IOException) {
-                    e.printStackTrace()
+                var file : File? = null
+                file = File(
+                    Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator + title.replace("/", "") + ".png"
+                )
+
+                if (!file.exists()) {
+                    try {
+                        val picture =
+                            context.contentResolver.loadThumbnail(contentUri, Size(500, 350), null)
+                        albumArt = getAlbumArt(picture, title.replace("/", ""))
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                } else {
+                    albumArt = file
                 }
 
 

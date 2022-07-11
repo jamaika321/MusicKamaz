@@ -48,7 +48,7 @@ abstract class BaseFragment<T : BaseViewModel, B : ViewBinding>(private val type
     }
 
     private fun initOnBackPressedCallback() {
-        onBackPressedCallback = object : OnBackPressedCallback(false) {
+        onBackPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 onBackPressed()
             }

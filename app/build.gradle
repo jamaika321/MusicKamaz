@@ -66,7 +66,7 @@ dependencies {
     api twManager
     api twManagerCore
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
+//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
 
     implementation dagger
     kapt daggerCompiler

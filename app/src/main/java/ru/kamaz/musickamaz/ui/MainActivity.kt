@@ -1,5 +1,6 @@
 package ru.kamaz.musickamaz.ui
 
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.navigation.findNavController
 import ru.kamaz.music.ui.NavAction
@@ -30,6 +31,12 @@ class MainActivity : BaseActivity() {
             }
             NavAction.OPEN_DIALOG_TRACK_OPTION -> {
                 navigator.navigate(R.id.trackOptionFragment)
+            }
+            NavAction.OPEN_MUSIC_FRAGMENT -> {
+                navigator.navigate(R.id.musicFragment)
+            }
+            NavAction.OPEN_DIALOG_ADD_TRACK -> {
+                navigator.navigate(R.id.addTrack)
             }
         }
     }

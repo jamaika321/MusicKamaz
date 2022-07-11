@@ -27,6 +27,11 @@
         android:id="@+id/trackOptionFragment"
         android:name="ru.kamaz.music.ui.fragmentDialog.TrackOptionFragment"
         android:label="TrackOptionFragment" />
+    <dialog
+        android:id="@+id/addTrack"
+        android:name="ru.kamaz.music.ui.fragmentDialog.DialogAddTrack"
+        android:label="DialogAddTrack" />
+
 
 
 </navigation>

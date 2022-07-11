@@ -584,6 +584,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
         stopMediaPlayer()
         twManager.stopMonitoring(applicationContext)
         mediaManager.deleteAlbumArtDir()
+        System.exit(1)
 //        twManagerMusic.close()
     }
 
@@ -885,7 +886,7 @@ class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCom
             }
         } else {
             currentTrackPosition = 0
-            nextTrack(1)
+            funPlayOneSong()
         }
     }
 

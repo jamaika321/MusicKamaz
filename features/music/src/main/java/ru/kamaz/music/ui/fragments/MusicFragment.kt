@@ -22,6 +22,7 @@ import ru.kamaz.music.databinding.FragmentPlayerBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.domain.GlobalConstants
 import ru.kamaz.music.services.MusicService
+import ru.kamaz.music.ui.NavAction.OPEN_DIALOG_ADD_TRACK
 import ru.kamaz.music.ui.NavAction.OPEN_DIALOG_BT_FRAGMENT
 import ru.kamaz.music.ui.NavAction.OPEN_TRACK_LIST_FRAGMENT
 import ru.kamaz.music.ui.enums.PlayListFlow
@@ -128,8 +129,7 @@ class MusicFragment :
         binding.controlPanel.addToFolder.setOnClickListener {
             navigator.navigateTo(
                 UiAction(
-                    OPEN_TRACK_LIST_FRAGMENT,
-                    bundleOf(GlobalConstants.MAIN to PlayListFlow.SECOND_WINDOW)
+                    OPEN_DIALOG_ADD_TRACK
                 )
             )
         }
@@ -282,6 +282,11 @@ class MusicFragment :
         }
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        viewModel.appClosed()
+    }
+
     private fun updateTrackCover(coverPath: String) {
         if (coverPath != "") {
             Log.i("picasso", "updateTrackCover:$coverPath")
@@ -290,7 +295,7 @@ class MusicFragment :
                 .into(binding.picture)
             Picasso.with(context)
                 .load(Uri.fromFile(File(coverPath.trim())))
-                .transform(BlurTransformation(context, 40, 2))
+                .transform(BlurTransformation(context, 50, 10))
                 .resize(1100, 600)
                 .into(binding.pictureDevice)
             binding.pictureBucket.visibility = View.VISIBLE
