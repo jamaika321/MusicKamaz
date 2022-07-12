@@ -13,4 +13,6 @@
     <string name="add_to_playlist">Добавить в плейлист</string>
     <string name="delete">Удалить</string>
     <string name="options">Опции</string>
+    <string name="add_playlist">Добавить</string>
+    <string name="cancel_add">Отмена</string>
 </resources>

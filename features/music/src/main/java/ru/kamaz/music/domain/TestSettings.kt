@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Message
 import ru.kamaz.music.utils.TWSetting
-
+//ByAirat and Chinese man
 interface TestSettings {
 
     fun start(start: (Int) -> Unit)

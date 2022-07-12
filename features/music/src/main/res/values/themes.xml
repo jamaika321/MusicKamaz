@@ -71,6 +71,13 @@
         <item name="android:padding">@dimen/control_btn_padding</item>
         <item name="android:background">@drawable/back_item</item>
     </style>
+    <style name="button_add_playlist">
+        <item name="android:textSize">22dp</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:padding">@dimen/add_playlist_btn</item>
+        <item name="android:background">@drawable/back_item_add_playlist</item>
+    </style>
 
     <style name="ButtonCategoryOff">
         <item name="android:layout_width">0dp</item>

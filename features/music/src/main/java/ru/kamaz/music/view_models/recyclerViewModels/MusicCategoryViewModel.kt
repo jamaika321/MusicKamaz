@@ -1,4 +1,4 @@
-package ru.kamaz.music.view_models
+package ru.kamaz.music.view_models.recyclerViewModels
 
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow

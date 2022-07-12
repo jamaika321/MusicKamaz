@@ -14,13 +14,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
+import ru.kamaz.music.ui.producers.ItemType
 import ru.kamaz.music.ui.producers.ItemType.RV_ITEM_MUSIC_FAVORITE
 import ru.kamaz.music.view_models.list.FolderViewModel
 import ru.kamaz.music_api.interactor.*
-import ru.kamaz.music_api.models.AllFolderWithMusic
-import ru.kamaz.music_api.models.CategoryMusicModel
-import ru.kamaz.music_api.models.FavoriteSongs
-import ru.kamaz.music_api.models.Track
+import ru.kamaz.music_api.models.*
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseViewModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
@@ -199,7 +197,10 @@ class MainListMusicViewModel @Inject constructor(
     val categoryList = _categoryList.asStateFlow()
 
     private val _favoriteSongs = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
-    val favoriteSongs = _favoriteSongs
+    val favoriteSongs = _favoriteSongs.asStateFlow()
+
+    private val _listPlayList = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
+    val listPlayList = _listPlayList.asStateFlow()
 
     fun loadFavoriteTracks(data: List<Track>){
         _favoriteSongs.value = data.toRecyclerViewItemsFavorite()
@@ -218,6 +219,30 @@ class MainListMusicViewModel @Inject constructor(
     private fun List<CategoryMusicModel>.toRecyclerViewItemsCategory(): List<RecyclerViewBaseDataModel> {
         val newList = mutableListOf<RecyclerViewBaseDataModel>()
         this.forEach { newList.add(RecyclerViewBaseDataModel(it, RV_ITEM_MUSIC_CATEGORY)) }
+        return newList
+    }
+
+    fun getPlayLists(){
+        _listPlayList.value = fakeList.toRecyclerViewItemsPlayList()
+    }
+
+    private val fakeList : List<PlayListModel> = listOf(
+        PlayListModel(1, "PlayList", ""),
+        PlayListModel(2, "PlayList", ""),
+        PlayListModel(3, "PlayList", ""),
+        PlayListModel(4, "PlayList", ""),
+        PlayListModel(5, "PlayList", ""),
+        PlayListModel(6, "PlayList", ""),
+        PlayListModel(7, "PlayList", ""),
+        PlayListModel(8, "PlayList", ""),
+        PlayListModel(9, "PlayList", ""),
+        PlayListModel(10, "PlayList", ""),
+    )
+
+
+    private fun List<PlayListModel>.toRecyclerViewItemsPlayList(): List<RecyclerViewBaseDataModel> {
+        val newList = mutableListOf<RecyclerViewBaseDataModel>()
+        this.forEach { newList.add(RecyclerViewBaseDataModel(it, ItemType.RV_ITEM_MUSIC_PLAYLIST)) }
         return newList
     }
 

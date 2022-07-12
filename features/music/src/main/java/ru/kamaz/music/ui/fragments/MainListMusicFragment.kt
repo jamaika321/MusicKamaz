@@ -47,6 +47,7 @@ class MainListMusicFragment
         const val RV_ITEM_MUSIC_CATEGORY = 6
         const val RV_ITEM_MUSIC_FOLDER = 7
         const val RV_ITEM_MUSIC_PLAYLIST_ADD_NEW = 8
+        const val RV_ITEM_ADD_TRACK = 9
     }
 
     override fun initVars() {
@@ -71,7 +72,6 @@ class MainListMusicFragment
             }
             ListState.FOLDPLAYLIST -> {
                 categoryItemClicked(RV_ITEM_MUSIC_FOLDER)
-
             }
         }
         super.onBackPressed()
@@ -90,7 +90,8 @@ class MainListMusicFragment
         CATEGORY(1),
         CATPLAYLIST(2),
         FOLDER(3),
-        FOLDPLAYLIST(4)
+        FOLDPLAYLIST(4),
+        LISTPLAYLIST(5)
     }
 
     private fun initServiceVars() {
@@ -168,7 +169,7 @@ class MainListMusicFragment
             }
             3 -> {
                 RecyclerViewAdapter.Builder(this, items)
-                    .addProducer(MusicPlayListViewHolder())
+                    .addProducer(AddTrackViewHolder())
                     .build { it }
             }
             4 -> {
@@ -242,7 +243,9 @@ class MainListMusicFragment
                 this.mode = ListState.CATPLAYLIST
             }
             3 -> {
-                //TODO
+//                viewModel.getPlayLists()
+//                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.listPlayList, id)
+//                this.mode = ListState.LISTPLAYLIST
             }
             4 -> {
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.favoriteSongs, id)

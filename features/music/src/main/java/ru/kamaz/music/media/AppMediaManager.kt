@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.os.Build
 import android.os.Environment
+import android.provider.ContactsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.util.Size
@@ -20,11 +21,9 @@ import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.core.Either.Left
 import ru.sir.core.None
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
 import javax.inject.Inject
+import kotlin.math.log
 import kotlin.random.Random
 
 
@@ -149,6 +148,11 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         val store = "/storage/usbdisk0"
         lateinit var list: List<String>
 
+        File(store).listFiles().let {
+            it?.forEach { file ->
+                file.isDirectory
+            }
+        }
         list = readRecursive(File(store), listOf("mp3", "wav")).sorted().map {
             it.toString()
         }

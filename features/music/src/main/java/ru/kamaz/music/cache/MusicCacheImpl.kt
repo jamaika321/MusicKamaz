@@ -100,7 +100,7 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
 
     private fun convertEntityPlayListModelList(entity: List<PlayListEntity>):List<PlayListModel>{
         val data = mutableListOf<PlayListModel>()
-        entity.forEach { data.add(PlayListModel(it.idPlayList,it.name)) }
+        entity.forEach { data.add(PlayListModel(it.idPlayList,it.name, it.albumArt)) }
         return data
     }
 

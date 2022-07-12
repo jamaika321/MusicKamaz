@@ -103,7 +103,7 @@ class RepositoryImpl(
         this.albumArt,
         this.playing,
         this.favorite)
-    private fun PlayListModel.toDao() = PlayListEntity(this.id, this.title)
+    private fun PlayListModel.toDao() = PlayListEntity(this.id, this.title, this.albumArt)
     private fun HistorySongs.toDao() = HistorySongsEntity(
         this.dbID,
         this.idCursor,

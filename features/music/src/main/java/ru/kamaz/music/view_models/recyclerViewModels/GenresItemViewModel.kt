@@ -1,4 +1,4 @@
-package ru.kamaz.music.view_models
+package ru.kamaz.music.view_models.recyclerViewModels
 
 import android.net.Uri
 import androidx.lifecycle.lifecycleScope

@@ -10,5 +10,7 @@ data class PlayListEntity(
     @ColumnInfo(name = "id")
     var idPlayList: Long,
     @ColumnInfo(name = "name")
-    var name: String
+    var name: String,
+    @ColumnInfo(name = "albumArt")
+    var albumArt : String
 )
