@@ -28,27 +28,6 @@ class DialogAddTrack : DialogFragment(){
 
     private val playList = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
 
-    private val fakeList : List<PlayListModel> = listOf(
-        PlayListModel(1, "Title1", ""),
-        PlayListModel(2, "Title2", ""),
-        PlayListModel(3, "Title3", ""),
-        PlayListModel(4, "Title4", ""),
-        PlayListModel(5, "Title4", ""),
-        PlayListModel(6, "Title4", ""),
-        PlayListModel(7, "Title4", ""),
-        PlayListModel(8, "Title4", ""),
-        PlayListModel(9, "Title4", ""),
-        PlayListModel(10, "Title4", ""),
-        PlayListModel(11, "Title4", ""),
-        PlayListModel(12, "Title4", ""),
-        PlayListModel(13, "Title4", ""),
-        PlayListModel(14, "Title4", ""),
-        PlayListModel(15, "Title4", ""),
-        PlayListModel(16, "Title4", ""),
-        PlayListModel(17, "Title4", ""),
-        PlayListModel(18, "Title4", ""),
-        PlayListModel(19, "Title4", ""),
-    )
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         _binding = DialogAddTrackBinding.inflate(layoutInflater, null, false)
@@ -75,7 +54,6 @@ class DialogAddTrack : DialogFragment(){
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        playList.value = fakeList.toRecyclerViewItems()
         binding.rvAllMusic.layoutManager = GridLayoutManager(context, 4)
         binding.rvAllMusic.adapter = recyclerViewAdapter(playList)
         setListeners()
@@ -96,11 +74,7 @@ class DialogAddTrack : DialogFragment(){
     }
 
     fun selectPlayList(id: Long, title: String){
-        fakeList.forEach {
-                it.selection = it.id == id && it.title == title
-        }
-        playList.value = fakeList.toRecyclerViewItems()
-        binding.rvAllMusic.adapter = recyclerViewAdapter(playList)
+
 
     }
 

@@ -22,7 +22,7 @@ interface MusicCache {
     fun insertHistorySong(song: HistorySongsEntity): Either<Failure, None>
     fun queryFavoriteSongs(data:String) :  Either<Failure, String>
     fun getAllFavoriteSongs(): Either<None, List<Track>>
-    fun getAllPlayList(): Flow<List<PlayListModel>>
+    fun getAllPlayList(): Either<None, List<PlayListModel>>
     fun queryHistorySongs(): Either<Failure, String>
 
     fun insertTrackList(tracks: List<TrackEntity>) : Either<Failure, None>

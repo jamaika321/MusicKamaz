@@ -57,7 +57,8 @@ import java.io.FileReader
 import javax.inject.Inject
 
 
-class MusicService : Service(), MusicServiceInterface.Service, MediaPlayer.OnCompletionListener,
+class MusicService : Service(), MusicServiceInterface.
+Service, MediaPlayer.OnCompletionListener,
     MusicManagerListener, BluetoothManagerListener {
 
     @Inject

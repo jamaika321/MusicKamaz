@@ -277,9 +277,6 @@ class MusicFragment :
         viewModel.isDeviceNotConnectFromBt.launchWhenStarted(lifecycleScope) {
             if (it) dialog()
         }
-        viewModel.lastMusic.launchWhenStarted(lifecycleScope) {
-//            setFragmentResult("lastMusic", bundleOf("bundleKey" to it))
-        }
     }
 
     override fun onBackPressed() {

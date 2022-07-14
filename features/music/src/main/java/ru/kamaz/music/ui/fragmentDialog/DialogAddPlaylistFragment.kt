@@ -52,7 +52,7 @@ class DialogAddPlaylistFragment : DialogFragment() {
             Log.i("playList", "isEmpty$newPlayList")
         } else {
             Log.i("playList", "$newPlayList")
-            dialogAddPlaylistFragmentViewModelVM?.update(newPlayList)
+//            dialogAddPlaylistFragmentViewModelVM?.update(newPlayList)
         }
     }
 

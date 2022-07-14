@@ -9,4 +9,5 @@ object ItemType {
      const val RV_ITEM_MUSIC_CATEGORY = 6
      const val RV_ITEM_MUSIC_FOLDER = 7
      const val RV_ITEM_MUSIC_PLAYLIST_ADD_NEW = 8
+     const val RV_ITEM_MUSIC_FOLDER_PLAYLIST = 9
 }

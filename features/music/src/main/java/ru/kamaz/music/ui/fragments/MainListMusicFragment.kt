@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.kamaz.music.databinding.FragmentMainListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.services.MusicService
+import ru.kamaz.music.ui.NavAction.OPEN_ADD_PLAY_LIST_DIALOG
 import ru.kamaz.music.ui.NavAction.OPEN_MUSIC_FRAGMENT
 import ru.kamaz.music.ui.producers.*
 import ru.kamaz.music.ui.producers.ItemType.RV_ITEM_MUSIC_GENRES
@@ -47,11 +48,10 @@ class MainListMusicFragment
         const val RV_ITEM_MUSIC_CATEGORY = 6
         const val RV_ITEM_MUSIC_FOLDER = 7
         const val RV_ITEM_MUSIC_PLAYLIST_ADD_NEW = 8
-        const val RV_ITEM_ADD_TRACK = 9
     }
 
     override fun initVars() {
-//        categoryItemClicked(RV_ITEM)
+        categoryItemClicked(RV_ITEM)
         initServiceVars()
     }
 
@@ -90,8 +90,7 @@ class MainListMusicFragment
         CATEGORY(1),
         CATPLAYLIST(2),
         FOLDER(3),
-        FOLDPLAYLIST(4),
-        LISTPLAYLIST(5)
+        FOLDPLAYLIST(4)
     }
 
     private fun initServiceVars() {
@@ -103,6 +102,10 @@ class MainListMusicFragment
             if (mode == ListState.PLAYLIST) categoryItemClicked(RV_ITEM)
         }
 
+        viewModel.listPlayList.launchWhenStarted(lifecycleScope){
+            if (mode == ListState.CATPLAYLIST) categoryItemClicked(RV_ITEM_MUSIC_PLAYLIST)
+        }
+
         setFragmentResultListener("lastMusic") { key, bundle ->
             val result = bundle.getString("bundleKey")
             if (!result.isNullOrEmpty()) viewModel.lastMusic.value = result
@@ -110,13 +113,13 @@ class MainListMusicFragment
 
         binding.rvAllMusic.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
                 viewModel.rvPosition.value += dy
                 if (viewModel.rvPosition.value > 5) {
                     binding.search.visibility = View.INVISIBLE
                 } else {
                     binding.search.visibility = View.VISIBLE
                 }
-                super.onScrolled(recyclerView, dx, dy)
             }
         })
     }
@@ -215,6 +218,10 @@ class MainListMusicFragment
         )
     }
 
+    fun addNewPlaylist(){
+        navigator.navigateTo(OPEN_ADD_PLAY_LIST_DIALOG)
+    }
+
     fun onTrackClicked(track: Track) {
         viewModel.onItemClick(track, track.data)
     }
@@ -237,15 +244,14 @@ class MainListMusicFragment
     fun categoryItemClicked(id: Int) {
         when (id) {
             in 0..2 -> {
-                viewModel._categoryList.value =
-                    viewModel.loadingMusic.value.toRecyclerViewItemOfList(id)
+                viewModel.getCategoryList(id)
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList, id)
                 this.mode = ListState.CATPLAYLIST
             }
             3 -> {
-//                viewModel.getPlayLists()
-//                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.listPlayList, id)
-//                this.mode = ListState.LISTPLAYLIST
+                viewModel.getPlayLists()
+                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.listPlayList, id)
+                this.mode = ListState.CATPLAYLIST
             }
             4 -> {
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.favoriteSongs, id)
@@ -284,29 +290,13 @@ class MainListMusicFragment
         return categoryList
     }
 
-    private fun List<Track>.toRecyclerViewItemOfList(id: Int): List<RecyclerViewBaseDataModel> {
-        var listType = RV_ITEM
-        when (id) {
-            0 -> listType = RV_ITEM_MUSIC_ARTIST
-            1 -> listType = RV_ITEM_MUSIC_GENRES
-            2 -> listType = RV_ITEM_MUSIC_ALBUMS
-            3 -> listType = RV_ITEM_MUSIC_PLAYLIST
-            4 -> listType = RV_ITEM_MUSIC_FAVORITE
-            5 -> listType = RV_ITEM
-            6 -> listType = RV_ITEM_MUSIC_CATEGORY
-            7 -> listType = RV_ITEM_MUSIC_FOLDER
-            8 -> listType = RV_ITEM_MUSIC_PLAYLIST_ADD_NEW
-        }
-        val newList = mutableListOf<RecyclerViewBaseDataModel>()
-        this.forEach {
-            newList.add(
-                RecyclerViewBaseDataModel(
-                    it,
-                    listType
-                )
-            )
-        }
-        return newList
+    fun onFolderClicked(data: String){
+        viewModel.fillFolderPlaylist(data)
+        binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+        binding.rvAllMusic.adapter = RecyclerViewAdapter.Builder(this, viewModel.folderMusicPlaylist)
+            .addProducer(MusicListViewHolderProducer())
+            .build { it }
+        this.mode = ListState.FOLDPLAYLIST
     }
 
 

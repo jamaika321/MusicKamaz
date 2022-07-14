@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.os.Build
 import android.os.Environment
-import android.provider.ContactsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.util.Size
@@ -21,10 +20,11 @@ import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.core.Either.Left
 import ru.sir.core.None
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import javax.inject.Inject
-import kotlin.math.log
-import kotlin.random.Random
 
 
 class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
@@ -33,7 +33,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun getMediaFilesFromPath(path: String, mode: String): Either<None, List<Track>> {
-        Log.i("ReviewTest_GetMedia", "getMediaFilesFromPath: $path and $mode ")
         return when (path) {
             "sdCard" -> scanMediaFilesInSdCard(mode)
             "storage" -> scanMediaFilesInStorage(mode)
@@ -44,15 +43,14 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
     @RequiresApi(Build.VERSION_CODES.P)
     private fun scanMediaFilesInSdCard(mode: String): Either<None, List<Track>> {
-        metaRetriver = MediaMetadataRetriever()
 
         var listWithTrackData = ArrayList<Track>()
-        val trackPaths = scanTracksPath()
+        val trackPaths = scanTracksPath("usb")
 
         if (trackPaths is Either.Right) {
             listWithTrackData = when (mode) {
                 "all" -> metaDataRetriver(trackPaths.r.size, trackPaths.r)
-                "5" -> metaDataRetriver(trackPaths.r.size/4, trackPaths.r)
+                "5" -> metaDataRetriver(5, trackPaths.r)
                 else -> metaDataRetriver(1, trackPaths.r)
             }
         }
@@ -67,8 +65,9 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
     }
 
-    private fun metaDataRetriver (cycleNum: Int, trackPaths: List<String>): ArrayList<Track> {
+    private fun metaDataRetriver(cycleNum: Int, trackPaths: List<String>): ArrayList<Track> {
         val listWithTrackData = ArrayList<Track>()
+        metaRetriver = MediaMetadataRetriever()
         for (i in 0 until cycleNum) {
             metaRetriver.setDataSource(trackPaths[i])
 
@@ -89,11 +88,16 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                     ?.toLong() ?: (180)
             val data = trackPaths[i]
             val id = i.toLong()
+            val source = if (data.contains("/storage/usb")){
+                    "usb"
+            } else {
+                "disk"
+            }
+            Log.i("ReviewTest_AllTrack", " $i :$data + $title = ${trackPaths[i]}")
 
             var albumArt = File("")
 
-            var file : File? = null
-            file = File(
+            val file = File(
                 Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator + title.replace("/", "") + ".png"
             )
             if (!file.exists()) {
@@ -101,7 +105,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 if (art != null) {
                     val bitMap = BitmapFactory.decodeByteArray(art, 0, art.size)
                     albumArt = getAlbumArt(bitMap, title.replace("/",""))
-                    Log.i("ReviewTest_Embedded", " i am saved: $albumArt ")
                 }
             } else {
                 albumArt = file
@@ -119,7 +122,9 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                     duration,
                     album,
                     albumArt.toString(),
-                    source = "usb"
+                    false,
+                    false,
+                    source
                 )
             )
         }
@@ -129,33 +134,47 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     fun getAllTracks(mode: String): Either<None, List<Track>> {
-        val allTracks = ArrayList<Track>()
+        var allTracks = ArrayList<Track>()
+        val allPath = scanTracksPath("all")
 
-        var sdCard = scanMediaFilesInStorage(mode)
-        if (sdCard is Either.Right){
-            allTracks.addAll(sdCard.r)
+        if (allPath is Either.Right) {
+            allTracks = when (mode) {
+                "all" -> metaDataRetriver(allPath.r.size, allPath.r)
+                "5" -> metaDataRetriver(5, allPath.r)
+                else -> metaDataRetriver(1, allPath.r)
+            }
         }
-        sdCard = scanMediaFilesInSdCard(mode)
-        if (sdCard is Either.Right){
-            allTracks.addAll(sdCard.r)
-        }
+
+
         return Either.Right(allTracks)
     }
 
 
 
-    private fun scanTracksPath(): Either<None, List<String>> {
-        val store = "/storage/usbdisk0"
-        lateinit var list: List<String>
-
-        File(store).listFiles().let {
-            it?.forEach { file ->
-                file.isDirectory
+    private fun scanTracksPath(source: String): Either<None, List<String>> {
+        val list = ArrayList<String>()
+        when (source) {
+            "usb" -> {
+                list.addAll(readRecursive(File("/storage/usbdisk0"), listOf("mp3", "wav")).sorted().map {
+                    it.toString()
+                })
+            }
+            "disk" -> {
+                list.addAll(readRecursive(File("/storage/emulated/0"), listOf("mp3", "wav")).sorted().map {
+                    it.toString()
+                })
+            }
+            "all" -> {
+                list.addAll(readRecursive(File("/storage/emulated/0"), listOf("mp3", "wav")).sorted().map {
+                    it.toString()
+                })
+                list.addAll(readRecursive(File("/storage/usbdisk0"), listOf("mp3", "wav")).sorted().map {
+                    it.toString()
+                })
             }
         }
-        list = readRecursive(File(store), listOf("mp3", "wav")).sorted().map {
-            it.toString()
-        }
+
+
         return if (list.isEmpty()) {
             Either.Left(None())
         } else {
@@ -163,7 +182,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         }
     }
 
-    private fun readRecursive(root: File, extentions: List<String>): List<File> {
+    private fun readRecursive(root: File, extentions: List<String>): ArrayList<File> {
         val list = ArrayList<File>()
         root.listFiles()?.filter { it.isDirectory }?.forEach {
             list.addAll(readRecursive(it, extentions))
@@ -174,6 +193,22 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         }
         return list
     }
+
+    private fun getFolderWithMusic(root: File, extensions: List<String>): List<File> {
+        var list = ArrayList<File>()
+        root.listFiles()?.filter { it.isDirectory }?.forEach {
+            list.addAll(getFolderWithMusic(it, extensions))
+        }
+
+        root.listFiles()?.filter { extensions.contains(it.extension) }?.forEach {
+            if (it != null){
+                list.add(root)
+                Log.i("ReviewTest_Get", " : ${root} ")
+            }
+        }
+        return list
+    }
+
 
     override fun getAlbumImagePath(albumID: Long): Either<None, String> {
         val uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
@@ -215,75 +250,14 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
         var result = ArrayList<AllFolderWithMusic>()
 
-        val directories = LinkedHashMap<String, ArrayList<ModelTest>>()
-
-        val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-
-        val selection = MediaStore.Audio.Media.IS_MUSIC + "!=0"
-
-        val selectionArgs =
-            arrayOf("%" + "/storage/usbdisk0" + "%", "%" + "/storage/usbdisk0" + "/%/%")
-        val order = MediaStore.Audio.Media.DATE_MODIFIED + " DESC"
-        var DOWNLOAD_FILE_DIR = "/storage/usbdisk0"
-        //val selection= MediaStore.Audio.Media.IS_MUSIC + " != 0"
-        val cursor = context.getContentResolver().query(uri, null, selection, null, order)
-
-        if (cursor != null) {
-
-            cursor?.let {
-
-                it.moveToFirst()
-                val pathIndex = it.getColumnIndex(MediaStore.Images.Media.DATA)
-                do {
-                    val path = it.getString(pathIndex)
-                    val file = File(path)
-                    if (!file.exists()) {
-                        continue
-                    }
-                    val fileDir = file.getParent()
-                    var songURL = it.getString(it.getColumnIndex(MediaStore.Audio.Media.DATA))
-                    var songAuth = it.getString(it.getColumnIndex(MediaStore.Audio.Media.ARTIST))
-                    var songName = it.getString(it.getColumnIndex(MediaStore.Audio.Media.TITLE))
-
-                    if (directories.containsKey(fileDir)) {
-                        var songs = directories.getValue(fileDir);
-
-                        var song = ModelTest(songURL, songAuth, songName)
-
-                        songs.add(song)
-
-                        directories.put(fileDir, songs)
-                    } else {
-                        var song = ModelTest(songURL, songAuth, songName)
-
-                        var songs = ArrayList<ModelTest>()
-                        songs.add(song)
-
-                        directories.put(fileDir, songs)
-                    }
-                } while (it.moveToNext())
-
-
-                for (dir in directories) {
-                    var dirInfo: AllFolderWithMusic = AllFolderWithMusic(dir.key, dir.value)
-
-                    result.add(dirInfo)
-                }
-            }
+        getFolderWithMusic(File("/storage/usbdisk0"), listOf("mp3", "wav")).forEach {
+            if (!result.contains(AllFolderWithMusic(it.name, it.toString()))) result.add(AllFolderWithMusic(it.name, it.toString()))
         }
-        return Either.Right(result)
-    }
+        getFolderWithMusic(File("/storage/emulated/0"), listOf("mp3", "wav")).forEach {
+            if (!result.contains(AllFolderWithMusic(it.name, it.toString()))) result.add(AllFolderWithMusic(it.name, it.toString()))
+        }
 
-    override fun getFilesFromPath(
-        path: String,
-        showHiddenFiles: Boolean,
-        onlyFolders: Boolean
-    ): List<File> {
-        val file = File(path)
-        return file.listFiles()
-            .filter { showHiddenFiles || !it.name.startsWith(".") }
-            .filter { !onlyFolders || it.isDirectory }
-            .toList()
+        return Either.Right(result)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.PlaylistItemBinding
 import ru.kamaz.music.ui.fragmentDialog.DialogAddTrack
+import ru.kamaz.music.ui.fragments.MainListMusicFragment
 import ru.kamaz.music_api.models.PlayListModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
@@ -33,7 +34,9 @@ class AddTrackViewModel: RecyclerViewBaseItem<PlayListModel, PlaylistItemBinding
             binding.textCategory.text = title.value
         }
         image.launchWhenStarted(parent.lifecycleScope){
-            if (it.isNotEmpty()) {
+            if (it == "create_playlist"){
+                binding.imageCategory.setImageResource(R.drawable.ic_plus)
+            } else if (it.isNotEmpty()) {
                 Picasso.with(parent.context)
                     .load(Uri.fromFile(File(image.value.trim())))
                     .into(binding.imageCategory)
@@ -42,6 +45,9 @@ class AddTrackViewModel: RecyclerViewBaseItem<PlayListModel, PlaylistItemBinding
             }
         }
         binding.root.setOnClickListener {
+            if (data.id == 9999L){
+                (parent as MainListMusicFragment).addNewPlaylist()
+            }
             (parent as DialogAddTrack).selectPlayList(data.id, data.title)
         }
     }

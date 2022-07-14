@@ -14,13 +14,6 @@ class DialogAddPlaylistFragmentViewModel @Inject constructor(
     private val insertPlayList:InsertPlayList
 
 ): ViewModel(){
-    fun update(playList: String){
-        Log.i("playList", "update$playList")
-        val list = PlayListModel(
-            1,
-            playList,
-        "")
-        insertPlayList(InsertPlayList.Params(list))
-    }
+
 
 }

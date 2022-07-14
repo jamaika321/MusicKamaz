@@ -2,7 +2,9 @@ package ru.kamaz.music.view_models.recyclerViewModels
 
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import ru.kamaz.music.R
 import ru.kamaz.music.databinding.MainCategoryItemBinding
+import ru.kamaz.music.ui.fragments.MainListMusicFragment
 import ru.kamaz.music_api.models.AllFolderWithMusic
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
@@ -22,11 +24,13 @@ class FolderItemViewModel: RecyclerViewBaseItem<AllFolderWithMusic, MainCategory
 
         }
 
+        binding.imageCategory.setImageResource(R.drawable.ic_folder_music)
+
 
 
 
         binding.root.setOnClickListener {
-
+            (parent as MainListMusicFragment).onFolderClicked(data.data)
         }
     }
 

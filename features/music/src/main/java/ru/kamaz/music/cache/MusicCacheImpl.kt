@@ -1,6 +1,5 @@
 package ru.kamaz.music.cache
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.kamaz.music.cache.db.AppDatabase
 import ru.kamaz.music.data.MusicCache
@@ -10,7 +9,6 @@ import ru.kamaz.music.domain.PlayListEntity
 import ru.kamaz.music.domain.TrackEntity
 import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.models.ErrorMessage
-import ru.kamaz.music_api.models.FavoriteSongs
 import ru.kamaz.music_api.models.PlayListModel
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
@@ -78,8 +76,12 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         }
     }
 
-    override fun getAllPlayList(): Flow<List<PlayListModel>> {
-        return db.playListDao().getData().map { convertEntityPlayListModelList(it) }
+    override fun getAllPlayList(): Either<None, List<PlayListModel>> {
+        return try {
+            Either.Right( convertEntityPlayListModelList(db.playListDao().getData()) )
+        } catch (e: Exception) {
+            Either.Left(None())
+        }
     }
 
     private fun convertEntityListFavoriteModelList(entity: List<FavoriteSongsEntity>): List<Track>{
@@ -100,7 +102,7 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
 
     private fun convertEntityPlayListModelList(entity: List<PlayListEntity>):List<PlayListModel>{
         val data = mutableListOf<PlayListModel>()
-        entity.forEach { data.add(PlayListModel(it.idPlayList,it.name, it.albumArt)) }
+        entity.forEach { data.add(PlayListModel(it.idPlayList,it.name, it.albumArt, it.trackTitleList, it.trackDataList)) }
         return data
     }
 
