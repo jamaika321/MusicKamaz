@@ -24,7 +24,6 @@ class MusicCategoryViewModel :RecyclerViewBaseItem<CategoryMusicModel, MainCateg
             data.let {item ->
                 (parent as MainListMusicFragment).categoryItemClicked(item.id)
             }
-
         }
 
 

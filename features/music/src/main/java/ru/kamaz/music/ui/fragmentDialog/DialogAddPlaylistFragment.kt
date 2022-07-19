@@ -8,10 +8,17 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.kamaz.music.databinding.DialogAddPlaylistBinding
 import ru.kamaz.music.view_models.DialogAddPlaylistFragmentViewModel
+import ru.kamaz.music_api.interactor.InsertPlayList
+import ru.kamaz.music_api.models.PlayListModel
+import javax.inject.Inject
 
 class DialogAddPlaylistFragment : DialogFragment() {
 
@@ -30,7 +37,6 @@ class DialogAddPlaylistFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialogAddPlaylistFragmentViewModelVM = ViewModelProvider(this).get(DialogAddPlaylistFragmentViewModel::class.java)
-        //dialogAddPlaylistFragmentViewModelVM?.update()
     }
 
     override fun onDestroyView() {
@@ -46,20 +52,19 @@ class DialogAddPlaylistFragment : DialogFragment() {
         setListener()
     }
 
-    fun addPlayList(){
+    private fun addPlayList(){
         val newPlayList = binding.etAddPlayList.text.toString()
-        if (newPlayList.isEmpty()) {
-            Log.i("playList", "isEmpty$newPlayList")
-        } else {
-            Log.i("playList", "$newPlayList")
-//            dialogAddPlaylistFragmentViewModelVM?.update(newPlayList)
-        }
+        dialogAddPlaylistFragmentViewModelVM?.insertPlayList(newPlayList)
     }
 
-    fun setListener() {
+    private fun setListener() {
         binding.btnGet.setOnClickListener {
-            addPlayList()
-            onDestroyView()
+            if (binding.etAddPlayList.text.isNullOrEmpty()){
+                Toast.makeText(context, "Введите название.", Toast.LENGTH_SHORT).show()
+            } else {
+                addPlayList()
+                onDestroyView()
+            }
         }
         binding.btnClose.setOnClickListener {
             onDestroyView()

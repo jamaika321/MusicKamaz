@@ -61,8 +61,6 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
             }
         }
 
-//        mediaPlayer.seekTo()//TODO
-
         playing.launchWhenStarted(parent.lifecycleScope){
             if (it){
                 binding.foregroundImage.visibility = View.VISIBLE

@@ -6,10 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music.ui.fragments.MainListMusicFragment
@@ -29,6 +31,7 @@ class MainListMusicViewModel @Inject constructor(
     private val categoryData: CategoryLoadRV,
     private val rvFavorite: FavoriteMusicRV,
     private val rvPlayList: PlayListRV,
+    private val insertPlayList: InsertPlayList,
     private val insertFavoriteMusic: InsertFavoriteMusic,
     private val deleteFavoriteMusic: DeleteFavoriteMusic,
     private val rvAllFolderWithMusic: AllFolderWithMusicRV
@@ -52,7 +55,6 @@ class MainListMusicViewModel @Inject constructor(
         service.value?.lastMusic() ?: MutableStateFlow("")
     }
 
-
     val serviceTracks: StateFlow<List<Track>> by lazy {
         service.value?.getAllTracks() ?: MutableStateFlow(emptyList())
     }
@@ -60,12 +62,22 @@ class MainListMusicViewModel @Inject constructor(
     init {
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
+        testPlayList()
+    }
+
+    private fun testPlayList(){
+        CoroutineScope(Dispatchers.IO).launch {
+            insertPlayList.run(InsertPlayList.Params(
+                PlayListModel(0L, "Создать", "create_playlist", listOf(""), listOf(""))
+            ))
+        }
     }
 
     fun loadAllDBLists(){
         categoryData(None()) { it.either({}, ::onCategoryLoaded) }
         rvAllFolderWithMusic(None()) { it.either({}, ::onAllFolderWithMusic) }
         rvFavorite(None()) {it.either({}, ::loadFavoriteTracks)}
+        getPlayLists()
     }
 
     //////////////////////////////////////////////
@@ -189,21 +201,10 @@ class MainListMusicViewModel @Inject constructor(
     }
 
     fun getPlayLists(){
-        val listPlayList = ArrayList<PlayListModel>()
-        listPlayList.add(PlayListModel(9999L, "Создать", "create_playlist", listOf(""), listOf("")))
-        val scope = CoroutineScope(Job() + Dispatchers.IO)
-        val job = scope.launch {
-            val it = rvPlayList.run(None())
-            it.either({
-
-            },
-                {
-                    listPlayList.addAll(it)
-                })
-        }
-        job.start()
-        if (job.isCompleted){
-            _listPlayList.value = listPlayList.toRecyclerViewItemsPlayList()
+        viewModelScope.launch {
+            rvPlayList.run(None()).collect {
+                _listPlayList.value = it.toRecyclerViewItemsPlayList()
+            }
         }
     }
 

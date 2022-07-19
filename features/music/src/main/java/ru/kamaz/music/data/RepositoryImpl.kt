@@ -28,7 +28,7 @@ class RepositoryImpl(
     override fun loadDiskData(mode: String): Either<None, List<Track>> = media.getMediaFilesFromPath("all", mode)
     override fun loadUsbData(mode: String): Either<None, List<Track>> = media.getMediaFilesFromPath("sdCard", mode)
     override fun rvArtist(): Either<None, List<Track>> = media.getMediaFilesFromPath("storage", "all")
-    override fun rvPlayList(): Either<None, List<PlayListModel>> = testDBDao.getAllPlayList()
+    override fun rvPlayList(): Flow<List<PlayListModel>> = testDBDao.getAllPlayList()
     override fun rvCategory(): Either<None, List<CategoryMusicModel>> = media.getCategory()
     override fun rvFavorite(): Either<None, List<Track>> = testDBDao.getAllFavoriteSongs()
     override fun rvAllFolderWithMusic(): Either<None, List<AllFolderWithMusic>> =

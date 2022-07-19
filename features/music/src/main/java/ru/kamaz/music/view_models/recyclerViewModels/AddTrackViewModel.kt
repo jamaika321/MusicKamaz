@@ -1,6 +1,7 @@
 package ru.kamaz.music.view_models.recyclerViewModels
 
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
@@ -19,22 +20,21 @@ class AddTrackViewModel: RecyclerViewBaseItem<PlayListModel, PlaylistItemBinding
     private val title = MutableStateFlow("")
     private val image = MutableStateFlow("")
     private val id = MutableStateFlow(0L)
-    private val selection = MutableStateFlow(false)
     lateinit var data: PlayListModel
 
+    override fun bindData(data: PlayListModel, position: Int) {
+        title.value = data.title
+        image.value = data.albumArt
+        id.value = data.id
+        this.data = data
+    }
+
     override fun initVars() {
-        selection.launchWhenStarted(parent.lifecycleScope){
-            if (it) {
-                binding.foregroundImage.visibility = View.VISIBLE
-            } else {
-                binding.foregroundImage.visibility = View.INVISIBLE
-            }
-        }
         title.launchWhenStarted(parent.lifecycleScope){
             binding.textCategory.text = title.value
         }
-        image.launchWhenStarted(parent.lifecycleScope){
-            if (it == "create_playlist"){
+        image.launchWhenStarted(parent.lifecycleScope) {
+            if (it == "create_playlist") {
                 binding.imageCategory.setImageResource(R.drawable.ic_plus)
             } else if (it.isNotEmpty()) {
                 Picasso.with(parent.context)
@@ -44,21 +44,15 @@ class AddTrackViewModel: RecyclerViewBaseItem<PlayListModel, PlaylistItemBinding
                 binding.imageCategory.setImageResource(R.drawable.ic_play_list)
             }
         }
-        binding.root.setOnClickListener {
-            if (data.id == 9999L){
+        binding.clAllItem.setOnClickListener {
+            if (data.albumArt == "create_playlist"){
+                Log.i("ReviewTest_add", "  ::::::::::::: ")
                 (parent as MainListMusicFragment).addNewPlaylist()
             }
-            (parent as DialogAddTrack).selectPlayList(data.id, data.title)
         }
     }
 
-    override fun bindData(data: PlayListModel, position: Int) {
-        title.value = data.title
-        image.value = data.albumArt
-        id.value = data.id
-        selection.value = data.selection
-        this.data = data
-    }
+
 
 
 }

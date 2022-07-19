@@ -103,11 +103,11 @@ class MainListMusicFragment
         }
 
         viewModel.allMusic.launchWhenStarted(lifecycleScope){
-            Log.i("ReviewTest_Update", "${it.isEmpty()}: ")
             if (mode == ListState.PLAYLIST) categoryItemClicked(RV_ITEM)
         }
 
         viewModel.listPlayList.launchWhenStarted(lifecycleScope){
+            Log.i("ReviewTest_Update", "listPlay: ")
             if (mode == ListState.CATPLAYLIST) categoryItemClicked(RV_ITEM_MUSIC_PLAYLIST)
         }
 
@@ -254,7 +254,6 @@ class MainListMusicFragment
                 this.mode = ListState.CATPLAYLIST
             }
             3 -> {
-                viewModel.getPlayLists()
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.listPlayList, id)
                 this.mode = ListState.CATPLAYLIST
             }

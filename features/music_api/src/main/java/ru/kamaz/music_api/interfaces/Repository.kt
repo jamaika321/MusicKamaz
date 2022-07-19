@@ -13,7 +13,7 @@ interface Repository: PathManager, SourceManager {
     fun loadDiskData(mode: String): Either<None, List<Track>>
     fun loadUsbData(mode: String): Either<None, List<Track>>
     fun rvArtist(): Either<None, List<Track>>
-    fun rvPlayList():Either<None, List<PlayListModel>>
+    fun rvPlayList(): Flow<List<PlayListModel>>
     fun rvCategory():Either<None,List<CategoryMusicModel>>
     fun rvFavorite(): Either<None, List<Track>>
     fun rvAllFolderWithMusic():Either<None, List<AllFolderWithMusic>>

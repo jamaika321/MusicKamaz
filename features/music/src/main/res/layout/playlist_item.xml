@@ -1,63 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="160dp"
-    android:layout_width="160dp"
-    android:layout_marginStart="20dp"
-    android:layout_marginTop="20dp"
-    app:cardBackgroundColor="@color/test2"
-    app:layout_constraintCircleRadius="5dp"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_all_item"
+    android:layout_width="match_parent"
+    android:layout_height="180dp"
+    android:layout_margin="20dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_height="match_parent"
+    <ImageView
+        android:id="@+id/image_category"
         android:layout_width="match_parent"
-        android:paddingTop="5dp"
-        android:background="@drawable/dialog_border"
+        android:layout_height="0dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/ic_back_for_main_category"
+        android:padding="@dimen/margin_list_frag2"
+        app:layout_constraintBottom_toTopOf="@id/text_category"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/image_category"
-            android:layout_height="0dp"
-            android:layout_width="match_parent"
-            android:src="@drawable/korj"
-            android:background="@color/test2"
-            app:layout_constraintBottom_toTopOf="@+id/text_category"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_weight="4" />
+    <TextView
+        android:id="@+id/text_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:padding="2dp"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="file name" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:background="@drawable/add_playlist_back_item"
-            android:id="@+id/foreground_image"
-            android:layout_height="0dp"
-            android:layout_width="match_parent"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/text_category"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_weight="4" />
-
-        <TextView
-            android:fontFamily="sans-serif-condensed-medium"
-            android:gravity="center"
-            android:id="@+id/text_category"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:text="Title"
-            android:background="@color/test2"
-            android:textColor="@color/light_blue_50"
-            android:textSize="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/image_category" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,13 +8,13 @@ import ru.kamaz.music.domain.PlayListEntity
 @Dao
 interface PlayListDao  {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll(playList: PlayListEntity)
 
     @Delete
     fun delete(playList: PlayListEntity)
 
     @Query("SELECT * FROM play_list ")
-    fun getData(): List<PlayListEntity>
+    fun getData(): Flow<List<PlayListEntity>>
 
 }
