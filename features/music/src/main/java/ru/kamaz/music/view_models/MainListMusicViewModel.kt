@@ -6,25 +6,19 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import android.util.Log
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import ru.kamaz.music.R
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music.ui.fragments.MainListMusicFragment
 import ru.kamaz.music.ui.producers.ItemType
-import ru.kamaz.music.ui.producers.ItemType.RV_ITEM_MUSIC_FAVORITE
-import ru.kamaz.music.view_models.list.FolderViewModel
 import ru.kamaz.music_api.interactor.*
 import ru.kamaz.music_api.models.*
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseViewModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
-import ru.sir.presentation.extensions.launchOn
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -33,7 +27,6 @@ import kotlin.collections.ArrayList
 class MainListMusicViewModel @Inject constructor(
     application: Application,
     private val categoryData: CategoryLoadRV,
-    private val loadAllMusic: LoadDiskData,
     private val rvFavorite: FavoriteMusicRV,
     private val rvPlayList: PlayListRV,
     private val insertFavoriteMusic: InsertFavoriteMusic,
@@ -59,11 +52,19 @@ class MainListMusicViewModel @Inject constructor(
         service.value?.lastMusic() ?: MutableStateFlow("")
     }
 
+
+    val serviceTracks: StateFlow<List<Track>> by lazy {
+        service.value?.getAllTracks() ?: MutableStateFlow(emptyList())
+    }
+
     init {
-        categoryData(None()) { it.either({}, ::onCategoryLoaded) }
-        rvAllFolderWithMusic(None()) { it.either({}, ::onAllFolderWithMusic) }
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
+    }
+
+    fun loadAllDBLists(){
+        categoryData(None()) { it.either({}, ::onCategoryLoaded) }
+        rvAllFolderWithMusic(None()) { it.either({}, ::onAllFolderWithMusic) }
         rvFavorite(None()) {it.either({}, ::loadFavoriteTracks)}
     }
 
@@ -75,37 +76,11 @@ class MainListMusicViewModel @Inject constructor(
 
     val rvPosition = MutableStateFlow(0)
 
-    private val _loadingMusic = MutableStateFlow<List<Track>>(emptyList())
-    val loadingMusic = _loadingMusic
-
-    private val _searchedMusic = MutableStateFlow<List<Track>>(emptyList())
-    val searchedMusic = _searchedMusic
-
     private val _playlistIsEmpty = MutableStateFlow(false)
     val playlistIsEmpty = _playlistIsEmpty.asStateFlow()
 
     private val _lastMusic = MutableStateFlow("")
     val lastMusic = _lastMusic
-
-    private fun loadDiskPlaylist(mode: String) {
-        Log.i("ReviewTest", "loadDiskPlaylist: $mode ")
-        loadAllMusic(mode) { it.either({ }, ::onDiskDataLoaded) }
-        if (mode != "all") loadPlayListInCoroutine("all")
-    }
-
-    private fun loadPlayListInCoroutine(loadMode : String){
-        CoroutineScope(Dispatchers.IO).launch {
-            Thread.sleep(5000)
-            loadDiskPlaylist(loadMode)
-        }
-    }
-
-    private fun onDiskDataLoaded(data: List<Track>) {
-        _playlistIsEmpty.value = data.isEmpty()
-        _loadingMusic.value = data
-        _searchedMusic.value = data
-        convertToRecyclerViewItems(data as ArrayList<Track>)
-    }
 
     private fun List<Track>.findPlayingMusic(title: String): List<Track> {
         for (i in this.indices) {
@@ -134,17 +109,13 @@ class MainListMusicViewModel @Inject constructor(
         return this
     }
 
-    private fun convertToRecyclerViewItems(listTrack: ArrayList<Track>) {
-        _allMusic.value = listTrack.findFavoriteMusic().findPlayingMusic(lastMusic.value).toRecyclerViewItemOfList(RV_ITEM)
+    fun fillAllTracksList() {
+        _allMusic.value = serviceTracks.value.findFavoriteMusic().findPlayingMusic(lastMusic.value).toRecyclerViewItemOfList(RV_ITEM)
     }
 
     fun lastMusic(title: String) {
         _lastMusic.value = title
-        if (allMusic.value.isEmpty()) {
-            loadDiskPlaylist("5")
-        } else {
-            onDiskDataLoaded(searchedMusic.value)
-        }
+        fillAllTracksList()
     }
 
     fun onItemClick(track: Track, data: String) {
@@ -152,7 +123,6 @@ class MainListMusicViewModel @Inject constructor(
         if (track.id.toString() != lastMusic.value) {
             service.value?.initTrack(track, data)
             service.value?.resume()
-            _lastMusic.value = track.id.toString()
         } else {
             service.value?.playOrPause()
         }
@@ -185,7 +155,7 @@ class MainListMusicViewModel @Inject constructor(
     private val _categoryOfMusic = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     var categoryOfMusic = _categoryOfMusic.asStateFlow()
 
-    val _categoryList = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
+    private val _categoryList = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     val categoryList = _categoryList.asStateFlow()
 
     private val _favoriteSongs = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
@@ -199,7 +169,7 @@ class MainListMusicViewModel @Inject constructor(
     }
 
     fun getCategoryList(id: Int){
-        _categoryList.value = loadingMusic.value.toRecyclerViewItemOfList(id)
+        _categoryList.value = serviceTracks.value.toRecyclerViewItemOfList(id)
     }
 
     private fun onCategoryLoaded(category: List<CategoryMusicModel>) {
@@ -269,7 +239,7 @@ class MainListMusicViewModel @Inject constructor(
 
     //FolderMusic
 
-    val _foldersMusic = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
+    private val _foldersMusic = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     val foldersMusic = _foldersMusic
 
     private val _folderMusicPlaylist = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
@@ -288,7 +258,7 @@ class MainListMusicViewModel @Inject constructor(
 
     fun fillFolderPlaylist(data: String){
         val trackList = ArrayList<Track>()
-        searchedMusic.value.forEach {
+        serviceTracks.value.forEach {
             if (it.data.contains(data + File.separator + it.title.replace(" ", "_"))){
                 trackList.add(it)
             }
@@ -297,15 +267,13 @@ class MainListMusicViewModel @Inject constructor(
     }
 
 
-
-
-
     ///////////////////////////////////////////
     ///////////////////////////////////////////
     //////////////////////////////////////////
 
     fun searchMusic(music: String) {
-        convertToRecyclerViewItems(filterRecyclerList(music, loadingMusic.value))
+        _allMusic.value = filterRecyclerList(music, serviceTracks.value).toRecyclerViewItemOfList(
+            RV_ITEM)
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -322,7 +290,6 @@ class MainListMusicViewModel @Inject constructor(
             }
             musicFilterList = resultList
         }
-        _searchedMusic.value = musicFilterList
         return musicFilterList
     }
 

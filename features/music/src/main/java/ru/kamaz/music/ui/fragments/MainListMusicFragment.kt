@@ -25,6 +25,7 @@ import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseFragment
 import ru.sir.presentation.base.recycler_view.RecyclerViewAdapter
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
+import ru.sir.presentation.extensions.launchOn
 import ru.sir.presentation.extensions.launchWhenStarted
 import ru.sir.presentation.navigation.UiAction
 
@@ -51,8 +52,11 @@ class MainListMusicFragment
     }
 
     override fun initVars() {
+        viewModel.service.launchWhenStarted(lifecycleScope){
+            if (it == null) return@launchWhenStarted
+            initServiceVars()
+        }
         categoryItemClicked(RV_ITEM)
-        initServiceVars()
     }
 
     override fun onBackPressed() {
@@ -94,11 +98,12 @@ class MainListMusicFragment
     }
 
     private fun initServiceVars() {
-        viewModel.lastMusicChanged.launchWhenStarted(lifecycleScope) {
+        viewModel.lastMusicChanged.launchOn(lifecycleScope) {
             viewModel.lastMusic(it)
         }
 
         viewModel.allMusic.launchWhenStarted(lifecycleScope){
+            Log.i("ReviewTest_Update", "${it.isEmpty()}: ")
             if (mode == ListState.PLAYLIST) categoryItemClicked(RV_ITEM)
         }
 
@@ -106,9 +111,9 @@ class MainListMusicFragment
             if (mode == ListState.CATPLAYLIST) categoryItemClicked(RV_ITEM_MUSIC_PLAYLIST)
         }
 
-        setFragmentResultListener("lastMusic") { key, bundle ->
-            val result = bundle.getString("bundleKey")
-            if (!result.isNullOrEmpty()) viewModel.lastMusic.value = result
+        viewModel.serviceTracks.launchWhenStarted(lifecycleScope){
+            viewModel.fillAllTracksList()
+            viewModel.loadAllDBLists()
         }
 
         binding.rvAllMusic.addOnScrollListener(object : RecyclerView.OnScrollListener() {

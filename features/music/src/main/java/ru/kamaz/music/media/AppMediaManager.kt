@@ -35,7 +35,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
     override fun getMediaFilesFromPath(path: String, mode: String): Either<None, List<Track>> {
         return when (path) {
             "sdCard" -> scanMediaFilesInSdCard(mode)
-            "storage" -> scanMediaFilesInStorage(mode)
+            "storage" -> getAllTracks(mode)
             "all" -> getAllTracks(mode)
             else -> Either.Left(None())
         }
@@ -93,7 +93,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             } else {
                 "disk"
             }
-            Log.i("ReviewTest_AllTrack", " $i :$data + $title = ${trackPaths[i]}")
+//            Log.i("ReviewTest_Update", " $i :$data + $title = ${trackPaths[i]}")
 
             var albumArt = File("")
 
@@ -135,7 +135,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
     @RequiresApi(Build.VERSION_CODES.Q)
     fun getAllTracks(mode: String): Either<None, List<Track>> {
         var allTracks = ArrayList<Track>()
-        val allPath = scanTracksPath("all")
+        val allPath = scanTracksPath("disk")
 
         if (allPath is Either.Right) {
             allTracks = when (mode) {
@@ -144,8 +144,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 else -> metaDataRetriver(1, allPath.r)
             }
         }
-
-
         return Either.Right(allTracks)
     }
 
@@ -163,17 +161,11 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 list.addAll(readRecursive(File("/storage/emulated/0"), listOf("mp3", "wav")).sorted().map {
                     it.toString()
                 })
-            }
-            "all" -> {
-                list.addAll(readRecursive(File("/storage/emulated/0"), listOf("mp3", "wav")).sorted().map {
-                    it.toString()
-                })
                 list.addAll(readRecursive(File("/storage/usbdisk0"), listOf("mp3", "wav")).sorted().map {
                     it.toString()
                 })
             }
         }
-
 
         return if (list.isEmpty()) {
             Either.Left(None())

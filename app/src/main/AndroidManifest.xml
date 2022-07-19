@@ -14,7 +14,7 @@
 
 <!--    <uses-feature android:name="android.hardware.nfc" />-->
 
-<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
 
 <!--    <uses-feature android:name="android.hardware.usb.accessory" />-->

@@ -28,18 +28,18 @@ class MusicFragmentViewModel @Inject constructor(
     private val testSettings: TestSettings,
     private val getMusicPosition: GetMusicPosition,
 ) : BaseViewModel(application), MediaPlayer.OnCompletionListener, ServiceConnection,
-    MusicServiceInterface.ViewModel,MusicManagerListener {
+    MusicServiceInterface.ViewModel, MusicManagerListener {
 
     val artist: StateFlow<String> by lazy {
-      service.value?.getArtistName() ?: MutableStateFlow("Unknown")
+        service.value?.getArtistName() ?: MutableStateFlow("Unknown")
     }
 
-    val isPlay : StateFlow<Boolean> by lazy {
+    val isPlay: StateFlow<Boolean> by lazy {
         service.value?.isPlay() ?: MutableStateFlow(false)
     }
 
     val repeatHowModeNow: StateFlow<Int> by lazy {
-      service.value?.getRepeat() ?: MutableStateFlow(2)
+        service.value?.getRepeat() ?: MutableStateFlow(2)
     }
 
     val title: StateFlow<String> by lazy {
@@ -87,15 +87,15 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     val isDeviceNotConnectFromBt: StateFlow<Boolean> by lazy {
-        service.value?.dialogFragment()?: MutableStateFlow(false)
+        service.value?.dialogFragment() ?: MutableStateFlow(false)
     }
 
     val isMusicEmpty: StateFlow<Boolean> by lazy {
-        service.value?.musicEmpty()?: MutableStateFlow(false)
+        service.value?.musicEmpty() ?: MutableStateFlow(false)
     }
 
     val cover: StateFlow<String> by lazy {
-        service.value?.coverId()?: MutableStateFlow("")
+        service.value?.coverId() ?: MutableStateFlow("")
     }
 
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
@@ -112,9 +112,9 @@ class MusicFragmentViewModel @Inject constructor(
 
     }
 
-    fun remoteNextPrevControlButton(){
+    fun remoteNextPrevControlButton() {
         testSettings.start {
-            when (it){
+            when (it) {
                 19 -> nextTrack()
                 21 -> previousTrack()
             }
@@ -122,7 +122,7 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
 
-    fun shuffleStatusChange(){
+    fun shuffleStatusChange() {
         service.value?.shuffleStatusChange()
     }
 
@@ -138,11 +138,11 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.previousTrack()
     }
 
-    fun isSaveFavoriteMusic(){
+    fun isSaveFavoriteMusic() {
         service.value?.insertFavoriteMusic()
     }
 
-    fun isSaveLastMusic(){
+    fun isSaveLastMusic() {
         service.value?.insertLastMusic()
     }
 
@@ -154,7 +154,7 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.appClosed()
     }
 
-    fun lastSavedState(){
+    fun lastSavedState() {
         service.value?.lastSavedState()
     }
 
@@ -172,17 +172,13 @@ class MusicFragmentViewModel @Inject constructor(
                 service.value?.sourceSelection(action)
             }
             MusicService.SourceEnum.USB -> {
-                service.value?.checkUsb()
-                when(isNotConnectedUsb.value){
-                    true -> service.value?.sourceSelection(action)
-                    false -> Toast.makeText(context, "Файлы не найдены", Toast.LENGTH_LONG).show()
-                }
+                service.value?.sourceSelection(action)
             }
         }
 
     }
 
-    fun repeatChange(){
+    fun repeatChange() {
         service.value?.changeRepeatMode()
     }
 
@@ -197,14 +193,13 @@ class MusicFragmentViewModel @Inject constructor(
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         Log.d("testPlayTrack", "onServiceConnected")
-            _service.value = (service as MusicService.MyBinder).getService()
-            this.service.value?.setViewModel(this)
+        _service.value = (service as MusicService.MyBinder).getService()
+        this.service.value?.setViewModel(this)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
         _service.value = null
     }
-
 
 
     override fun onSdStatusChanged(path: String, isAdded: Boolean) {

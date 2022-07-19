@@ -20,10 +20,11 @@ interface MusicServiceInterface{
         fun isPlay(): StateFlow<Boolean>
         fun checkPosition(position: Int)
         fun previousTrack()
-        fun nextTrack(auto:Int)/* fun updateMusic(track: Track)*/
-        fun updateTracks(loadMode: String)
+        fun nextTrack(auto:Int)
+        fun updateTracks()
         fun intMediaPlayer()
         fun sourceSelection(action: MusicService.SourceEnum)
+        fun getAllTracks(): StateFlow<List<Track>>
         fun getMusicName(): StateFlow<String>
         fun getArtistName(): StateFlow<String>
         fun getMusicDuration(): StateFlow<Int>

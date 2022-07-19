@@ -92,6 +92,7 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
         binding.like.setOnClickListener {
             (parent as MainListMusicFragment).onLikeClicked(data)
             favorite.value = !favorite.value
+            this.data.favorite = favorite.value
         }
     }
 }

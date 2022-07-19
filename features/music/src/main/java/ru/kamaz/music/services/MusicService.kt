@@ -44,7 +44,6 @@ import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
 import ru.kamaz.music_api.BaseConstants.EXTRA_APP_WIDGET_NAME
 import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.*
-import ru.kamaz.music_api.models.FavoriteSongs
 import ru.kamaz.music_api.models.HistorySongs
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
@@ -106,8 +105,8 @@ Service, MediaPlayer.OnCompletionListener,
     private val _isNotConnected = MutableStateFlow(true)
     val isNotConnected = _isNotConnected.asStateFlow()
 
-    private val _isNotUSBConnected = MutableStateFlow(false)
-    val isNotUSBConnected = _isNotUSBConnected.asStateFlow()
+    private val _isUSBConnected = MutableStateFlow(false)
+    val isUSBConnected = _isUSBConnected.asStateFlow()
 
     private var lifecycleJob = Job()
 
@@ -121,9 +120,9 @@ Service, MediaPlayer.OnCompletionListener,
 
     lateinit var myViewModel: MusicServiceInterface.ViewModel
 
-    private var currentTrackPosition = 0
-
     private var tracks = mutableListOf<Track>()
+
+    private var allTracks = mutableListOf<Track>()
 
     private var files = mutableListOf<File>()
 
@@ -200,6 +199,8 @@ Service, MediaPlayer.OnCompletionListener,
         }
     }
 
+    private val _currentTrackPosition = MutableStateFlow(0)
+    val currentTrackPosition = _currentTrackPosition.asStateFlow()
 
     private val _duration = MutableStateFlow(0)
     val duration = _duration.asStateFlow()
@@ -236,6 +237,7 @@ Service, MediaPlayer.OnCompletionListener,
         }
     }
 
+    override fun getAllTracks() = MutableStateFlow(allTracks).asStateFlow()
 
     override fun getMusicName(): StateFlow<String> = title
     override fun getArtistName(): StateFlow<String> = artist
@@ -245,7 +247,7 @@ Service, MediaPlayer.OnCompletionListener,
     override fun isShuffleOn(): StateFlow<Boolean> = isShuffleStatus
 
     override fun checkDeviceConnection(): StateFlow<Boolean> = isNotConnected
-    override fun checkUSBConnection(): StateFlow<Boolean> = isNotUSBConnected
+    override fun checkUSBConnection(): StateFlow<Boolean> = isUSBConnected
     override fun checkBTConnection(): StateFlow<Boolean> = isNotConnected
     override fun updateWidget(): StateFlow<Boolean> = isNotConnected
     override fun btModeOn(): StateFlow<Boolean> = isBtModeOn
@@ -327,7 +329,8 @@ Service, MediaPlayer.OnCompletionListener,
 
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
         Log.i("USBstatus", "onUsbStatusChanged:$path ")
-        _isNotUSBConnected.value = isAdded
+        _isUSBConnected.value = isAdded
+        updateTracks()
         if (isAdded) {
             startUsbMode()
         } else {
@@ -436,18 +439,16 @@ Service, MediaPlayer.OnCompletionListener,
     }
 
     inner class MyBinder : Binder() {
-        fun getService(): MusicServiceInterface.Service = this@MusicService
-    }
-
-    private fun getAudioManager(): AudioManager {
-        if (audioManager == null) {
-            audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+        fun getService(): MusicServiceInterface.Service {
+            Log.i("ReviewTest_Binder", "MyBinder")
+            return this@MusicService
         }
-        return audioManager as AudioManager
     }
 
-
-    override fun onBind(intent: Intent?): IBinder = binder
+    override fun onBind(intent: Intent?): IBinder {
+        Log.i("ReviewTest_Binder", "onBind: ")
+        return binder
+    }
 
     override fun setViewModel(viewModel: MusicServiceInterface.ViewModel) {
         this.myViewModel = viewModel
@@ -512,17 +513,27 @@ Service, MediaPlayer.OnCompletionListener,
 
     fun startDiskMode() {
         if (!isDiskModeOn.value) {
+            Log.i("ReviewTest_", "startDiskMode: ")
             changeSource(2)
-            updateTracks("5")
+            if (allTracks.isEmpty()){
+                updateTracks()
+            } else {
+                replaceAllTracks(emptyList())
+            }
             nextTrack(2)
         }
     }
 
 
     fun startUsbMode() {
-        if (!isUsbModeOn.value) {
+        if (!isUsbModeOn.value && isUSBConnected.value) {
+            Log.i("ReviewTest_", "startUSBMode: ")
             changeSource(3)
-            updateTracks("1")
+            if (allTracks.isEmpty()){
+                updateTracks()
+            } else {
+                replaceAllTracks(emptyList())
+            }
             nextTrack(2)
         }
     }
@@ -611,11 +622,37 @@ Service, MediaPlayer.OnCompletionListener,
         updateMusicName("", "", 120)
         _idSong.value = 1
         _data.value = ""
+    }
 
+    private fun getTrackPosition(track: Track): Int{
+        var index = 0
+        tracks.forEach {
+            if (it.data == track.data){
+                return@forEach
+            }
+            index++
+        }
+        return index
     }
 
 
     override fun initTrack(track: Track, data1: String) {
+        when (mode){
+            SourceEnum.DISK -> {
+                if (track.source == "usb"){
+                    startUsbMode()
+                    _currentTrackPosition.value = getTrackPosition(track)
+                    funPlayOneSong()
+                }
+            }
+            SourceEnum.USB -> {
+                if (track.source == "disk"){
+                    startDiskMode()
+                    _currentTrackPosition.value = getTrackPosition(track)
+                    funPlayOneSong()
+                }
+            }
+        }
         _isFavorite.value = track.favorite
         val currentTrack = track
         _lastMusic.value = currentTrack.id.toString()
@@ -623,7 +660,6 @@ Service, MediaPlayer.OnCompletionListener,
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
         _data.value = track.data
         _duration.value = track.duration.toInt()
-        Log.i("ReviewTest_Duration", "${track.duration} ")
         if (track.albumArt != "") {
             _cover.value = track.albumArt
         } else {
@@ -656,7 +692,7 @@ Service, MediaPlayer.OnCompletionListener,
     }
 
     override fun firstOpenTrackFound(track: Track) {
-        updateTracks("5")
+        updateTracks()
         val currentTrack = track
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
     }
@@ -720,22 +756,22 @@ Service, MediaPlayer.OnCompletionListener,
                 if (tracks.isEmpty()) {
 
                 } else {
-                    when (currentTrackPosition - 1) {
-                        -1 -> currentTrackPosition = tracks.size - 1
-                        else -> currentTrackPosition--
+                    when (currentTrackPosition.value - 1) {
+                        -1 -> _currentTrackPosition.value = tracks.size - 1
+                        else -> _currentTrackPosition.value--
                     }
 
                     when (isPlaying.value) {
                         true -> {
                             initTrack(
-                                tracks[currentTrackPosition],
-                                tracks[currentTrackPosition].data
+                                tracks[currentTrackPosition.value],
+                                tracks[currentTrackPosition.value].data
                             )
                             resume()
                         }
                         false -> initTrack(
-                            tracks[currentTrackPosition],
-                            tracks[currentTrackPosition].data
+                            tracks[currentTrackPosition.value],
+                            tracks[currentTrackPosition.value].data
                         )
                     }
                 }
@@ -748,22 +784,22 @@ Service, MediaPlayer.OnCompletionListener,
             SourceEnum.USB -> if (tracks.isEmpty()) {
 
             } else {
-                when (currentTrackPosition - 1) {
-                    -1 -> currentTrackPosition = tracks.size - 1
-                    else -> currentTrackPosition--
+                when (currentTrackPosition.value - 1) {
+                    -1 -> _currentTrackPosition.value = tracks.size - 1
+                    else -> _currentTrackPosition.value--
                 }
 
                 when (isPlaying.value) {
                     true -> {
                         initTrack(
-                            tracks[currentTrackPosition],
-                            tracks[currentTrackPosition].data
+                            tracks[currentTrackPosition.value],
+                            tracks[currentTrackPosition.value].data
                         )
                         resume()
                     }
                     false -> initTrack(
-                        tracks[currentTrackPosition],
-                        tracks[currentTrackPosition].data
+                        tracks[currentTrackPosition.value],
+                        tracks[currentTrackPosition.value].data
                     )
                 }
             }
@@ -775,7 +811,7 @@ Service, MediaPlayer.OnCompletionListener,
         mediaPlayer.setOnCompletionListener(OnCompletionListener {
             Log.i("isPlayingAutoModeMain", "true${isPlaying.value}")
             checkUsb()
-            if (isNotUSBConnected.value && isUsbModeOn.value) {
+            if (isUSBConnected.value && isUsbModeOn.value) {
                 nextTrack(1)
             } else if (isBtModeOn.value) {
                 nextTrack(1)
@@ -787,8 +823,8 @@ Service, MediaPlayer.OnCompletionListener,
         })
     }
 
-    override fun checkUsb(){
-        _isNotUSBConnected.value = mediaManager.getMediaFilesFromPath("sdCard", "one").isRight
+    override fun checkUsb() {
+        _isUSBConnected.value = mediaManager.getMediaFilesFromPath("sdCard", "one").isRight
     }
 
     private fun initMediaPlayer() {
@@ -848,11 +884,11 @@ Service, MediaPlayer.OnCompletionListener,
     private fun funRepeatAll() {
         if (tracks.isEmpty()) {
         } else {
-            when (currentTrackPosition == tracks.size - 1) {
+            when (currentTrackPosition.value == tracks.size - 1) {
                 true -> {
-                    currentTrackPosition = 0
+                    _currentTrackPosition.value = 0
                 }
-                false -> currentTrackPosition++
+                false -> _currentTrackPosition.value++
             }
             funPlayOneSong()
         }
@@ -862,16 +898,16 @@ Service, MediaPlayer.OnCompletionListener,
         when (isPlaying.value) {
             true -> {
                 initTrack(
-                    tracks[currentTrackPosition],
-                    tracks[currentTrackPosition].data
+                    tracks[currentTrackPosition.value],
+                    tracks[currentTrackPosition.value].data
                 )
                 resume()
                 Log.i("isPlayingWhenPlay", "true${isPlaying.value}")
             }
             false -> {
                 initTrack(
-                    tracks[currentTrackPosition],
-                    tracks[currentTrackPosition].data
+                    tracks[currentTrackPosition.value],
+                    tracks[currentTrackPosition.value].data
                 )
                 Log.i("isPlayingWhenStop", "false${isPlaying.value}")
             }
@@ -880,15 +916,10 @@ Service, MediaPlayer.OnCompletionListener,
     }
 
     private fun restartPlaylist() {
-        if (tracks.isEmpty()) {
-            when (isNotUSBConnected.value) {
-                true -> startUsbMode()
-                false -> clearTrackData()
-            }
-        } else {
-            currentTrackPosition = 0
-            funPlayOneSong()
+        if (tracks.size-1 <= currentTrackPosition.value){
+            _currentTrackPosition.value = 0
         }
+        funPlayOneSong()
     }
 
     private val widgetIntentReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -917,7 +948,6 @@ Service, MediaPlayer.OnCompletionListener,
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
         if (intent != null) {
             val action = intent.action
             val cmd = intent.getStringExtra("cmd")
@@ -975,37 +1005,13 @@ Service, MediaPlayer.OnCompletionListener,
         return channelId
     }
 
-    override fun updateTracks(loadMode: String) {
-        when (mode) {
-            SourceEnum.USB -> {
-                val result = mediaManager.getMediaFilesFromPath("sdCard", loadMode)
-                if (result is Either.Right) {
-                    replaceAllTracks(result.r)
-                    _isNotUSBConnected.value = true
-                    _musicEmpty.value = false
-                    when (loadMode) {
-                        "1" -> loadTracksOnCoroutine("5")
-                        "5" -> loadTracksOnCoroutine("all")
-                    }
-                } else {
-                    _isNotUSBConnected.value = false
-                    _musicEmpty.value = true
-                    startDiskMode()
-                }
-            }
-            SourceEnum.DISK -> {
-                val result = mediaManager.getMediaFilesFromPath("storage", loadMode)
-                if (result is Either.Right) {
-                    replaceAllTracks(result.r)
-                    _musicEmpty.value = false
-                    when (loadMode) {
-                        "1" -> loadTracksOnCoroutine("5")
-                        "5" -> loadTracksOnCoroutine("all")
-                    }
-                } else {
-                    _musicEmpty.value = true
-                }
-            }
+    override fun updateTracks() {
+        val result = mediaManager.getMediaFilesFromPath("all", "all")
+        if (result is Either.Right) {
+            replaceAllTracks(result.r)
+            _musicEmpty.value = false
+        } else {
+            _musicEmpty.value = true
         }
         if (isShuffleStatus.value) {
             setShuffleMode()
@@ -1013,21 +1019,48 @@ Service, MediaPlayer.OnCompletionListener,
 
     }
 
-    private fun loadTracksOnCoroutine(loadMode : String){
-        val scope = CoroutineScope(Job() + Dispatchers.IO)
-        val job = scope.launch {
-            updateTracks(loadMode)
-            val result = async {
-                getFavoriteMusicList()
-            }.await()
-        }
-        job.start()
-    }
+//    private fun loadTracksOnCoroutine(loadMode: String) {
+//        val scope = CoroutineScope(Job() + Dispatchers.IO)
+//        val job = scope.launch {
+//            updateTracks(loadMode)
+//            val result = async {
+//                getFavoriteMusicList()
+//            }.await()
+//        }
+//        job.start()
+//    }
 
     private fun replaceAllTracks(trackList: List<Track>) {
+        if (trackList.isNotEmpty()){
+            allTracks.clear()
+            allTracks.addAll(trackList)
+        }
         tracks.clear()
-        tracks.addAll(trackList)
-        _musicEmpty.value = tracks.isEmpty()
+        allTracks.forEach {
+            when (mode){
+                SourceEnum.DISK -> {
+                    if (it.source == "disk"){
+                        tracks.add(it)
+                    }
+                }
+                SourceEnum.USB -> {
+                    if (it.source == "usb"){
+                        tracks.add(it)
+                    }
+                }
+            }
+        }
+        if (tracks.isEmpty()){
+            _musicEmpty.value = tracks.isEmpty()
+            when (mode){
+                SourceEnum.DISK -> {
+                }
+                SourceEnum.USB -> {
+                    _isUSBConnected.value = false
+                    startDiskMode()
+                }
+            }
+        }
     }
 
     override fun intMediaPlayer() {
@@ -1036,7 +1069,6 @@ Service, MediaPlayer.OnCompletionListener,
             .setUsage(AudioAttributes.USAGE_MEDIA)
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
             .build()
-
         mediaPlayer.setOnCompletionListener(this)
         mediaPlayer.setAudioAttributes(audioAttributes)
     }
@@ -1057,10 +1089,11 @@ Service, MediaPlayer.OnCompletionListener,
             }
             SourceEnum.DISK -> startDiskMode()
             SourceEnum.USB -> {
-                if (_isNotUSBConnected.value) {
+                checkUsb()
+                if (_isUSBConnected.value) {
                     startUsbMode()
                 } else {
-                    startUsbMode()
+                    Toast.makeText(this, "Файлы не найдены.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -1074,11 +1107,11 @@ Service, MediaPlayer.OnCompletionListener,
     override fun insertFavoriteMusic() {
         if (isFavorite.value) {
             deleteFavoriteMusic()
-            tracks[currentTrackPosition].favorite = false
+            tracks[currentTrackPosition.value].favorite = false
         } else {
             _isFavorite.value = true
-            tracks[currentTrackPosition].favorite = true
-            insertFavoriteMusic(InsertFavoriteMusic.Params(tracks[currentTrackPosition]))
+            tracks[currentTrackPosition.value].favorite = true
+            insertFavoriteMusic(InsertFavoriteMusic.Params(tracks[currentTrackPosition.value]))
         }
     }
 
@@ -1090,14 +1123,14 @@ Service, MediaPlayer.OnCompletionListener,
     override fun deleteFavoriteMusic() {
         Log.i("ReviewTest_Favorite", " : -----delete ")
         _isFavorite.value = false
-        deleteFavoriteMusic(DeleteFavoriteMusic.Params(tracks[currentTrackPosition]))
+        deleteFavoriteMusic(DeleteFavoriteMusic.Params(tracks[currentTrackPosition.value]))
     }
 
     private fun changeFavoriteStatus(list: List<Track>) {
         CoroutineScope(Dispatchers.IO).launch {
-            tracks.forEach{ track ->
-                list.forEach{ list ->
-                    if (track.title == list.title && track.data == list.data){
+            tracks.forEach { track ->
+                list.forEach { list ->
+                    if (track.title == list.title && track.data == list.data) {
                         track.favorite = true
                     }
                 }

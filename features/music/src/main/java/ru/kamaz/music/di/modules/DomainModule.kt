@@ -3,6 +3,7 @@ package ru.kamaz.music.di.modules
 import dagger.Module
 import dagger.Provides
 import ru.kamaz.music.domain.TestSettings
+import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.utils.TWSetting
 import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.*
@@ -10,6 +11,9 @@ import ru.kamaz.music_api.interfaces.Repository
 
 @Module
 class DomainModule {
+
+    @Provides
+    fun provideService(): MusicService = MusicService()
 
     @Provides
     fun provideLoadDiskData(repository: Repository): LoadDiskData = LoadDiskData(repository)

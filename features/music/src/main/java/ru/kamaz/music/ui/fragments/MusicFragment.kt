@@ -88,7 +88,6 @@ class MusicFragment :
             addEvent()
         }
         binding.openListFragment.setOnClickListener {
-            setFragmentResult("lastMusic", bundleOf("bundleKey" to viewModel.lastMusic.value))
             navigator.navigateTo(
                 UiAction(
                     OPEN_TRACK_LIST_FRAGMENT,
