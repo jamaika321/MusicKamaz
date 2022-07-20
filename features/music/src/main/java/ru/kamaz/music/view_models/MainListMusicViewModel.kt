@@ -32,6 +32,7 @@ class MainListMusicViewModel @Inject constructor(
     private val rvFavorite: FavoriteMusicRV,
     private val rvPlayList: PlayListRV,
     private val insertPlayList: InsertPlayList,
+    private val deletePlayList: DeletePlayList,
     private val insertFavoriteMusic: InsertFavoriteMusic,
     private val deleteFavoriteMusic: DeleteFavoriteMusic,
     private val rvAllFolderWithMusic: AllFolderWithMusicRV
@@ -62,13 +63,13 @@ class MainListMusicViewModel @Inject constructor(
     init {
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
-        testPlayList()
+        testPlayList("Создать")
     }
 
-    private fun testPlayList(){
+    fun testPlayList(title: String){
         CoroutineScope(Dispatchers.IO).launch {
             insertPlayList.run(InsertPlayList.Params(
-                PlayListModel(0L, "Создать", "create_playlist", listOf(""), listOf(""))
+                PlayListModel(0L, title, "create_playlist", listOf(""), listOf(""))
             ))
         }
     }
@@ -76,7 +77,7 @@ class MainListMusicViewModel @Inject constructor(
     fun loadAllDBLists(){
         categoryData(None()) { it.either({}, ::onCategoryLoaded) }
         rvAllFolderWithMusic(None()) { it.either({}, ::onAllFolderWithMusic) }
-        rvFavorite(None()) {it.either({}, ::loadFavoriteTracks)}
+        getFavoriteTracks()
         getPlayLists()
     }
 
@@ -103,22 +104,23 @@ class MainListMusicViewModel @Inject constructor(
 
 
     private fun List<Track>.findFavoriteMusic(): List<Track> {
-        CoroutineScope(Dispatchers.IO).launch {
-            val it = rvFavorite.run(None())
-            it.either({
-            }, {
-                (if (!it.isEmpty()) {
-                    this@findFavoriteMusic.forEach{ tracks ->
-                        it.forEach{ list ->
-                            if (tracks.title == list.title && tracks.data == list.data){
-                                tracks.favorite = true
-                            }
-                        }
-                    }
-                })
-            })
+        this.forEach { tracks ->
+            viewModelScope.launch {
+                rvFavorite.run(None()).collect {
+                    _favoriteSongs.value = it.toRecyclerViewItemOfList(RV_ITEM_MUSIC_FAVORITE)
+                    it.forEach { favorites ->  if (tracks.data == favorites.data) tracks.favorite = true }
+                }
+            }
         }
         return this
+    }
+
+    private fun getFavoriteTracks(){
+        viewModelScope.launch {
+            rvFavorite.run(None()).collect{
+                _favoriteSongs.value = it.toRecyclerViewItemOfList(RV_ITEM_MUSIC_FAVORITE)
+            }
+        }
     }
 
     fun fillAllTracksList() {
@@ -131,12 +133,18 @@ class MainListMusicViewModel @Inject constructor(
     }
 
     fun onItemClick(track: Track, data: String) {
-        service.value?.intMediaPlayer()
+//        service.value?.intMediaPlayer()
         if (track.id.toString() != lastMusic.value) {
             service.value?.initTrack(track, data)
             service.value?.resume()
         } else {
             service.value?.playOrPause()
+        }
+    }
+
+    fun deletePlaylist(name: String){
+        CoroutineScope(Dispatchers.IO).launch {
+            deletePlayList.run(DeletePlayList.Params(name))
         }
     }
 
@@ -176,10 +184,6 @@ class MainListMusicViewModel @Inject constructor(
     private val _listPlayList = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     val listPlayList = _listPlayList.asStateFlow()
 
-    fun loadFavoriteTracks(data: List<Track>){
-        _favoriteSongs.value = data.toRecyclerViewItemOfList(RV_ITEM_MUSIC_FAVORITE)
-    }
-
     fun getCategoryList(id: Int){
         _categoryList.value = serviceTracks.value.toRecyclerViewItemOfList(id)
     }
@@ -200,7 +204,7 @@ class MainListMusicViewModel @Inject constructor(
         return newList
     }
 
-    fun getPlayLists(){
+    private fun getPlayLists(){
         viewModelScope.launch {
             rvPlayList.run(None()).collect {
                 _listPlayList.value = it.toRecyclerViewItemsPlayList()
@@ -293,7 +297,6 @@ class MainListMusicViewModel @Inject constructor(
         }
         return musicFilterList
     }
-
 
     override fun init() {
         val intent = Intent(context, MusicService::class.java)

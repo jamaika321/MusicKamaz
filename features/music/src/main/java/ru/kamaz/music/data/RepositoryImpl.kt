@@ -30,7 +30,7 @@ class RepositoryImpl(
     override fun rvArtist(): Either<None, List<Track>> = media.getMediaFilesFromPath("storage", "all")
     override fun rvPlayList(): Flow<List<PlayListModel>> = testDBDao.getAllPlayList()
     override fun rvCategory(): Either<None, List<CategoryMusicModel>> = media.getCategory()
-    override fun rvFavorite(): Either<None, List<Track>> = testDBDao.getAllFavoriteSongs()
+    override fun rvFavorite(): Flow<List<Track>> = testDBDao.getAllFavoriteSongs()
     override fun rvAllFolderWithMusic(): Either<None, List<AllFolderWithMusic>> =
         media.getAllFolder()
 
@@ -66,8 +66,8 @@ class RepositoryImpl(
     override fun insertPlayList(song: PlayListModel): Either<Failure, None> =
         testDBDao.insertPlayList(song.toDao())
 
-    override fun deletePlayList(song: PlayListModel): Either<Failure, None> =
-        testDBDao.deletePlayList(song.toDao())
+    override fun deletePlayList(playList: String): Either<Failure, None> =
+        testDBDao.deletePlayList(playList)
 
     override fun insertHistorySong(song: HistorySongs): Either<Failure, None> {
         val r = testDBDao.insertHistorySong(song.toDao())
@@ -168,9 +168,6 @@ class RepositoryImpl(
         return (list)
     }
 
-    private fun readMediaStore(media1: SourceType) {
-
-    }
     private fun getNoMediaFiles(): List<File> {
         val resultList = mutableListOf<File>()
         val allFiles = File(devicePath).listFiles()

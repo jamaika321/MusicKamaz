@@ -11,8 +11,8 @@ interface PlayListDao  {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll(playList: PlayListEntity)
 
-    @Delete
-    fun delete(playList: PlayListEntity)
+    @Query("DELETE FROM play_list WHERE name = :playList")
+    fun delete(playList: String)
 
     @Query("SELECT * FROM play_list ")
     fun getData(): Flow<List<PlayListEntity>>

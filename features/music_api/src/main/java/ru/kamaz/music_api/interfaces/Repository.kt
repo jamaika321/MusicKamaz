@@ -15,7 +15,7 @@ interface Repository: PathManager, SourceManager {
     fun rvArtist(): Either<None, List<Track>>
     fun rvPlayList(): Flow<List<PlayListModel>>
     fun rvCategory():Either<None,List<CategoryMusicModel>>
-    fun rvFavorite(): Either<None, List<Track>>
+    fun rvFavorite(): Flow<List<Track>>
     fun rvAllFolderWithMusic():Either<None, List<AllFolderWithMusic>>
     fun getMusicCover(albumId: Long): Either<None, String>
     fun getMusicPositionFlow(): Flow<Int>
@@ -23,7 +23,7 @@ interface Repository: PathManager, SourceManager {
     fun insertFavoriteSong(song: Track): Either<Failure, None>
     fun deleteFavoriteSong(song: Track): Either<Failure, None>
     fun insertPlayList(song: PlayListModel): Either<Failure, None>
-    fun deletePlayList(song: PlayListModel): Either<Failure, None>
+    fun deletePlayList(playList: String): Either<Failure, None>
     fun insertHistorySong(song: HistorySongs): Either<Failure, None>
     fun queryFavoriteSongs(data:String) :  Either<Failure, String>
     fun queryHistorySongs() : Either<Failure, String>

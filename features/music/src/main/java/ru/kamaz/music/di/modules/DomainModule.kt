@@ -33,9 +33,9 @@ class DomainModule {
     @Provides
     fun provideGetMusicPosition(repository: Repository): GetMusicPosition = GetMusicPosition(repository)
     @Provides
-    fun provideGetUseCase(repository: Repository): GetFilesUseCase {
-        return GetFilesUseCaseImpl(repository)
-    }
+    fun provideGetUseCase(repository: Repository): GetFilesUseCase = GetFilesUseCaseImpl(repository)
+    @Provides
+    fun provideDeletePlayList(repository: Repository): DeletePlayList = DeletePlayList(repository)
 
     @Provides
     fun provideInsertFavoriteMusic(repository: Repository): InsertFavoriteMusic = InsertFavoriteMusic(repository)

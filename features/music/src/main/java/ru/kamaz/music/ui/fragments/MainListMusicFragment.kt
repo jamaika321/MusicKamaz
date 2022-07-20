@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -17,6 +18,7 @@ import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.ui.NavAction.OPEN_ADD_PLAY_LIST_DIALOG
 import ru.kamaz.music.ui.NavAction.OPEN_MUSIC_FRAGMENT
+import ru.kamaz.music.ui.fragmentDialog.DialogAddPlaylistFragment
 import ru.kamaz.music.ui.producers.*
 import ru.kamaz.music.ui.producers.ItemType.RV_ITEM_MUSIC_GENRES
 import ru.kamaz.music.view_models.MainListMusicViewModel
@@ -60,7 +62,6 @@ class MainListMusicFragment
     }
 
     override fun onBackPressed() {
-        Log.i("ReviewTest_OnBack", " Fragment: ")
         when(mode) {
             ListState.PLAYLIST -> {
                 backToPlayer()
@@ -107,7 +108,6 @@ class MainListMusicFragment
         }
 
         viewModel.listPlayList.launchWhenStarted(lifecycleScope){
-            Log.i("ReviewTest_Update", "listPlay: ")
             if (mode == ListState.CATPLAYLIST) categoryItemClicked(RV_ITEM_MUSIC_PLAYLIST)
         }
 
@@ -119,7 +119,6 @@ class MainListMusicFragment
         binding.rvAllMusic.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                viewModel.rvPosition.value += dy
                 if (viewModel.rvPosition.value > 5) {
                     binding.search.visibility = View.INVISIBLE
                 } else {
@@ -227,7 +226,8 @@ class MainListMusicFragment
         navigator.navigateTo(OPEN_ADD_PLAY_LIST_DIALOG)
     }
 
-    fun onTrackClicked(track: Track) {
+    fun onTrackClicked(track: Track, position: Int) {
+        viewModel.rvPosition.value = position
         viewModel.onItemClick(track, track.data)
     }
 
@@ -264,6 +264,7 @@ class MainListMusicFragment
             5 -> {
                 binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.allMusic, id)
+                binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
                 this.mode = ListState.PLAYLIST
             }
             6 -> {
@@ -280,7 +281,7 @@ class MainListMusicFragment
                 //TODO
             }
         }
-        viewModel.rvPosition.value = 0
+//        viewModel.rvPosition.value = 0
     }
 
 
@@ -301,6 +302,10 @@ class MainListMusicFragment
             .addProducer(MusicListViewHolderProducer())
             .build { it }
         this.mode = ListState.FOLDPLAYLIST
+    }
+
+    fun deletePlayList(name: String){
+        viewModel.deletePlaylist(name)
     }
 
 

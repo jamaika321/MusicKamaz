@@ -11,3 +11,8 @@ class InsertPlayList(private val repository: Repository) : AsyncUseCase<None, In
     data class Params(val list: PlayListModel)
     override suspend fun run(params: Params): Either<Failure, None> = repository.insertPlayList(params.list)
 }
+
+class DeletePlayList(private val repository: Repository) : AsyncUseCase<None, DeletePlayList.Params, Failure>() {
+    data class Params(val playList: String)
+    override suspend fun run(params: Params): Either<Failure, None> = repository.deletePlayList(params.playList)
+}

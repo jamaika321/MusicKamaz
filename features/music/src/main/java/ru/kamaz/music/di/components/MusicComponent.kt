@@ -3,12 +3,9 @@ package ru.kamaz.music.di.components
 import dagger.Subcomponent
 import ru.kamaz.music.di.modules.*
 import ru.kamaz.music.services.MusicService
-import ru.kamaz.music.ui.fragments.FolderFragment
 import ru.kamaz.music.ui.fragments.MainListMusicFragment
-import ru.kamaz.music.ui.fragments.TrackFragment
 import ru.kamaz.music.ui.fragments.MusicFragment
 import ru.kamaz.music.ui.fragmentDialog.BtFragment
-import ru.kamaz.music.ui.fragments.CategoryFragment
 import ru.kamaz.music.ui.fragmentDialog.DialogAddPlaylistFragment
 import ru.kamaz.music.ui.fragmentDialog.DialogBtSettings
 import ru.kamaz.music.ui.fragmentDialog.TrackOptionFragment
@@ -24,12 +21,9 @@ interface MusicComponent : BaseDaggerComponent {
     }
 
     fun inject(fragment: MusicFragment)
-    fun inject(fragment: TrackFragment)
     fun inject(service: MusicService)
     fun inject(fragment: BtFragment)
     fun inject(fragment: MainListMusicFragment)
-    fun inject(fragment: CategoryFragment)
-    fun inject(fragment: FolderFragment)
     fun inject(fragment: DialogBtSettings)
     fun inject(fragment: DialogAddPlaylistFragment)
     fun inject(fragment: TrackOptionFragment)

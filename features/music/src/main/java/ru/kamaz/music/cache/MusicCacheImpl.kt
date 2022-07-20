@@ -34,8 +34,8 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         return Either.Right(None())
     }
 
-    override fun deletePlayList(song: PlayListEntity): Either<Failure, None> {
-        db.playListDao().delete(song)
+    override fun deletePlayList(playList: String): Either<Failure, None> {
+        db.playListDao().delete(playList)
         return Either.Right(None())
     }
 
@@ -69,12 +69,8 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         }
     }
 
-    override fun getAllFavoriteSongs(): Either<None, List<Track>> {
-        return try {
-            Either.Right( convertEntityListFavoriteModelList(db.userDao().getData()) )
-        } catch (e: Exception) {
-            Either.Left(None())
-        }
+    override fun getAllFavoriteSongs(): Flow<List<Track>> {
+        return db.userDao().getData().map { convertEntityListFavoriteModelList(it) }
     }
 
     override fun getAllPlayList(): Flow<List<PlayListModel>> {

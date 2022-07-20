@@ -2,20 +2,13 @@ package ru.kamaz.music.view_models.recyclerViewModels
 
 import android.media.MediaPlayer
 import android.net.Uri
-import android.util.Log
-import android.view.Gravity
-import android.view.MotionEvent
 import android.view.View
-import android.widget.PopupMenu
-import android.widget.PopupWindow
-import androidx.core.widget.PopupWindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.TestTextItemBinding
 import ru.kamaz.music.ui.fragments.MainListMusicFragment
-import ru.kamaz.music.ui.fragments.TrackFragment
 import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
@@ -84,7 +77,7 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
         }
 
         binding.root.setOnClickListener {
-           (parent as MainListMusicFragment).onTrackClicked(data)
+           (parent as MainListMusicFragment).onTrackClicked(data, _position.value)
         }
 
         binding.like.setOnClickListener {

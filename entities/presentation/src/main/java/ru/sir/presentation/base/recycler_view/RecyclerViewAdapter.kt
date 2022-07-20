@@ -39,9 +39,6 @@ class RecyclerViewAdapter<D>(private val producers: SparseArray<ViewHolderProduc
         fun build(transform: (D) -> List<RecyclerViewBaseDataModel>) = RecyclerViewAdapter(producers as SparseArray<ViewHolderProducer<in Any, *, *>>, dataFlow, parent, transform)
     }
 
-    fun update(){
-
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<in Any, *, *> {
         return producers[viewType]?.produce(parent)

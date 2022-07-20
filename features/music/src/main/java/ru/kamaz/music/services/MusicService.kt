@@ -57,7 +57,7 @@ import javax.inject.Inject
 
 
 class MusicService : Service(), MusicServiceInterface.
-Service, MediaPlayer.OnCompletionListener,
+Service, OnCompletionListener,
     MusicManagerListener, BluetoothManagerListener {
 
     @Inject
@@ -340,12 +340,9 @@ Service, MediaPlayer.OnCompletionListener,
 
     private fun getFavoriteMusicList() {
         CoroutineScope(Dispatchers.IO).launch {
-            val it = getAllFavoriteSongs.run(None())
-            it.either({
-            }, {
-                (if (it.isEmpty()) Log.i("queryFavoriteMusic", "duration${it}")
-                else changeFavoriteStatus(it))
-            })
+            getAllFavoriteSongs.run(None()).collect {
+                changeFavoriteStatus(it)
+            }
         }
     }
 
@@ -738,9 +735,7 @@ Service, MediaPlayer.OnCompletionListener,
     }
 
     override fun resume() {
-        if (musicEmpty.value) {
-
-        } else {
+        if (!musicEmpty.value) {
             mediaPlayer.start()
             _isPlaying.value = true
         }
@@ -753,9 +748,7 @@ Service, MediaPlayer.OnCompletionListener,
     override fun previousTrack() {
         when (mode) {
             SourceEnum.DISK -> {
-                if (tracks.isEmpty()) {
-
-                } else {
+                if (!tracks.isEmpty()) {
                     when (currentTrackPosition.value - 1) {
                         -1 -> _currentTrackPosition.value = tracks.size - 1
                         else -> _currentTrackPosition.value--
@@ -781,9 +774,7 @@ Service, MediaPlayer.OnCompletionListener,
                 twManager.playerPrev()
             }
             SourceEnum.AUX -> TODO()
-            SourceEnum.USB -> if (tracks.isEmpty()) {
-
-            } else {
+            SourceEnum.USB -> if (!tracks.isEmpty()) {
                 when (currentTrackPosition.value - 1) {
                     -1 -> _currentTrackPosition.value = tracks.size - 1
                     else -> _currentTrackPosition.value--
@@ -808,7 +799,7 @@ Service, MediaPlayer.OnCompletionListener,
     }
 
     private fun compilationMusic() {
-        mediaPlayer.setOnCompletionListener(OnCompletionListener {
+        mediaPlayer.setOnCompletionListener {
             Log.i("isPlayingAutoModeMain", "true${isPlaying.value}")
             checkUsb()
             if (isUSBConnected.value && isUsbModeOn.value) {
@@ -820,7 +811,7 @@ Service, MediaPlayer.OnCompletionListener,
             } else {
                 startDiskMode()
             }
-        })
+        }
     }
 
     override fun checkUsb() {
@@ -882,8 +873,7 @@ Service, MediaPlayer.OnCompletionListener,
     }
 
     private fun funRepeatAll() {
-        if (tracks.isEmpty()) {
-        } else {
+        if (tracks.isNotEmpty()) {
             when (currentTrackPosition.value == tracks.size - 1) {
                 true -> {
                     _currentTrackPosition.value = 0

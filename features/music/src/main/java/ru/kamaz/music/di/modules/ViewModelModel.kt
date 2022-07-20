@@ -8,13 +8,12 @@ import dagger.multibindings.IntoMap
 import ru.kamaz.music.view_models.*
 import ru.kamaz.music.view_models.bt.BtDialogFragmentViewModel
 import ru.kamaz.music.view_models.bt.BtFragmentViewModel
-import ru.kamaz.music.view_models.list.FolderViewModel
-import ru.kamaz.music.view_models.music_category.CategoryViewModel
 import ru.sir.presentation.annotations.ViewModelKey
 import ru.sir.presentation.factories.ViewModelFactory
 
 @Module
 abstract class ViewModelModel() {
+
     @Binds
     abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
 
@@ -22,11 +21,6 @@ abstract class ViewModelModel() {
     @IntoMap
     @ViewModelKey(MusicFragmentViewModel::class)
     abstract fun bindMusicViewModel(model: MusicFragmentViewModel): ViewModel
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(TrackViewModel::class)
-    abstract fun bindListMusicViewModel(model: TrackViewModel): ViewModel
 
     @Binds
     @IntoMap
@@ -40,22 +34,14 @@ abstract class ViewModelModel() {
 
     @Binds
     @IntoMap
-    @ViewModelKey(FolderViewModel::class)
-    abstract fun bindListViewModel(model: FolderViewModel): ViewModel
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(CategoryViewModel::class)
-    abstract fun bindCategoryViewModel(model: CategoryViewModel): ViewModel
-
-    @Binds
-    @IntoMap
     @ViewModelKey(DialogViewModel::class)
     abstract fun bindDialogViewModel(model: DialogViewModel): ViewModel
-  @Binds
+
+    @Binds
     @IntoMap
     @ViewModelKey(BtDialogFragmentViewModel::class)
     abstract fun bindBtDialogFragmentViewModel(model: BtDialogFragmentViewModel): ViewModel
+
     @Binds
     @IntoMap
     @ViewModelKey(DialogAddPlaylistFragmentViewModel::class)
