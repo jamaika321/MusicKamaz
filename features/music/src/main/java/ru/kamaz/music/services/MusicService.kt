@@ -245,10 +245,10 @@ Service, OnCompletionListener,
     override fun getMusicDuration(): StateFlow<Int> = duration
     override fun isFavoriteMusic(): StateFlow<Boolean> = isFavorite
     override fun isShuffleOn(): StateFlow<Boolean> = isShuffleStatus
+    override fun getMusicData(): StateFlow<String> = data
 
     override fun checkDeviceConnection(): StateFlow<Boolean> = isNotConnected
     override fun checkUSBConnection(): StateFlow<Boolean> = isUSBConnected
-    override fun checkBTConnection(): StateFlow<Boolean> = isNotConnected
     override fun updateWidget(): StateFlow<Boolean> = isNotConnected
     override fun btModeOn(): StateFlow<Boolean> = isBtModeOn
     override fun auxModeOn(): StateFlow<Boolean> = isAuxModeOn
@@ -688,11 +688,11 @@ Service, OnCompletionListener,
         }
     }
 
-    override fun firstOpenTrackFound(track: Track) {
-        updateTracks()
-        val currentTrack = track
-        updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
-    }
+//    override fun firstOpenTrackFound(track: Track) {
+//        updateTracks()
+//        val currentTrack = track
+//        updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
+//    }
 
     override fun playOrPause(): Boolean {
         when (mode) {
@@ -723,10 +723,6 @@ Service, OnCompletionListener,
         _title.value = title
         _artist.value = artist
 //        _duration.value = duration.toInt()
-    }
-
-    override fun getMusicImg(albumID: String) {
-
     }
 
     override fun pause() {

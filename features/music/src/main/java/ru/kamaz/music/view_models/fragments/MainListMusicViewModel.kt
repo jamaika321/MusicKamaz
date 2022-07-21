@@ -1,4 +1,4 @@
-package ru.kamaz.music.view_models
+package ru.kamaz.music.view_models.fragments
 
 import android.app.Application
 import android.content.ComponentName
@@ -124,7 +124,9 @@ class MainListMusicViewModel @Inject constructor(
     }
 
     fun fillAllTracksList() {
-        _allMusic.value = serviceTracks.value.findFavoriteMusic().findPlayingMusic(lastMusic.value).toRecyclerViewItemOfList(RV_ITEM)
+        _allMusic.value = serviceTracks.value.findFavoriteMusic().findPlayingMusic(lastMusic.value).toRecyclerViewItemOfList(
+            RV_ITEM
+        )
     }
 
     fun lastMusic(title: String) {
@@ -278,7 +280,8 @@ class MainListMusicViewModel @Inject constructor(
 
     fun searchMusic(music: String) {
         _allMusic.value = filterRecyclerList(music, serviceTracks.value).toRecyclerViewItemOfList(
-            RV_ITEM)
+            RV_ITEM
+        )
     }
 
     @OptIn(ExperimentalStdlibApi::class)

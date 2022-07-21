@@ -16,5 +16,5 @@
     <string name="add_playlist">Добавить</string>
     <string name="create_playlist">Создать</string>
     <string name="cancel_add">Отмена</string>
-    <string name="playing">Добавить в проигрыватель</string>
+    <string name="rename">Переименовать</string>
 </resources>

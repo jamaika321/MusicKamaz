@@ -7,10 +7,6 @@
         android:id="@+id/musicFragment"
         android:name="ru.kamaz.music.ui.fragments.MusicFragment"
         android:label="MusicFragment" />
-    <fragment
-        android:id="@+id/btFragment"
-        android:name="ru.kamaz.music.ui.fragmentDialog.BtFragment"
-        android:label="BtFragment" />
     <dialog
         android:id="@+id/fragment_dialog"
         android:name="ru.kamaz.music.ui.fragmentDialog.DialogBtSettings"

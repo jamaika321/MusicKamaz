@@ -16,23 +16,26 @@ import ru.kamaz.music_api.models.PlayListModel
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
 import java.io.File
+import java.lang.Exception
 
-class AddTrackViewModel: RecyclerViewBaseItem<PlayListModel, PlaylistItemBinding>() {
+class AddTrackViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBinding>() {
 
     private val title = MutableStateFlow("")
     private val image = MutableStateFlow("")
     private val id = MutableStateFlow(0L)
+    private val selection = MutableStateFlow(false)
     lateinit var data: PlayListModel
 
     override fun bindData(data: PlayListModel, position: Int) {
         title.value = data.title
         image.value = data.albumArt
         id.value = data.id
+        selection.value = data.selection
         this.data = data
     }
 
     override fun initVars() {
-        title.launchWhenStarted(parent.lifecycleScope){
+        title.launchWhenStarted(parent.lifecycleScope) {
             binding.textCategory.text = title.value
         }
         image.launchWhenStarted(parent.lifecycleScope) {
@@ -46,9 +49,26 @@ class AddTrackViewModel: RecyclerViewBaseItem<PlayListModel, PlaylistItemBinding
                 binding.imageCategory.setImageResource(R.drawable.ic_play_list)
             }
         }
+        selection.launchWhenStarted(parent.lifecycleScope){
+            if (it){
+                binding.foregroundImage.visibility = View.VISIBLE
+            } else {
+                binding.foregroundImage.visibility = View.INVISIBLE
+            }
+        }
         binding.clAllItem.setOnClickListener {
-            if (data.albumArt == "create_playlist"){
-                (parent as MainListMusicFragment).addNewPlaylist()
+            if (data.albumArt == "create_playlist") {
+                try {
+                    (parent as MainListMusicFragment).addNewPlaylist()
+                } catch (e: Exception) {
+                    (parent as DialogAddTrack).addNewPlaylist()
+                }
+            } else {
+                try {
+                    (parent as DialogAddTrack).selectPlayList(id.value, title.value)
+                } catch (e: Exception) {
+
+                }
             }
         }
         binding.clAllItem.setOnLongClickListener {
@@ -58,23 +78,23 @@ class AddTrackViewModel: RecyclerViewBaseItem<PlayListModel, PlaylistItemBinding
                 popupMenu.setOnMenuItemClickListener { item ->
                     when (item.itemId) {
                         R.id.delete -> {
-                            (parent as MainListMusicFragment).deletePlayList(this.data.title)
-                            Toast.makeText(parent.context, "Delete", Toast.LENGTH_SHORT).show()
+                            try {
+                                (parent as MainListMusicFragment).deletePlayList(this.data.title)
+                            } catch (e: Exception) {
+                                (parent as DialogAddTrack).deletePlaylist(this.data.title)
+                            }
                         }
                         R.id.playing -> {
-                            Toast.makeText(parent.context, "Playing", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(parent.context, R.string.rename, Toast.LENGTH_SHORT).show()
                         }
                     }
                     true
                 }
-
                 popupMenu.show()
             }
             return@setOnLongClickListener true
         }
     }
-
-
 
 
 }

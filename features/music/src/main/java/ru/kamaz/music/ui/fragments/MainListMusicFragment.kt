@@ -1,13 +1,10 @@
 package ru.kamaz.music.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,13 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.StateFlow
 import ru.kamaz.music.databinding.FragmentMainListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
-import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.ui.NavAction.OPEN_ADD_PLAY_LIST_DIALOG
 import ru.kamaz.music.ui.NavAction.OPEN_MUSIC_FRAGMENT
-import ru.kamaz.music.ui.fragmentDialog.DialogAddPlaylistFragment
 import ru.kamaz.music.ui.producers.*
-import ru.kamaz.music.ui.producers.ItemType.RV_ITEM_MUSIC_GENRES
-import ru.kamaz.music.view_models.MainListMusicViewModel
+import ru.kamaz.music.view_models.fragments.MainListMusicViewModel
 import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseFragment

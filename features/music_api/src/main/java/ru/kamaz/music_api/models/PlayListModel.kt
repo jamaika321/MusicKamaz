@@ -4,9 +4,9 @@ import java.io.Serializable
 
 data class PlayListModel(
     val id: Long,
-    val title: String,
-    val albumArt: String,
-    val trackTitleList: List<String>,
-    val trackDataList: List<String>,
+    var title: String,
+    var albumArt: String,
+    val trackTitleList: ArrayList<String>,
+    val trackDataList: ArrayList<String>,
     var selection: Boolean = false
     ): Serializable

@@ -13,8 +13,6 @@ interface MusicServiceInterface{
         fun setViewModel(viewModel:ViewModel)
         fun init()
         fun playOrPause(): Boolean
-        fun firstOpenTrackFound(track: Track)
-        fun getMusicImg(albumID: String)
         fun pause()
         fun resume()
         fun isPlay(): StateFlow<Boolean>
@@ -31,7 +29,6 @@ interface MusicServiceInterface{
         fun checkDeviceConnection(): StateFlow<Boolean>
         fun lastMusic(): StateFlow<String>
         fun checkUSBConnection(): StateFlow<Boolean>
-        fun checkBTConnection(): StateFlow<Boolean>
         fun updateWidget():StateFlow<Boolean>
         fun btModeOn():StateFlow<Boolean>
         fun auxModeOn():StateFlow<Boolean>
@@ -49,6 +46,7 @@ interface MusicServiceInterface{
         fun getRepeat(): StateFlow<Int>
         fun changeRepeatMode()
         fun isShuffleOn(): StateFlow<Boolean>
+        fun getMusicData(): StateFlow<String>
         fun initTrack(track: Track, data1: String)
         fun clearTrackData()
         fun appClosed()

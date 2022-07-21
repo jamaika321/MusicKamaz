@@ -57,6 +57,11 @@ class RepositoryImpl(
         TODO("Not yet implemented")
     }
 
+    override fun updatePlayList(name: String, title: List<String>, data: List<String>): Either<Failure, None> {
+        testDBDao.updatePlayList(name, title, data)
+        return Either.Right(None())
+    }
+
     override fun insertFavoriteSong(song: Track): Either<Failure, None> =
         testDBDao.insertFavoriteSong(song.toFavoriteDao())
 
@@ -167,6 +172,7 @@ class RepositoryImpl(
         Log.i("usbMusic", "getFiles: $list")
         return (list)
     }
+
 
     private fun getNoMediaFiles(): List<File> {
         val resultList = mutableListOf<File>()

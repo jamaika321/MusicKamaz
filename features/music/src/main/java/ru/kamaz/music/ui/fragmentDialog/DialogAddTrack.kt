@@ -2,31 +2,68 @@ package ru.kamaz.music.ui.fragmentDialog
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.ComponentName
+import android.content.ServiceConnection
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import ru.kamaz.music.databinding.DialogAddTrackBinding
+import ru.kamaz.music.di.components.MusicComponent
+import ru.kamaz.music.services.MusicService
+import ru.kamaz.music.services.MusicServiceInterface
+import ru.kamaz.music.ui.NavAction
 import ru.kamaz.music.ui.producers.AddTrackViewHolder
 import ru.kamaz.music.ui.producers.ItemType
+import ru.kamaz.music_api.interactor.DeletePlayList
+import ru.kamaz.music_api.interactor.PlayListRV
+import ru.kamaz.music_api.interactor.UpdatePlayList
 import ru.kamaz.music_api.models.PlayListModel
+import ru.sir.core.None
+import ru.sir.presentation.base.BaseActivity
+import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.recycler_view.RecyclerViewAdapter
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseDataModel
+import ru.sir.presentation.extensions.launchWhenStarted
+import javax.inject.Inject
 
-class DialogAddTrack : DialogFragment(){
+class DialogAddTrack : DialogFragment(), ServiceConnection, MusicServiceInterface.ViewModel{
 
     private var _binding: DialogAddTrackBinding? = null
-
     private val binding get() = _binding!!
+    lateinit var navigator: BaseActivity
+
+    fun inject(app: BaseApplication){
+        app.getComponent<MusicComponent>().inject(this)
+    }
+
+    @Inject
+    lateinit var loadAllPlayList: PlayListRV
+    @Inject
+    lateinit var deletePlayList: DeletePlayList
+    @Inject
+    lateinit var updatePlayList: UpdatePlayList
+
+    private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
+    val service = _service.asStateFlow()
 
     private val playList = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
+    private var notFLowList : ArrayList<PlayListModel> = arrayListOf(PlayListModel(0L,"","", arrayListOf(""), arrayListOf("")))
+    private var selectedPlayList = ""
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -34,6 +71,11 @@ class DialogAddTrack : DialogFragment(){
         val dialog = AlertDialog.Builder(context).setView(binding.root).create()
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        inject(activity?.application as BaseApplication)
+        service.launchWhenStarted(lifecycleScope){
+            if (it == null) return@launchWhenStarted
+            initServiceVars()
+        }
         return dialog
     }
 
@@ -47,6 +89,7 @@ class DialogAddTrack : DialogFragment(){
         val width = (resources.displayMetrics.widthPixels * 0.80).toInt()
         val height = (resources.displayMetrics.heightPixels * 0.80).toInt()
         dialog!!.window?.setLayout(width, height)
+        loadPlayLists()
     }
 
     override fun onCreateView(
@@ -57,7 +100,12 @@ class DialogAddTrack : DialogFragment(){
         binding.rvAllMusic.layoutManager = GridLayoutManager(context, 4)
         binding.rvAllMusic.adapter = recyclerViewAdapter(playList)
         setListeners()
+        navigator = requireActivity() as BaseActivity
         return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    fun initServiceVars(){
+
     }
 
     private fun setListeners(){
@@ -65,17 +113,56 @@ class DialogAddTrack : DialogFragment(){
             onDestroyView()
         }
         binding.addButtons.addBtn.setOnClickListener {
-            openAddDialog()
+            openAddDialog("")
         }
     }
 
-    private fun openAddDialog(){
+    private fun loadPlayLists(){
+        CoroutineScope(Dispatchers.IO).launch {
+            loadAllPlayList.run(None()).collect {
+                playList.value = it.toRecyclerViewItems()
+                notFLowList = it as ArrayList<PlayListModel>
+            }
+        }
+    }
 
+    private fun openAddDialog(newName: String) {
+        val title : String = if (!service.value?.getMusicName()?.value.isNullOrEmpty()) {
+            service.value?.getMusicName()!!.value
+        } else {
+            ""
+        }
+        notFLowList.forEach {
+            if (it.title == selectedPlayList){
+                if (newName != "") it.title = newName
+                if (title != "") it.trackTitleList.add(title)
+                it.trackDataList.add(title)
+            }
+        }
+        service.value?.getMusicName()
+        service.value?.getMusicData()
+        CoroutineScope(Dispatchers.IO).launch {
+//            updatePlayList.run(UpdatePlayList.Params(selectedPlayList,  ))
+        }
     }
 
     fun selectPlayList(id: Long, title: String){
+        notFLowList.forEach {
+            it.selection = it.id == id && it.title == title
+        }
+        playList.value = notFLowList.toRecyclerViewItems()
+        binding.rvAllMusic.adapter = recyclerViewAdapter(playList)
+        selectedPlayList = title
+    }
 
+    fun addNewPlaylist(){
+        navigator.navigateTo(NavAction.OPEN_ADD_PLAY_LIST_DIALOG)
+    }
 
+    fun deletePlaylist(name: String){
+        CoroutineScope(Dispatchers.IO).launch {
+            deletePlayList.run(DeletePlayList.Params(name))
+        }
     }
 
     private fun recyclerViewAdapter(
@@ -91,6 +178,15 @@ class DialogAddTrack : DialogFragment(){
         val newList = mutableListOf<RecyclerViewBaseDataModel>()
         this.forEach { newList.add(RecyclerViewBaseDataModel(it, ItemType.RV_ITEM_MUSIC_PLAYLIST)) }
         return newList
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+        _service.value = (service as MusicService.MyBinder).getService()
+        this.service.value?.setViewModel(this)
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        _service.value = null
     }
 
 }

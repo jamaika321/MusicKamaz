@@ -17,4 +17,7 @@ interface PlayListDao  {
     @Query("SELECT * FROM play_list ")
     fun getData(): Flow<List<PlayListEntity>>
 
+    @Query("UPDATE play_list SET name = :name, trackTitleList = :title, trackDataList = :data WHERE name = :name")
+    fun updatePlayList(name: String, title: List<String>, data: List<String>)
+
 }

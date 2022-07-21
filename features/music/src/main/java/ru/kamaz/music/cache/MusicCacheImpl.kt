@@ -47,6 +47,10 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         }
     }
 
+    override fun updatePlayList(name: String, title: List<String>, data: List<String>) {
+        db.playListDao().updatePlayList(name, title, data)
+    }
+
     override fun insertTrackList(tracks: List<TrackEntity>) : Either<Failure, None> {
         db.historySongsDao().insertTrackList(tracks)
         return Either.Right(None())

@@ -25,7 +25,7 @@ import ru.kamaz.music.ui.NavAction.OPEN_DIALOG_ADD_TRACK
 import ru.kamaz.music.ui.NavAction.OPEN_DIALOG_BT_FRAGMENT
 import ru.kamaz.music.ui.NavAction.OPEN_TRACK_LIST_FRAGMENT
 import ru.kamaz.music.ui.enums.PlayListFlow
-import ru.kamaz.music.view_models.MusicFragmentViewModel
+import ru.kamaz.music.view_models.fragments.MusicFragmentViewModel
 import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.base.BaseFragment

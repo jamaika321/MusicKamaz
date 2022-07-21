@@ -1,4 +1,4 @@
-package ru.kamaz.music.view_models
+package ru.kamaz.music.view_models.fragments
 
 import android.app.Application
 import android.content.ComponentName
@@ -8,18 +8,14 @@ import android.content.ServiceConnection
 import android.media.MediaPlayer
 import android.os.IBinder
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.biozzlab.twmanager.utils.easyLog
-import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.domain.TestSettings
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
-import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.GetMusicPosition
-import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.BaseViewModel
 import javax.inject.Inject
 

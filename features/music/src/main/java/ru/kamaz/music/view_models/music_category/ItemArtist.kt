@@ -18,7 +18,7 @@ class ItemArtist : RecyclerViewBaseItem<Track, FolderItemRvBinding>(){
         artist.launchWhenStarted(parent.lifecycleScope){
             binding.textCategory.text = it
             if (it == ""){
-                binding.textCategory.text = "Красота в простате"
+                binding.textCategory.text = "Красота в деталях"
             }
         }
 
