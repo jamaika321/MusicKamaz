@@ -197,14 +197,4 @@ class MusicFragmentViewModel @Inject constructor(
         _service.value = null
     }
 
-
-    override fun onSdStatusChanged(path: String, isAdded: Boolean) {
-        "MicroSD status changed: value = $path status = $isAdded".easyLog(this)
-    }
-
-    override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
-        "USB status changed: value = $path status = $isAdded".easyLog(this)
-    }
-
-
 }

@@ -8,6 +8,6 @@ import ru.sir.core.Either
 import ru.sir.core.None
 
 class UpdatePlayList(private val repository: Repository) : AsyncUseCase<None, UpdatePlayList.Params, Failure>() {
-    data class Params(val name: String, val title: List<String>, val data: List<String>)
-    override suspend fun run(params: Params): Either<Failure, None> = repository.updatePlayList(params.name, params.title, params.data)
+    data class Params(val name: String, val data: List<String>)
+    override suspend fun run(params: Params): Either<Failure, None> = repository.updatePlayList(params.name, params.data)
 }

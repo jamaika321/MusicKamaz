@@ -29,7 +29,7 @@ interface Repository: PathManager, SourceManager {
     fun queryHistorySongs() : Either<Failure, String>
     suspend fun rootFilesFromSource(source: SourceType):List<File>
     fun getFiles(path: String): List<File>
-    fun updatePlayList(name: String, title: List<String>, data: List<String>): Either<Failure, None>
+    fun updatePlayList(name: String,  data: List<String>): Either<Failure, None>
  //suspend fun getFilesFromDirectory(path: String): List<File
 
 

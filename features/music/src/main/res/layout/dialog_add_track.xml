@@ -6,13 +6,13 @@
 
 
     <TextView
-        android:id="@+id/tv_question_bt_connection"
+        android:id="@+id/tv_music_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="10dp"
         android:gravity="center"
-        android:text="Artist - Title"
-        android:textColor="@color/white"
+        android:hint="Artist - Title"
+        android:textColorHint="@color/white"
         android:textSize="24dp"
         app:layout_constraintBottom_toTopOf="@id/line"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,7 +27,7 @@
         app:layout_constraintBottom_toTopOf="@id/tv_add_to_playlist"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_question_bt_connection" />
+        app:layout_constraintTop_toBottomOf="@id/tv_music_title" />
 
     <TextView
         android:id="@+id/tv_add_to_playlist"

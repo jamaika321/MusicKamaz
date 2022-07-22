@@ -31,50 +31,37 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_question_bt_connection"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_btn_add_to_playlist"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            app:cardCornerRadius="10dp"
-            android:background="#2C3542"
-            android:layout_marginHorizontal="40dp"
-            android:layout_marginVertical="15dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/card_btn_delete"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-        <Button
-            android:id="@+id/btn_add_to_playlist"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#2C3542"
-            android:gravity="center"
-            android:text="@string/add_to_playlist"
-            android:textColor="#FFFFFF"
-            android:fontFamily="sans-serif-smallcaps" />
-        </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_btn_delete"
+        <TextView
+            android:id="@+id/btn_add_to_playlist"
+            style="@style/button_add_playlist"
             android:layout_width="0dp"
-            android:layout_height="56dp"
-            app:cardCornerRadius="10dp"
-            android:background="#2C3542"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/btn_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="@string/add_to_playlist"
+            android:textColor="@color/white"
             android:layout_marginHorizontal="40dp"
             android:layout_marginVertical="15dp"
+            android:gravity="center|top"
+            />
+
+        <TextView
+            android:id="@+id/btn_delete"
+            style="@style/button_add_playlist"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/card_btn_add_to_playlist">
-        <Button
-            android:id="@+id/btn_delete"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_add_to_playlist"
             android:text="@string/delete"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginVertical="15dp"
             android:gravity="center"
-            android:fontFamily="sans-serif-smallcaps"
-            android:background="#2C3542" />
-        </androidx.cardview.widget.CardView>
+            />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

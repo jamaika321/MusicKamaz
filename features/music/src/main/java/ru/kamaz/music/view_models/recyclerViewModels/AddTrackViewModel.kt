@@ -56,6 +56,10 @@ class AddTrackViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBindin
                 binding.foregroundImage.visibility = View.INVISIBLE
             }
         }
+        setListeners()
+    }
+
+    private fun setListeners(){
         binding.clAllItem.setOnClickListener {
             if (data.albumArt == "create_playlist") {
                 try {
@@ -67,7 +71,7 @@ class AddTrackViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBindin
                 try {
                     (parent as DialogAddTrack).selectPlayList(id.value, title.value)
                 } catch (e: Exception) {
-
+                    (parent as MainListMusicFragment).playListSelected(title.value)
                 }
             }
         }
@@ -95,6 +99,8 @@ class AddTrackViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBindin
             return@setOnLongClickListener true
         }
     }
+
+
 
 
 }

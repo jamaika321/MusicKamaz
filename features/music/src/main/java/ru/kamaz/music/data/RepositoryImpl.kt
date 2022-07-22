@@ -57,8 +57,8 @@ class RepositoryImpl(
         TODO("Not yet implemented")
     }
 
-    override fun updatePlayList(name: String, title: List<String>, data: List<String>): Either<Failure, None> {
-        testDBDao.updatePlayList(name, title, data)
+    override fun updatePlayList(name: String,  data: List<String>): Either<Failure, None> {
+        testDBDao.updatePlayList(name,  data)
         return Either.Right(None())
     }
 
@@ -108,7 +108,7 @@ class RepositoryImpl(
         this.albumArt,
         this.playing,
         this.favorite)
-    private fun PlayListModel.toDao() = PlayListEntity(this.id, this.title, this.albumArt, this.trackTitleList, this.trackDataList)
+    private fun PlayListModel.toDao() = PlayListEntity(this.id, this.title, this.albumArt, this.trackDataList)
     private fun HistorySongs.toDao() = HistorySongsEntity(
         this.dbID,
         this.idCursor,

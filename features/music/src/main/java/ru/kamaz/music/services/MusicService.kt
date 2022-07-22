@@ -122,7 +122,7 @@ Service, OnCompletionListener,
 
     private var tracks = mutableListOf<Track>()
 
-    private var allTracks = mutableListOf<Track>()
+    private var allTracks = MutableStateFlow<List<Track>>(emptyList())
 
     private var files = mutableListOf<File>()
 
@@ -237,7 +237,7 @@ Service, OnCompletionListener,
         }
     }
 
-    override fun getAllTracks() = MutableStateFlow(allTracks).asStateFlow()
+    override fun getAllTracks() = allTracks.asStateFlow()
 
     override fun getMusicName(): StateFlow<String> = title
     override fun getArtistName(): StateFlow<String> = artist
@@ -330,7 +330,7 @@ Service, OnCompletionListener,
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
         Log.i("USBstatus", "onUsbStatusChanged:$path ")
         _isUSBConnected.value = isAdded
-        updateTracks()
+        updateTracks("5")
         if (isAdded) {
             startUsbMode()
         } else {
@@ -512,8 +512,8 @@ Service, OnCompletionListener,
         if (!isDiskModeOn.value) {
             Log.i("ReviewTest_", "startDiskMode: ")
             changeSource(2)
-            if (allTracks.isEmpty()){
-                updateTracks()
+            if (allTracks.value.isEmpty()){
+                updateTracks("5")
             } else {
                 replaceAllTracks(emptyList())
             }
@@ -526,8 +526,8 @@ Service, OnCompletionListener,
         if (!isUsbModeOn.value && isUSBConnected.value) {
             Log.i("ReviewTest_", "startUSBMode: ")
             changeSource(3)
-            if (allTracks.isEmpty()){
-                updateTracks()
+            if (allTracks.value.isEmpty()){
+                updateTracks("5")
             } else {
                 replaceAllTracks(emptyList())
             }
@@ -991,38 +991,38 @@ Service, OnCompletionListener,
         return channelId
     }
 
-    override fun updateTracks() {
-        val result = mediaManager.getMediaFilesFromPath("all", "all")
+    override fun updateTracks(loadMode: String) {
+        val result = mediaManager.getMediaFilesFromPath("all", loadMode)
         if (result is Either.Right) {
             replaceAllTracks(result.r)
             _musicEmpty.value = false
         } else {
             _musicEmpty.value = true
         }
+        if (loadMode == "5") loadTracksOnCoroutine("all")
         if (isShuffleStatus.value) {
             setShuffleMode()
         }
 
     }
 
-//    private fun loadTracksOnCoroutine(loadMode: String) {
-//        val scope = CoroutineScope(Job() + Dispatchers.IO)
-//        val job = scope.launch {
-//            updateTracks(loadMode)
-//            val result = async {
-//                getFavoriteMusicList()
-//            }.await()
-//        }
-//        job.start()
-//    }
+    private fun loadTracksOnCoroutine(loadMode: String) {
+        val scope = CoroutineScope(Job() + Dispatchers.IO)
+        val job = scope.launch {
+            updateTracks(loadMode)
+            val result = async {
+                getFavoriteMusicList()
+            }.await()
+        }
+        job.start()
+    }
 
     private fun replaceAllTracks(trackList: List<Track>) {
         if (trackList.isNotEmpty()){
-            allTracks.clear()
-            allTracks.addAll(trackList)
+            allTracks.value = trackList
         }
         tracks.clear()
-        allTracks.forEach {
+        allTracks.value.forEach {
             when (mode){
                 SourceEnum.DISK -> {
                     if (it.source == "disk"){

@@ -17,4 +17,6 @@
     <string name="create_playlist">Создать</string>
     <string name="cancel_add">Отмена</string>
     <string name="rename">Переименовать</string>
+    <string name="music_added">Аудиозапись добавлена в плейлист</string>
+    <string name="playlist_name_hint">Введите название</string>
 </resources>

@@ -228,7 +228,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
         val category = listOf(
             CategoryMusicModel(R.drawable.ic_songers, "Исполнители", 0),
-            CategoryMusicModel(R.drawable.ic_guitar, "Жанры", 1),
             CategoryMusicModel(R.drawable.ic_albom, "Альбомы", 2),
             CategoryMusicModel(R.drawable.ic_play_list, "Плейлисты", 3),
             CategoryMusicModel(R.drawable.ic_like_for_list, "Избранное", 4)

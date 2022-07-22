@@ -16,9 +16,6 @@ data class PlayListEntity(
     @ColumnInfo(name = "albumArt")
     var albumArt : String,
     @TypeConverters(Converters::class)
-    @ColumnInfo(name = "trackTitleList")
-    var trackTitleList: List<String>,
-    @TypeConverters(Converters::class)
     @ColumnInfo(name = "trackDataList")
     var trackDataList: List<String>,
 )

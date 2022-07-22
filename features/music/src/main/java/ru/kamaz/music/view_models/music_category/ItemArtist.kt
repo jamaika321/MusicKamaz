@@ -2,6 +2,7 @@ package ru.kamaz.music.view_models.music_category
 
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FolderItemRvBinding
 import ru.kamaz.music.ui.fragments.MainListMusicFragment
 import ru.kamaz.music_api.models.Track
@@ -23,7 +24,7 @@ class ItemArtist : RecyclerViewBaseItem<Track, FolderItemRvBinding>(){
         }
 
         binding.root.setOnClickListener {
-            (parent as MainListMusicFragment)
+            binding.imageCategory.setImageResource(R.drawable.music_png_bg)
         }
     }
     override fun bindData(data: Track, position: Int) {

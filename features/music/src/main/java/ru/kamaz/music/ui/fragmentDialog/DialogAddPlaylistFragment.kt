@@ -59,7 +59,7 @@ class DialogAddPlaylistFragment : DialogFragment() {
         CoroutineScope(Dispatchers.IO).launch {
             insertPlayList.run(
                 InsertPlayList.Params(
-                    PlayListModel(13L, newPlayList, "", listOf(""), listOf(""))
+                    PlayListModel(13L, newPlayList, "",  arrayListOf(""))
                 )
             )
         }

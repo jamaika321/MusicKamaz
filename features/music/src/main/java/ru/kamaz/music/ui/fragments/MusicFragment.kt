@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
 import com.squareup.picasso.Picasso
@@ -124,6 +125,7 @@ class MusicFragment :
 
         }
         binding.controlPanel.addToFolder.setOnClickListener {
+//            setFragmentResult("musicTitle", bundleOf("bundleKey" to viewModel.title.value))
             navigator.navigateTo(
                 UiAction(
                     OPEN_DIALOG_ADD_TRACK
@@ -229,6 +231,7 @@ class MusicFragment :
 
         viewModel.isMusicEmpty.launchWhenStarted(lifecycleScope) {
             if (it) Toast.makeText(context, "Файлы не найдены", Toast.LENGTH_LONG).show()
+            binding.seek.progress = 0
         }
 
         viewModel.musicPosition.launchWhenStarted(lifecycleScope) {

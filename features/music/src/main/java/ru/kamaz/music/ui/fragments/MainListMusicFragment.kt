@@ -1,19 +1,27 @@
 package ru.kamaz.music.ui.fragments
 
+import android.content.Context.LAYOUT_INFLATER_SERVICE
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils.loadAnimation
+import android.widget.LinearLayout
+import android.widget.PopupWindow
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.StateFlow
+import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentMainListMusicBinding
+import ru.kamaz.music.databinding.PlaylistContextMenuBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.ui.NavAction.OPEN_ADD_PLAY_LIST_DIALOG
 import ru.kamaz.music.ui.NavAction.OPEN_MUSIC_FRAGMENT
+import ru.kamaz.music.ui.fragmentDialog.TrackOptionFragment
 import ru.kamaz.music.ui.producers.*
 import ru.kamaz.music.view_models.fragments.MainListMusicViewModel
 import ru.kamaz.music_api.models.Track
@@ -37,14 +45,13 @@ class MainListMusicFragment
 
     companion object {
         const val RV_ITEM_MUSIC_ARTIST = 0
-        const val RV_ITEM_MUSIC_GENRES = 1
         const val RV_ITEM_MUSIC_ALBUMS = 2
         const val RV_ITEM_MUSIC_PLAYLIST = 3
         const val RV_ITEM_MUSIC_FAVORITE = 4
         const val RV_ITEM = 5
         const val RV_ITEM_MUSIC_CATEGORY = 6
         const val RV_ITEM_MUSIC_FOLDER = 7
-        const val RV_ITEM_MUSIC_PLAYLIST_ADD_NEW = 8
+        const val RV_ITEM_PLAYLIST = 8
     }
 
     override fun initVars() {
@@ -66,11 +73,14 @@ class MainListMusicFragment
             ListState.CATEGORY -> {
                 backToPlayer()
             }
-            ListState.CATPLAYLIST -> {
-                categoryItemClicked(RV_ITEM_MUSIC_CATEGORY)
-            }
             ListState.FOLDPLAYLIST -> {
                 categoryItemClicked(RV_ITEM_MUSIC_FOLDER)
+            }
+            ListState.PLAYLISTMUSIC -> {
+                categoryItemClicked(RV_ITEM_MUSIC_PLAYLIST)
+            }
+            else -> {
+                categoryItemClicked(RV_ITEM_MUSIC_CATEGORY)
             }
         }
         super.onBackPressed()
@@ -89,7 +99,10 @@ class MainListMusicFragment
         CATEGORY(1),
         CATPLAYLIST(2),
         FOLDER(3),
-        FOLDPLAYLIST(4)
+        FOLDPLAYLIST(4),
+        PLAYLISTMUSIC(5),
+        CATFAVORITES(6),
+        CATARTIST(7)
     }
 
     private fun initServiceVars() {
@@ -108,6 +121,14 @@ class MainListMusicFragment
         viewModel.serviceTracks.launchWhenStarted(lifecycleScope){
             viewModel.fillAllTracksList()
             viewModel.loadAllDBLists()
+        }
+
+        viewModel.foldersMusic.launchWhenStarted(lifecycleScope){
+            if (mode == ListState.FOLDER) categoryItemClicked(RV_ITEM_MUSIC_FOLDER)
+        }
+
+        viewModel.favoriteSongs.launchWhenStarted(lifecycleScope){
+            if (mode == ListState.CATFAVORITES) categoryItemClicked(RV_ITEM_MUSIC_FAVORITE)
         }
 
         binding.rvAllMusic.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -158,11 +179,6 @@ class MainListMusicFragment
                     .addProducer(MusicArtistViewHolder())
                     .build { it }
             }
-            1 -> {
-                RecyclerViewAdapter.Builder(this, items)
-                    .addProducer(MusicGenresViewHolder())
-                    .build { it }
-            }
             2 -> {
                 RecyclerViewAdapter.Builder(this, items)
                     .addProducer(MusicAlbumsViewHolder())
@@ -191,6 +207,11 @@ class MainListMusicFragment
             7 -> {
                 RecyclerViewAdapter.Builder(this, items)
                     .addProducer(MusicFoldersViewHolder())
+                    .build { it }
+            }
+            8 -> {
+                RecyclerViewAdapter.Builder(this, items)
+                    .addProducer(MusicListViewHolderProducer())
                     .build { it }
             }
             else -> {
@@ -230,9 +251,7 @@ class MainListMusicFragment
     }
 
     fun onOptionsItemClicked(position: Int, track: Track) {
-        //TODO
-//        Log.i("RVPosition", "${viewModel.rvPosition.value}")
-//        TrackOptionFragment().show(childFragmentManager, "TrackOptionFragment")
+        TrackOptionFragment().show(childFragmentManager, "TrackOptionFragment")
     }
 
     override fun onStop() {
@@ -242,18 +261,24 @@ class MainListMusicFragment
 
     fun categoryItemClicked(id: Int) {
         when (id) {
-            in 0..2 -> {
+            0 -> {
+                viewModel.getCategoryList(id)
+                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList, id)
+                this.mode = ListState.CATARTIST
+            }
+            2 -> {
                 viewModel.getCategoryList(id)
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList, id)
                 this.mode = ListState.CATPLAYLIST
             }
             3 -> {
+                binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.listPlayList, id)
                 this.mode = ListState.CATPLAYLIST
             }
             4 -> {
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.favoriteSongs, id)
-                this.mode = ListState.CATPLAYLIST
+                this.mode = ListState.CATFAVORITES
             }
             5 -> {
                 binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
@@ -272,10 +297,29 @@ class MainListMusicFragment
                 this.mode = ListState.FOLDER
             }
             8 -> {
-                //TODO
+                binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.playListMusic, id)
+                this.mode = ListState.PLAYLISTMUSIC
             }
         }
 //        viewModel.rvPosition.value = 0
+    }
+
+    fun playListSelected(name: String){
+        val trackList = ArrayList<Track>()
+        viewModel.notFLowList.forEach { playList ->
+            if (playList.title == name){
+                playList.trackDataList.forEach { data ->
+                    viewModel.serviceTracks.value.forEach { tracks ->
+                        if (data == tracks.data){
+                            trackList.add(tracks)
+                        }
+                    }
+                }
+            }
+        }
+        viewModel.getPlayListMusic(trackList)
+        categoryItemClicked(RV_ITEM_PLAYLIST)
     }
 
 

@@ -16,9 +16,9 @@ import ru.sir.core.Either
 import ru.sir.core.None
 import java.lang.Exception
 
-class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val db: AppDatabase):MusicCache {
+class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val db: AppDatabase): MusicCache {
     override fun getLastMusic(): String = prefsManager.getLastMusic()
-    override fun saveLastMusic(lastMusic: String)  = prefsManager.saveMusicInfo(lastMusic)
+    override fun saveLastMusic(lastMusic: String) = prefsManager.saveMusicInfo(lastMusic)
     override fun insertFavoriteSong(song: FavoriteSongsEntity): Either<Failure, None> {
         db.userDao().insertAll(song)
         return Either.Right(None())
@@ -47,8 +47,8 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         }
     }
 
-    override fun updatePlayList(name: String, title: List<String>, data: List<String>) {
-        db.playListDao().updatePlayList(name, title, data)
+    override fun updatePlayList(name: String,  data: List<String>) {
+        db.playListDao().updatePlayList(name,  data)
     }
 
     override fun insertTrackList(tracks: List<TrackEntity>) : Either<Failure, None> {
@@ -98,7 +98,7 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
 
     private fun convertEntityPlayListModelList(entity: List<PlayListEntity>):List<PlayListModel>{
         val data = mutableListOf<PlayListModel>()
-        entity.forEach { data.add(PlayListModel(it.idPlayList,it.name, it.albumArt, it.trackTitleList, it.trackDataList)) }
+        entity.forEach { data.add(PlayListModel(it.idPlayList,it.name, it.albumArt, it.trackDataList as ArrayList<String>)) }
         return data
     }
 

@@ -19,7 +19,7 @@ interface MusicServiceInterface{
         fun checkPosition(position: Int)
         fun previousTrack()
         fun nextTrack(auto:Int)
-        fun updateTracks()
+        fun updateTracks(loadMode: String)
         fun intMediaPlayer()
         fun sourceSelection(action: MusicService.SourceEnum)
         fun getAllTracks(): StateFlow<List<Track>>
