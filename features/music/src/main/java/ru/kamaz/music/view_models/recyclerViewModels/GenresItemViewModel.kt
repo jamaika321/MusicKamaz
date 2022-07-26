@@ -37,7 +37,6 @@ class GenresItemViewModel: RecyclerViewBaseItem<Track, GenresItemBinding>(){
 
     override fun bindData(data: Track, position: Int) {
         this.data = data
-        genres.value= data.genre
     }
 
 

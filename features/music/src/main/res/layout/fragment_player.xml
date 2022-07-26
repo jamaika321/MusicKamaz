@@ -63,15 +63,27 @@
             app:layout_constraintBottom_toBottomOf="parent"
             android:src="@drawable/prev_switch" />
 
+        <ImageView
+            android:id="@+id/source_image"
+            android:layout_width="30dp"
+            android:layout_height="0dp"
+            android:paddingTop="10dp"
+            android:paddingHorizontal="5dp"
+            app:layout_constraintEnd_toStartOf="@+id/text_usb"
+            app:layout_constraintTop_toBottomOf="@+id/prev"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+
         <TextView
             android:id="@+id/text_usb"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:text="USB"
-            android:textSize="30sp"
+            android:text="Источник"
+            android:textSize="24sp"
             android:textColor="@color/white"
             android:gravity="center_vertical"
-            android:visibility="invisible"
+            android:layout_marginStart="30dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

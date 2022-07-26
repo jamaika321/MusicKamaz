@@ -72,17 +72,12 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             metaRetriver.setDataSource(trackPaths[i])
 
             val artist =
-                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST))
+                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST)) + i.toString()
                     ?: ("unknown")
             val album =
                 metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))
                     ?: ("unknown")
-            val title =
-                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE))
-                    ?: ("unknown")
-            val genre =
-                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_GENRE))
-                    ?: ("unknown")
+            val title = metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE)) ?: ("unknown")
             val duration =
                 metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
                     ?.toLong() ?: (180)
@@ -93,7 +88,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             } else {
                 "disk"
             }
-//            Log.i("ReviewTest_Update", " $i :$data + $title = ${trackPaths[i]}")
 
             var albumArt = File("")
 
@@ -118,7 +112,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                     title,
                     artist,
                     data,
-                    genre,
                     duration,
                     album,
                     albumArt.toString(),
@@ -249,83 +242,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         }
 
         return Either.Right(result)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    fun scanMediaFilesInStorage(mode: String): Either<None, List<Track>> {
-
-        val array = ArrayList<Track>()
-
-        val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-
-        //перечень набора данных из таблицы
-        val projection = arrayOf(
-            MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media.TITLE,
-//            MediaStore.Audio.Media.GENRE,
-            MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media._ID
-        )
-        //выбор аудио файлов
-        var selection = "${MediaStore.Audio.Media.DATA} LIKE '/storage/emul%'"
-
-        val cursor = context.contentResolver.query(uri, projection, selection, null, null)
-
-        if (cursor != null) {
-            cursor.moveToFirst()
-            while (!cursor.isAfterLast) {
-                var albumArt = File("")
-                val artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST))
-                val album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM))
-                val title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE))
-                val genre = ""
-                val duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)).toLong()
-                val data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))
-                val id = 5000 + cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID))
-                val pictureId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID))
-                val contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, pictureId)
-
-                var file : File? = null
-                file = File(
-                    Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator + title.replace("/", "") + ".png"
-                )
-
-                if (!file.exists()) {
-                    try {
-                        val picture =
-                            context.contentResolver.loadThumbnail(contentUri, Size(500, 350), null)
-                        albumArt = getAlbumArt(picture, title.replace("/", ""))
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-                } else {
-                    albumArt = file
-                }
-
-
-                array.add(
-                    Track(
-                        id,
-                        title,
-                        artist,
-                        data,
-                        genre,
-                        duration,
-                        album,
-                        albumArt.toString()
-                    )
-                )
-                cursor.moveToNext()
-            }
-            cursor.close()
-        }
-        return if (array.isEmpty()) {
-            Either.Left(None())
-        } else {
-            Either.Right(array)
-        }
     }
 
     private fun getAlbumArt(picture: Bitmap, title: String): File {

@@ -87,7 +87,6 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
             it.title,
             it.artist,
             it.data,
-            it.genre,
             it.duration,
             it.album,
             it.albumArt,

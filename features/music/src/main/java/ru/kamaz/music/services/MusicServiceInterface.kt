@@ -5,6 +5,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.kamaz.music.data.MediaManager
+import ru.kamaz.music_api.models.AllFolderWithMusic
+import ru.kamaz.music_api.models.PlayListModel
+import ru.kamaz.music_api.models.PlayListSource
 import ru.kamaz.music_api.models.Track
 
 
@@ -23,6 +26,8 @@ interface MusicServiceInterface{
         fun intMediaPlayer()
         fun sourceSelection(action: MusicService.SourceEnum)
         fun getAllTracks(): StateFlow<List<Track>>
+        fun getPlayLists(): StateFlow<List<PlayListModel>>
+        fun getFoldersList(): StateFlow<List<AllFolderWithMusic>>
         fun getMusicName(): StateFlow<String>
         fun getArtistName(): StateFlow<String>
         fun getMusicDuration(): StateFlow<Int>
@@ -39,9 +44,8 @@ interface MusicServiceInterface{
         fun musicEmpty():StateFlow<Boolean>
         fun coverId(): StateFlow<String>
         fun isFavoriteMusic():StateFlow<Boolean>
-        fun insertFavoriteMusic()
+        fun insertFavoriteMusic(data: String)
         fun shuffleStatusChange()
-        fun deleteFavoriteMusic()
         fun insertLastMusic()
         fun getRepeat(): StateFlow<Int>
         fun changeRepeatMode()
@@ -52,6 +56,8 @@ interface MusicServiceInterface{
         fun appClosed()
         fun lastSavedState()
         fun checkUsb()
+        fun initPlayListSource(track: Track, playList: PlayListSource)
+        fun getSource(): StateFlow<String>
     }
 
     interface ViewModel{

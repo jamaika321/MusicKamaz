@@ -11,7 +11,6 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
-import ru.biozzlab.twmanager.utils.easyLog
 import ru.kamaz.music.domain.TestSettings
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
@@ -34,6 +33,10 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.isPlay() ?: MutableStateFlow(false)
     }
 
+    val data: StateFlow<String> by lazy {
+        service.value?.getMusicData() ?: MutableStateFlow("")
+    }
+
     val repeatHowModeNow: StateFlow<Int> by lazy {
         service.value?.getRepeat() ?: MutableStateFlow(2)
     }
@@ -48,6 +51,10 @@ class MusicFragmentViewModel @Inject constructor(
 
     val isShuffleOn: StateFlow<Boolean> by lazy {
         service.value?.isShuffleOn() ?: MutableStateFlow(true)
+    }
+
+    val sourceName: StateFlow<String> by lazy {
+        service.value?.getSource() ?: MutableStateFlow("Unknown")
     }
 
     val isNotConnected: StateFlow<Boolean> by lazy {
@@ -134,8 +141,8 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.previousTrack()
     }
 
-    fun isSaveFavoriteMusic() {
-        service.value?.insertFavoriteMusic()
+    fun isSaveFavoriteMusic(data: String) {
+        service.value?.insertFavoriteMusic(data)
     }
 
     fun isSaveLastMusic() {

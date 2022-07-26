@@ -6,12 +6,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.appwidget.AppWidgetManager
-import android.bluetooth.BluetoothDevice
 import android.content.*
 import android.content.ContentValues.TAG
 import android.graphics.Color
 import android.media.AudioAttributes
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.MediaPlayer.OnCompletionListener
 import android.net.ConnectivityManager
@@ -23,6 +21,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MIN
+import androidx.lifecycle.viewModelScope
 import com.eckom.xtlibrary.twproject.music.bean.MusicName
 import com.eckom.xtlibrary.twproject.music.bean.Record
 import com.eckom.xtlibrary.twproject.music.utils.TWMusic
@@ -44,8 +43,7 @@ import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
 import ru.kamaz.music_api.BaseConstants.EXTRA_APP_WIDGET_NAME
 import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.*
-import ru.kamaz.music_api.models.HistorySongs
-import ru.kamaz.music_api.models.Track
+import ru.kamaz.music_api.models.*
 import ru.sir.core.Either
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseApplication
@@ -93,11 +91,15 @@ Service, OnCompletionListener,
     @Inject
     lateinit var getFilesUseCase: GetFilesUseCase
 
-    val twManager = BluetoothManager()
+    @Inject
+    lateinit var rvPlayList: PlayListRV
+
+    @Inject
+    lateinit var rvAllFolderWithMusic: AllFolderWithMusicRV
+
+    private val twManager = BluetoothManager()
 
     private val twManagerMusic = MusicManager()
-
-    lateinit var device: BluetoothDevice
 
     private val _isNotAuxConnected = MutableStateFlow(false)
     val isNotAuxConnected = _isNotAuxConnected.asStateFlow()
@@ -112,8 +114,6 @@ Service, OnCompletionListener,
 
     private lateinit var lifecycleScope: CoroutineScope
 
-    private var audioManager: AudioManager? = null
-
     val context: Context? = null
 
     private val widgettest = TestWidget.instance
@@ -123,6 +123,10 @@ Service, OnCompletionListener,
     private var tracks = mutableListOf<Track>()
 
     private var allTracks = MutableStateFlow<List<Track>>(emptyList())
+
+    private var playLists = MutableStateFlow<List<PlayListModel>>(emptyList())
+
+    private var foldersList = MutableStateFlow<List<AllFolderWithMusic>>(emptyList())
 
     private var files = mutableListOf<File>()
 
@@ -164,6 +168,9 @@ Service, OnCompletionListener,
     private val _isUsbModeOn = MutableStateFlow<Boolean>(false)
     val isUsbModeOn = _isUsbModeOn.asStateFlow()
 
+    private val _isPlaylistModeOn = MutableStateFlow<Boolean>(false)
+    val isPlaylistModeOn = _isPlaylistModeOn.asStateFlow()
+
     val br: BroadcastReceiver = BrReceiver()
     var CMDPREV = "prev"
     var CMDNEXT = "next"
@@ -202,6 +209,10 @@ Service, OnCompletionListener,
     private val _currentTrackPosition = MutableStateFlow(0)
     val currentTrackPosition = _currentTrackPosition.asStateFlow()
 
+    private val _sourceName = MutableStateFlow("")
+    val sourceName = _sourceName.asStateFlow()
+
+
     private val _duration = MutableStateFlow(0)
     val duration = _duration.asStateFlow()
 
@@ -224,20 +235,20 @@ Service, OnCompletionListener,
     val isShuffleStatus = _isShuffleStatus.asStateFlow()
 
 
-    fun setShuffleMode() {
+    private fun setShuffleMode() {
         when (isShuffleStatus.value) {
             true -> {
-                randomTracks = tracks
                 tracks.shuffle()
-//                ShuffleHelper.makeShuffleList(tracks, currentTrackPosition)
             }
             false -> {
-                tracks = randomTracks
+                replaceAllTracks(emptyList())
             }
         }
     }
 
     override fun getAllTracks() = allTracks.asStateFlow()
+    override fun getPlayLists() = playLists.asStateFlow()
+    override fun getFoldersList() = foldersList.asStateFlow()
 
     override fun getMusicName(): StateFlow<String> = title
     override fun getArtistName(): StateFlow<String> = artist
@@ -246,6 +257,7 @@ Service, OnCompletionListener,
     override fun isFavoriteMusic(): StateFlow<Boolean> = isFavorite
     override fun isShuffleOn(): StateFlow<Boolean> = isShuffleStatus
     override fun getMusicData(): StateFlow<String> = data
+    override fun getSource(): StateFlow<String> = sourceName
 
     override fun checkDeviceConnection(): StateFlow<Boolean> = isNotConnected
     override fun checkUSBConnection(): StateFlow<Boolean> = isUSBConnected
@@ -455,7 +467,8 @@ Service, OnCompletionListener,
         BT(0),
         AUX(1),
         DISK(2),
-        USB(3)
+        USB(3),
+        PLAYLIST(4)
     }
 
     enum class RepeatMusicEnum(val value: Int) {
@@ -500,7 +513,7 @@ Service, OnCompletionListener,
     }
 
 
-    fun startBtMode() {
+    private fun startBtMode() {
         if (!isBtModeOn.value) {
             changeSource(1)
             stopMediaPlayer()
@@ -508,31 +521,35 @@ Service, OnCompletionListener,
         }
     }
 
-    fun startDiskMode() {
+    private fun startDiskMode() {
         if (!isDiskModeOn.value) {
-            Log.i("ReviewTest_", "startDiskMode: ")
             changeSource(2)
-            if (allTracks.value.isEmpty()){
+            if (allTracks.value.isEmpty()) {
                 updateTracks("5")
             } else {
                 replaceAllTracks(emptyList())
             }
+            _sourceName.value = "Disk"
             nextTrack(2)
         }
     }
 
 
-    fun startUsbMode() {
+    private fun startUsbMode() {
         if (!isUsbModeOn.value && isUSBConnected.value) {
-            Log.i("ReviewTest_", "startUSBMode: ")
             changeSource(3)
-            if (allTracks.value.isEmpty()){
+            if (allTracks.value.isEmpty()) {
                 updateTracks("5")
             } else {
                 replaceAllTracks(emptyList())
             }
+            _sourceName.value = "USB"
             nextTrack(2)
         }
+    }
+
+    private fun startPlayListMode() {
+        changeSource(4)
     }
 
     private fun changeSource(sourceEnum: Int) {
@@ -546,12 +563,14 @@ Service, OnCompletionListener,
                 _isUsbModeOn.tryEmit(false)
                 _isDiskModeOn.tryEmit(false)
                 _isBtModeOn.tryEmit(false)
+                _isPlaylistModeOn.tryEmit(false)
             }
             //BT
             1 -> {
                 _isUsbModeOn.tryEmit(false)
                 _isDiskModeOn.tryEmit(false)
                 _isAuxModeOn.tryEmit(false)
+                _isPlaylistModeOn.tryEmit(false)
                 _isBtModeOn.tryEmit(true)
                 this.mode = SourceEnum.BT
             }
@@ -560,6 +579,7 @@ Service, OnCompletionListener,
                 _isUsbModeOn.tryEmit(false)
                 _isBtModeOn.tryEmit(false)
                 _isAuxModeOn.tryEmit(false)
+                _isPlaylistModeOn.tryEmit(false)
                 _isDiskModeOn.tryEmit(true)
                 this.mode = SourceEnum.DISK
             }
@@ -568,8 +588,18 @@ Service, OnCompletionListener,
                 _isDiskModeOn.tryEmit(false)
                 _isBtModeOn.tryEmit(false)
                 _isAuxModeOn.tryEmit(false)
+                _isPlaylistModeOn.tryEmit(false)
                 _isUsbModeOn.tryEmit(true)
                 this.mode = SourceEnum.USB
+            }
+            //PlayLists
+            5 -> {
+                _isDiskModeOn.tryEmit(false)
+                _isBtModeOn.tryEmit(false)
+                _isAuxModeOn.tryEmit(false)
+                _isUsbModeOn.tryEmit(false)
+                _isPlaylistModeOn.tryEmit(true)
+                this.mode = SourceEnum.PLAYLIST
             }
         }
     }
@@ -621,38 +651,16 @@ Service, OnCompletionListener,
         _data.value = ""
     }
 
-    private fun getTrackPosition(track: Track): Int{
-        var index = 0
-        tracks.forEach {
-            if (it.data == track.data){
-                return@forEach
-            }
-            index++
-        }
-        return index
-    }
-
 
     override fun initTrack(track: Track, data1: String) {
-        when (mode){
-            SourceEnum.DISK -> {
-                if (track.source == "usb"){
-                    startUsbMode()
-                    _currentTrackPosition.value = getTrackPosition(track)
-                    funPlayOneSong()
-                }
-            }
-            SourceEnum.USB -> {
-                if (track.source == "disk"){
-                    startDiskMode()
-                    _currentTrackPosition.value = getTrackPosition(track)
-                    funPlayOneSong()
-                }
-            }
+        tracks.find { it.data == track.data }.let {
+            if (it != null) _currentTrackPosition.value = it.id.toInt()
+            else _currentTrackPosition.value = 0
         }
-        _isFavorite.value = track.favorite
+        Log.i("ReviewTest_InitTrack", " : ${currentTrackPosition.value}  ==  ${tracks.size}")
         val currentTrack = track
-        _lastMusic.value = currentTrack.id.toString()
+        _isFavorite.value = track.favorite
+        _lastMusic.value = currentTrack.data
         _idSong.value = currentTrack.id.toInt()
         updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
         _data.value = track.data
@@ -696,6 +704,12 @@ Service, OnCompletionListener,
 
     override fun playOrPause(): Boolean {
         when (mode) {
+            SourceEnum.PLAYLIST -> {
+                when (isPlaying.value) {
+                    true -> pause()
+                    false -> resume()
+                }
+            }
             SourceEnum.DISK -> {
                 when (isPlaying.value) {
                     true -> pause()
@@ -838,20 +852,16 @@ Service, OnCompletionListener,
             SourceEnum.USB -> {
                 repeatModeListener(auto)
             }
+            SourceEnum.PLAYLIST -> {
+                repeatModeListener(auto)
+            }
         }
     }
 
     private fun repeatModeListener(auto: Int) {
         when (auto) {
             0 -> {
-                when (repeatMode) {
-                    RepeatMusicEnum.REPEAT_ONE_SONG -> {
-                        funRepeatAll()
-                    }
-                    RepeatMusicEnum.REPEAT_ALL -> {
-                        funRepeatAll()
-                    }
-                }
+                funRepeatAll()
             }
             1 -> {
                 when (repeatMode) {
@@ -881,6 +891,7 @@ Service, OnCompletionListener,
     }
 
     private fun funPlayOneSong() {
+        Log.i("ReviewTest_Position", " : ${currentTrackPosition.value} ")
         when (isPlaying.value) {
             true -> {
                 initTrack(
@@ -902,7 +913,7 @@ Service, OnCompletionListener,
     }
 
     private fun restartPlaylist() {
-        if (tracks.size-1 <= currentTrackPosition.value){
+        if (tracks.size - 1 <= currentTrackPosition.value) {
             _currentTrackPosition.value = 0
         }
         funPlayOneSong()
@@ -999,7 +1010,11 @@ Service, OnCompletionListener,
         } else {
             _musicEmpty.value = true
         }
-        if (loadMode == "5") loadTracksOnCoroutine("all")
+        if (loadMode == "5") {
+            loadTracksOnCoroutine("all")
+            loadPlayLists()
+            rvAllFolderWithMusic(None()) { it.either({}, ::fillFoldersList) }
+        }
         if (isShuffleStatus.value) {
             setShuffleMode()
         }
@@ -1017,28 +1032,36 @@ Service, OnCompletionListener,
         job.start()
     }
 
-    private fun replaceAllTracks(trackList: List<Track>) {
-        if (trackList.isNotEmpty()){
+    private fun replaceAllTracks(trackList: List<Track>, source: String = "") {
+        if (trackList.isNotEmpty()) {
             allTracks.value = trackList
         }
         tracks.clear()
+        var id = 0
         allTracks.value.forEach {
-            when (mode){
+            when (mode) {
                 SourceEnum.DISK -> {
-                    if (it.source == "disk"){
-                        tracks.add(it)
+                    if (it.source == "disk") {
+                        fillTracks(id.toLong(), it)
+                        id++
                     }
                 }
                 SourceEnum.USB -> {
-                    if (it.source == "usb"){
-                        tracks.add(it)
+                    if (it.source == "usb") {
+                        fillTracks(id.toLong(), it)
+                        id++
                     }
+                }
+                SourceEnum.PLAYLIST -> {
+                    _sourceName.value = "All"
+                    fillTracks(id.toLong(), it)
+                    id++
                 }
             }
         }
-        if (tracks.isEmpty()){
+        if (tracks.isEmpty()) {
             _musicEmpty.value = tracks.isEmpty()
-            when (mode){
+            when (mode) {
                 SourceEnum.DISK -> {
                 }
                 SourceEnum.USB -> {
@@ -1047,6 +1070,77 @@ Service, OnCompletionListener,
                 }
             }
         }
+    }
+
+    private fun fillTracks(id: Long, it: Track) {
+        tracks.add(
+            (Track(
+                id,
+                it.title,
+                it.artist,
+                it.data,
+                it.duration,
+                it.album,
+                it.albumArt,
+                it.playing,
+                it.favorite,
+                it.source
+            ))
+        )
+    }
+
+    override fun initPlayListSource(track: Track, playList: PlayListSource) {
+        startPlayListMode()
+        when (playList.type) {
+            "all" -> replaceAllTracks(emptyList())
+            "folder" -> getFolderTracks(playList)
+            "playList" -> getPlayListTracks(playList)
+        }
+    }
+
+    private fun getFolderTracks(folder: PlayListSource) {
+        tracks.clear()
+        _sourceName.value = folder.name
+        var id = 0
+        foldersList.value.forEach { data ->
+            if (data.dir == folder.name)
+                allTracks.value.forEach {
+                    if (it.data.contains(data.data + File.separator + it.title.replace(" ", "_").replace(",", "_").replace("-", "_").replace("'", "_"))) {
+                        fillTracks(id.toLong(), it)
+                        id++
+                    }
+                }
+        }
+    }
+
+    private fun getPlayListTracks(playList: PlayListSource) {
+        tracks.clear()
+        _sourceName.value = playList.name
+        var id = 0
+        playLists.value.find { it.title == playList.name }?.trackDataList?.forEach { track ->
+            allTracks.value.find { it.data == track }.let {
+                if (it != null) {
+                    fillTracks(id.toLong(), it)
+                    id++
+                }
+            }
+        }
+    }
+
+    private fun loadPlayLists() {
+        CoroutineScope(Dispatchers.IO).launch {
+            rvPlayList.run(None()).collect {
+                playLists.value = it
+            }
+        }
+    }
+
+    private fun loadFolderList() {
+
+    }
+
+    private fun fillFoldersList(allFoldersList: List<AllFolderWithMusic>) {
+        foldersList.value = allFoldersList
     }
 
     override fun intMediaPlayer() {
@@ -1090,26 +1184,31 @@ Service, OnCompletionListener,
         _btDeviceIsConnecting.value = !btDevise
     }
 
-    override fun insertFavoriteMusic() {
-        if (isFavorite.value) {
-            deleteFavoriteMusic()
-            tracks[currentTrackPosition.value].favorite = false
-        } else {
-            _isFavorite.value = true
-            tracks[currentTrackPosition.value].favorite = true
-            insertFavoriteMusic(InsertFavoriteMusic.Params(tracks[currentTrackPosition.value]))
-        }
-    }
-
     override fun shuffleStatusChange() {
         _isShuffleStatus.value = !isShuffleStatus.value
         setShuffleMode()
     }
 
-    override fun deleteFavoriteMusic() {
-        Log.i("ReviewTest_Favorite", " : -----delete ")
-        _isFavorite.value = false
-        deleteFavoriteMusic(DeleteFavoriteMusic.Params(tracks[currentTrackPosition.value]))
+    override fun insertFavoriteMusic(data: String) {
+        allTracks.value.forEach {
+            if (it.data == data) {
+                if (it.favorite) {
+                    deleteFavoriteMusic(it)
+                } else {
+                    insertFavoriteToDB(it)
+                }
+                it.favorite = !it.favorite
+                _isFavorite.value = !isFavorite.value
+            }
+        }
+    }
+
+    private fun insertFavoriteToDB(track: Track) {
+        insertFavoriteMusic(InsertFavoriteMusic.Params(track))
+    }
+
+    private fun deleteFavoriteMusic(track: Track) {
+        deleteFavoriteMusic(DeleteFavoriteMusic.Params(track))
     }
 
     private fun changeFavoriteStatus(list: List<Track>) {

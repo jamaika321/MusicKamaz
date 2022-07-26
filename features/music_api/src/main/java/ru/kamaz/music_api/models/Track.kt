@@ -3,11 +3,10 @@ package ru.kamaz.music_api.models
 import java.io.Serializable
 
 data class Track(
-    val id: Long,
+    var id: Long,
     val title: String,
     val artist: String,
     val data: String,
-    val genre: String,
     val duration: Long,
     val album: String,
     val albumArt: String,

@@ -1,5 +1,6 @@
 package ru.kamaz.music.view_models.recyclerViewModels
 
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.kamaz.music.R
@@ -18,7 +19,7 @@ class FolderItemViewModel: RecyclerViewBaseItem<AllFolderWithMusic, MainCategory
 
     override fun initVars() {
         artist.launchWhenStarted(parent.lifecycleScope){
-            binding.textCategory.text= it.toString()
+            binding.textCategory.text= it
         }
         title.launchWhenStarted(parent.lifecycleScope){
 
@@ -30,7 +31,7 @@ class FolderItemViewModel: RecyclerViewBaseItem<AllFolderWithMusic, MainCategory
 
 
         binding.root.setOnClickListener {
-            (parent as MainListMusicFragment).onFolderClicked(data.data)
+            (parent as MainListMusicFragment).onFolderClicked(data.data, data.dir)
         }
     }
 
