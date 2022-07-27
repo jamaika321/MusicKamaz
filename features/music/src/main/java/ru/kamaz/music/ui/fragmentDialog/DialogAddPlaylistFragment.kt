@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ru.kamaz.music.R
 import ru.kamaz.music.databinding.DialogAddPlaylistBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music_api.interactor.InsertPlayList
@@ -48,10 +49,12 @@ class DialogAddPlaylistFragment : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
-        val width = (resources.displayMetrics.widthPixels * 0.40).toInt()
-        val height = (resources.displayMetrics.heightPixels * 0.40).toInt()
+        val width = (resources.displayMetrics.widthPixels * 0.50).toInt()
+        val height = (resources.displayMetrics.heightPixels * 0.60).toInt()
         dialog!!.window?.setLayout(width, height)
         setListener()
+        binding.addButtons.btnClose.text = getString(R.string.cancel_add)
+        binding.addButtons.btnAddToPlaylist.text = getString(R.string.create_playlist)
     }
 
     private fun addPlayList(){
@@ -66,7 +69,7 @@ class DialogAddPlaylistFragment : DialogFragment() {
     }
 
     private fun setListener() {
-        binding.btnGet.setOnClickListener {
+        binding.addButtons.btnAddToPlaylist.setOnClickListener {
             if (binding.etAddPlayList.text.isNullOrEmpty()){
                 Toast.makeText(context, "Введите название.", Toast.LENGTH_SHORT).show()
             } else {
@@ -74,7 +77,7 @@ class DialogAddPlaylistFragment : DialogFragment() {
                 onDestroyView()
             }
         }
-        binding.btnClose.setOnClickListener {
+        binding.addButtons.btnClose.setOnClickListener {
             onDestroyView()
         }
     }

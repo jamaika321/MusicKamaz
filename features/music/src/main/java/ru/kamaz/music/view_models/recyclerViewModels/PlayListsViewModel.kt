@@ -18,7 +18,7 @@ import ru.sir.presentation.extensions.launchWhenStarted
 import java.io.File
 import java.lang.Exception
 
-class AddTrackViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBinding>() {
+class PlayListsViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBinding>() {
 
     private val title = MutableStateFlow("")
     private val image = MutableStateFlow("")
@@ -88,8 +88,13 @@ class AddTrackViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBindin
                                 (parent as DialogAddTrack).deletePlaylist(this.data.title)
                             }
                         }
-                        R.id.playing -> {
-                            Toast.makeText(parent.context, R.string.rename, Toast.LENGTH_SHORT).show()
+                        R.id.rename -> {
+                            try {
+                                (parent as MainListMusicFragment).renamePlayList(this.data.title)
+                            } catch (e: Exception) {
+                                (parent as MainListMusicFragment).renamePlayList(this.data.title)
+//                                (parent as DialogAddTrack).deletePlaylist(this.data.title)
+                            }
                         }
                     }
                     true

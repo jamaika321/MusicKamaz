@@ -15,22 +15,17 @@ import ru.sir.presentation.navigation.UiAction
 
 class TrackOptionFragment : DialogFragment() {
 
-    private var _binding : FragmentTrackOptionBinding? = null
+    lateinit var binding : FragmentTrackOptionBinding
 
-    private val binding get() = _binding!!
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _binding = FragmentTrackOptionBinding.inflate(layoutInflater, null, false)
+        binding = FragmentTrackOptionBinding.inflate(layoutInflater, null, false)
         val dialog = AlertDialog.Builder(context).setView(binding.root).create()
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return dialog
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 
     override fun onStart() {
         super.onStart()
@@ -47,6 +42,7 @@ class TrackOptionFragment : DialogFragment() {
 
     private fun setListener(){
         binding.btnDelete.setOnClickListener {
+
             dialog?.dismiss()
         }
         binding.btnAddToPlaylist.setOnClickListener {

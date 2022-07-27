@@ -5,6 +5,6 @@
         android:title="@string/delete"
         />
     <item
-        android:id="@+id/playing"
+        android:id="@+id/rename"
         android:title="@string/rename"/>
 </menu>

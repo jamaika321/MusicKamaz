@@ -62,6 +62,11 @@ class RepositoryImpl(
         return Either.Right(None())
     }
 
+    override fun updatePlayListName(name: String, newName: String): Either<Failure, None> {
+        testDBDao.updatePlayListName(name, newName)
+        return Either.Right(None())
+    }
+
     override fun insertFavoriteSong(song: Track): Either<Failure, None> =
         testDBDao.insertFavoriteSong(song.toFavoriteDao())
 

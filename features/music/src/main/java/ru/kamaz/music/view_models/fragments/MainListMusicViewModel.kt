@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +35,7 @@ class MainListMusicViewModel @Inject constructor(
     private val rvFavorite: FavoriteMusicRV,
     private val insertPlayList: InsertPlayList,
     private val deletePlayList: DeletePlayList,
+    private val updatePlayListName: UpdatePlayListName
 ) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel {
 
     companion object {
@@ -171,18 +173,19 @@ class MainListMusicViewModel @Inject constructor(
 
     fun lastMusic(data: String, mode: MainListMusicFragment.ListState) {
         _lastMusic.value = data
+        Log.i("ReviewTest_LastMusic", " : $data ")
         when (mode) {
             MainListMusicFragment.ListState.PLAYLIST -> {
                 fillAllTracksList()
             }
             MainListMusicFragment.ListState.CATPLAYLIST -> {
-
+                getCategoryList(0)
             }
             MainListMusicFragment.ListState.FOLDPLAYLIST -> {
-
+                fillFolderPlaylist(activeFolderName.value)
             }
             MainListMusicFragment.ListState.CATFAVORITES -> {
-
+                getFavoriteTracks()
             }
         }
     }
@@ -193,6 +196,7 @@ class MainListMusicViewModel @Inject constructor(
             service.value?.initTrack(track, data)
             service.value?.resume()
         } else {
+            service.value?.initPlayListSource(track, source)
             service.value?.playOrPause()
         }
     }
@@ -200,6 +204,18 @@ class MainListMusicViewModel @Inject constructor(
     fun deletePlaylist(name: String) {
         CoroutineScope(Dispatchers.IO).launch {
             deletePlayList.run(DeletePlayList.Params(name))
+        }
+    }
+
+    fun renamePlayList(name: String, newName: String) {
+        Log.i("ReviewTest_Update", " $newName: $name ")
+        if (newName != "") {
+            CoroutineScope(Dispatchers.IO).launch {
+                updatePlayListName.run(UpdatePlayListName.Params(name, newName))
+            }
+            Toast.makeText(context, "Сохранено.", Toast.LENGTH_SHORT).show()
+        } else {
+
         }
     }
 
@@ -299,7 +315,7 @@ class MainListMusicViewModel @Inject constructor(
                 trackList.add(it)
             }
         }
-        _folderMusicPlaylist.value = trackList.toRecyclerViewItemOfList(RV_ITEM)
+        _folderMusicPlaylist.value = trackList.findPlayingMusic(lastMusic.value).toRecyclerViewItemOfList(RV_ITEM)
     }
 
     ///////////////////////////////////////////
@@ -332,7 +348,6 @@ class MainListMusicViewModel @Inject constructor(
     override fun init() {
         val intent = Intent(context, MusicService::class.java)
         context.bindService(intent, this, Context.BIND_AUTO_CREATE)
-
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {

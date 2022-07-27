@@ -20,4 +20,7 @@ interface PlayListDao  {
     @Query("UPDATE play_list SET  trackDataList = :data WHERE name = :name")
     fun updatePlayList(name: String, data: List<String>)
 
+    @Query("UPDATE play_list SET name = :newName WHERE name = :name")
+    fun updatePlayListName(name: String, newName: String)
+
 }

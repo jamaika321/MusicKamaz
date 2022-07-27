@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.core.os.bundleOf
-import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import com.eckom.xtlibrary.twproject.music.presenter.MusicPresenter
 import com.squareup.picasso.Picasso
@@ -320,7 +319,7 @@ class MusicFragment :
     private fun repeatIconChange(repeat: Int) {
         when (repeat) {
             2 -> binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_white)
-            1 -> binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_blue_all)
+            1 -> binding.controlPanel.repeat.setImageResource(R.drawable.repeat_mode_one)
         }
 
     }

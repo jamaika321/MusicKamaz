@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,8 +49,7 @@ import javax.inject.Inject
 
 class DialogAddTrack : DialogFragment(), ServiceConnection, MusicServiceInterface.ViewModel {
 
-    private var _binding: DialogAddTrackBinding? = null
-    private val binding get() = _binding!!
+    lateinit var _binding: DialogAddTrackBinding
     lateinit var navigator: BaseActivity
 
     fun inject(app: BaseApplication) {
@@ -78,12 +78,14 @@ class DialogAddTrack : DialogFragment(), ServiceConnection, MusicServiceInterfac
         service.value?.getMusicData() ?: MutableStateFlow("Unknown")
     }
     private val musicName: StateFlow<String> by lazy {
-        service.value?.getMusicName() ?: MutableStateFlow("Unknown")
+        service.value?.getMusicName() ?: MutableStateFlow("Uwn")
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val intent = Intent(context, MusicService::class.java)
+        context?.bindService(intent, this, Context.BIND_AUTO_CREATE)
         _binding = DialogAddTrackBinding.inflate(layoutInflater, null, false)
-        val dialog = AlertDialog.Builder(context).setView(binding.root).create()
+        val dialog = AlertDialog.Builder(context).setView(_binding.root).create()
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         inject(activity?.application as BaseApplication)
@@ -91,17 +93,21 @@ class DialogAddTrack : DialogFragment(), ServiceConnection, MusicServiceInterfac
     }
 
     private fun initVars() {
-        val intent = Intent(context, MusicService::class.java)
-        context?.bindService(intent, this, Context.BIND_AUTO_CREATE)
-        initServiceVars()
         service.launchWhenStarted(lifecycleScope) {
             if (it == null) return@launchWhenStarted
+            initServiceVars()
+        }
+    }
+
+    private fun initServiceVars(){
+        musicName.launchWhenStarted(lifecycleScope) {
+            _binding.tvMusicTitle.text = it
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        dialog?.dismiss()
     }
 
     override fun onStart() {
@@ -119,27 +125,24 @@ class DialogAddTrack : DialogFragment(), ServiceConnection, MusicServiceInterfac
     ): View? {
         testPlayList()
         initVars()
-        binding.rvAllMusic.layoutManager = GridLayoutManager(context, 4)
-        binding.rvAllMusic.adapter = recyclerViewAdapter(playList)
+        _binding.rvAllMusic.layoutManager = GridLayoutManager(context, 4)
+        _binding.rvAllMusic.adapter = recyclerViewAdapter(playList)
         setListeners()
+        _binding.addButtons.addBtn.text = getString(R.string.add_playlist)
+        _binding.addButtons.cancelBtn.text = getString(R.string.cancel_add)
         navigator = requireActivity() as BaseActivity
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    private fun initServiceVars() {
-        musicName.launchWhenStarted(lifecycleScope) {
-            binding.tvMusicTitle.text = it
-        }
-    }
-
     private fun setListeners() {
-        binding.addButtons.cancelBtn.setOnClickListener {
+        _binding.addButtons.cancelBtn.setOnClickListener {
             onDestroyView()
         }
-        binding.addButtons.addBtn.setOnClickListener {
+        _binding.addButtons.addBtn.setOnClickListener {
             openAddDialog()
             onDestroyView()
         }
+
     }
 
     private fun loadPlayLists() {
@@ -192,7 +195,7 @@ class DialogAddTrack : DialogFragment(), ServiceConnection, MusicServiceInterfac
             it.selection = it.id == id && it.title == title
         }
         playList.value = notFLowList.toRecyclerViewItems()
-        binding.rvAllMusic.adapter = recyclerViewAdapter(playList)
+        _binding.rvAllMusic.adapter = recyclerViewAdapter(playList)
         selectedPlayList = title
     }
 

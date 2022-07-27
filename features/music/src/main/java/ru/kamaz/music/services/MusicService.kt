@@ -1095,6 +1095,7 @@ Service, OnCompletionListener,
             "all" -> replaceAllTracks(emptyList())
             "folder" -> getFolderTracks(playList)
             "playList" -> getPlayListTracks(playList)
+            "favorite" -> getFavoritePlayList(playList)
         }
     }
 
@@ -1123,6 +1124,18 @@ Service, OnCompletionListener,
                     fillTracks(id.toLong(), it)
                     id++
                 }
+            }
+        }
+    }
+
+    private fun getFavoritePlayList(playList: PlayListSource){
+        tracks.clear()
+        _sourceName.value = playList.name
+        var id = 0
+        allTracks.value.find { it.favorite == true }.let {
+            if (it != null) {
+                fillTracks(id.toLong(), it)
+                id++
             }
         }
     }

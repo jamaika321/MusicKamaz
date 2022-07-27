@@ -1,15 +1,14 @@
 package ru.kamaz.music.ui.fragments
 
-import android.content.Context.LAYOUT_INFLATER_SERVICE
+import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils.loadAnimation
-import android.widget.LinearLayout
-import android.widget.PopupWindow
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.StateFlow
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentMainListMusicBinding
-import ru.kamaz.music.databinding.PlaylistContextMenuBinding
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.ui.NavAction.OPEN_ADD_PLAY_LIST_DIALOG
 import ru.kamaz.music.ui.NavAction.OPEN_MUSIC_FRAGMENT
@@ -54,6 +52,7 @@ class MainListMusicFragment
         const val RV_ITEM_MUSIC_CATEGORY = 6
         const val RV_ITEM_MUSIC_FOLDER = 7
         const val RV_ITEM_PLAYLIST = 8
+        const val RV_ITEM_FOLDER_PLAYLIST = 9
     }
 
     override fun initVars() {
@@ -127,7 +126,8 @@ class MainListMusicFragment
         }
 
         viewModel.playLists.launchWhenStarted(lifecycleScope){
-            if (mode == ListState.PLAYLISTMUSIC) viewModel.getPlayLists()
+            Log.i("TAG", "initServiceVars: ")
+            if (mode == ListState.CATPLAYLIST) viewModel.getPlayLists()
         }
 
         viewModel.foldersList.launchWhenStarted(lifecycleScope){
@@ -140,6 +140,10 @@ class MainListMusicFragment
 
         viewModel.favoriteSongs.launchWhenStarted(lifecycleScope){
             if (mode == ListState.CATFAVORITES) categoryItemClicked(RV_ITEM_MUSIC_FAVORITE)
+        }
+
+        viewModel.folderMusicPlaylist.launchWhenStarted(lifecycleScope){
+            if (mode == ListState.FOLDPLAYLIST) categoryItemClicked(RV_ITEM_FOLDER_PLAYLIST)
         }
 
         binding.rvAllMusic.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -226,6 +230,11 @@ class MainListMusicFragment
                     .addProducer(MusicListViewHolderProducer())
                     .build { it }
             }
+            9 -> {//FolderPlayList
+                RecyclerViewAdapter.Builder(this, items)
+                    .addProducer(MusicListViewHolderProducer())
+                    .build { it }
+            }
             else -> {
                 RecyclerViewAdapter.Builder(this, items)
                     .addProducer(MusicListViewHolderProducer())
@@ -265,6 +274,9 @@ class MainListMusicFragment
             ListState.FOLDPLAYLIST -> {
                 viewModel.onItemClick(track, track.data, PlayListSource("folder", viewModel.activeFolderName.value))
             }
+            ListState.CATFAVORITES -> {
+                viewModel.onItemClick(track, track.data, PlayListSource("favorite", "Избранное"))
+            }
         }
     }
 
@@ -301,6 +313,7 @@ class MainListMusicFragment
             4 -> {//Favorite
                 binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.favoriteSongs, id)
+                binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
                 this.mode = ListState.CATFAVORITES
             }
             5 -> {//RV_ITEM
@@ -322,7 +335,14 @@ class MainListMusicFragment
             8 -> {//PlaylistMusic
                 binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.playListMusic, id)
+                binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
                 this.mode = ListState.PLAYLISTMUSIC
+            }
+            9 -> {//FolderPlayLists
+                binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.folderMusicPlaylist, id)
+                binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
+                this.mode = ListState.FOLDPLAYLIST
             }
         }
         viewModel.rvScrollState.value = 0
@@ -359,16 +379,46 @@ class MainListMusicFragment
 
     fun onFolderClicked(data: String, name: String){
         viewModel.fillFolderPlaylist(data)
-        viewModel.activeFolderName.value = name
-        binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
-        binding.rvAllMusic.adapter = RecyclerViewAdapter.Builder(this, viewModel.folderMusicPlaylist)
-            .addProducer(MusicListViewHolderProducer())
-            .build { it }
-        this.mode = ListState.FOLDPLAYLIST
+        viewModel.activeFolderName.value = data
+        categoryItemClicked(RV_ITEM_FOLDER_PLAYLIST)
     }
 
     fun deletePlayList(name: String){
         viewModel.deletePlaylist(name)
+    }
+
+    fun renamePlayList(name: String){
+        Log.i("ReviewTest_Rename", "renamePlayList: ")
+        showAlertDialog(name)
+    }
+
+    private fun showAlertDialog(name: String){
+        val builder = Dialog(requireContext())
+        val alertLayout = layoutInflater.inflate(R.layout.rename_alert_dialog,null)
+
+        builder.setTitle("Введите название")
+        builder.setContentView(alertLayout)
+
+//        val input : EditText = alertLayout.findViewById(R.id.et_add_play_list)
+//        val close : Button = alertLayout.findViewById(R.id.btn_close)
+//        val add : Button = alertLayout.findViewById(R.id.btn_get)
+//        var answer = ""
+//        close.setOnClickListener {
+//            Toast.makeText(context, "Hello ${input.text}", Toast.LENGTH_SHORT).show()
+//        }
+
+
+
+//        val input = EditText(context)
+//        input.setHint("Name")
+//        input.setHintTextColor(resources.getColor(R.color.white))
+//        input.setTextColor(resources.getColor(R.color.white))
+//        input.inputType = InputType.TYPE_CLASS_TEXT
+//        input.gravity = Gravity.CENTER
+
+
+
+        builder.show()
     }
 
 
