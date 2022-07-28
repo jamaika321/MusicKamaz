@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Window
 import androidx.fragment.app.DialogFragment
+import ru.kamaz.music.R
 import ru.kamaz.music.databinding.BtDialogFragmentBinding
 
 
@@ -40,11 +41,13 @@ class DialogBtSettings : DialogFragment() {
     }
 
     fun setListener(){
-        binding.btnSetting.setOnClickListener {
-            openBluetoothSettings()
-        }  
-        binding.btnClose.setOnClickListener {
+        binding.clButtons.btnAddToPlaylist.text = getString(R.string.close)
+        binding.clButtons.btnClose.text = getString(R.string.settings)
+        binding.clButtons.btnAddToPlaylist.setOnClickListener {
             onDestroyView()
+        }  
+        binding.clButtons.btnClose.setOnClickListener {
+            openBluetoothSettings()
         }
     }
 

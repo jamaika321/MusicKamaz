@@ -19,4 +19,7 @@
     <string name="rename">Переименовать</string>
     <string name="music_added">Аудиозапись добавлена в плейлист</string>
     <string name="playlist_name_hint">Введите название</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="delete_text">Удалить выбранный плейлист?</string>
 </resources>

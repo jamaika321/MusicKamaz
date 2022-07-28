@@ -7,13 +7,18 @@
 
     <ImageView
         android:id="@+id/repeat"
-        style="@style/controlButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:paddingStart="22dp"
+        android:paddingEnd="22dp"
+        android:paddingBottom="22dp"
         android:background="@drawable/button_click"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/rotate"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf=" parent"
-        app:srcCompat="@drawable/ic_rotate_music" />
+        app:srcCompat="@drawable/repeate_mode_single" />
 
     <ImageView
         android:id="@+id/rotate"
@@ -27,7 +32,12 @@
 
     <ImageView
         android:id="@+id/play_pause"
-        style="@style/controlButtonBigBlue"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:paddingVertical="35dp"
+        android:paddingStart="39dp"
+        android:paddingEnd="31dp"
+        android:background="@drawable/ic_btn_background_blue"
         app:layout_constraintBottom_toBottomOf="@+id/rotate"
         app:layout_constraintEnd_toStartOf="@+id/add_to_folder"
         app:layout_constraintStart_toEndOf="@id/rotate"

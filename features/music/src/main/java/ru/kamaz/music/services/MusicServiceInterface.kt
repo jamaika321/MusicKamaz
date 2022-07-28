@@ -36,6 +36,7 @@ interface MusicServiceInterface{
         fun checkUSBConnection(): StateFlow<Boolean>
         fun updateWidget():StateFlow<Boolean>
         fun btModeOn():StateFlow<Boolean>
+        fun playListModeOn(): StateFlow<String>
         fun auxModeOn():StateFlow<Boolean>
         fun diskModeOn():StateFlow<Boolean>
         fun usbModeOn():StateFlow<Boolean>

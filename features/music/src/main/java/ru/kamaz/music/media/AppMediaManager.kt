@@ -72,8 +72,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             metaRetriver.setDataSource(trackPaths[i])
 
             val artist =
-                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST)) + i.toString()
-                    ?: ("unknown")
+                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST)) ?: ("unknown")
             val album =
                 metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))
                     ?: ("unknown")
@@ -264,6 +263,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             file = File(
                 Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator + fileNameToSave
             )
+
             if (!file.exists()) file.createNewFile()
 
 

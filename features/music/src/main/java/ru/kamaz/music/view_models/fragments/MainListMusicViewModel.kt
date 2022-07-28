@@ -32,7 +32,6 @@ import kotlin.collections.ArrayList
 class MainListMusicViewModel @Inject constructor(
     application: Application,
     private val categoryData: CategoryLoadRV,
-    private val rvFavorite: FavoriteMusicRV,
     private val insertPlayList: InsertPlayList,
     private val deletePlayList: DeletePlayList,
     private val updatePlayListName: UpdatePlayListName
@@ -140,32 +139,18 @@ class MainListMusicViewModel @Inject constructor(
     }
 
 
-    private fun List<Track>.findFavoriteMusic(): List<Track> {
-        this.forEach { tracks ->
-            viewModelScope.launch {
-                rvFavorite.run(None()).collect {
-                    it.forEach { favorites ->
-                        if (tracks.data == favorites.data) tracks.favorite = true
-                    }
-                }
-            }
-        }
-        return this
-    }
+
 
     private fun getFavoriteTracks() {
-        viewModelScope.launch {
-            rvFavorite.run(None()).collect {
-                _favoriteSongs.value =
-                    it.findPlayingMusic(lastMusic.value).toRecyclerViewItemOfList(
-                        RV_ITEM
-                    )
-            }
+        val favoriteSongs = ArrayList<Track>()
+        serviceTracks.value.forEach { track ->
+            if (track.favorite) favoriteSongs.add(track)
         }
+        _favoriteSongs.value = favoriteSongs.findPlayingMusic(lastMusic.value).toRecyclerViewItemOfList(RV_ITEM)
     }
 
     fun fillAllTracksList() {
-        _allMusic.value = serviceTracks.value.findFavoriteMusic().findPlayingMusic(lastMusic.value)
+        _allMusic.value = serviceTracks.value.findPlayingMusic(lastMusic.value)
             .toRecyclerViewItemOfList(
                 RV_ITEM
             )
@@ -186,6 +171,9 @@ class MainListMusicViewModel @Inject constructor(
             }
             MainListMusicFragment.ListState.CATFAVORITES -> {
                 getFavoriteTracks()
+            }
+            MainListMusicFragment.ListState.PLAYLISTMUSIC -> {
+                getPlayListMusic()
             }
         }
     }
@@ -260,8 +248,21 @@ class MainListMusicViewModel @Inject constructor(
         _listPlayList.value = playLists.value.toRecyclerViewItemsPlayList()
     }
 
-    fun getPlayListMusic(trackList: List<Track>) {
-        _playListMusic.value = trackList.toRecyclerViewItemOfList(RV_ITEM)
+    fun getPlayListMusic() {
+        val name = activePlayListName.value
+        val trackList = ArrayList<Track>()
+        playLists.value.forEach { playList ->
+            if (playList.title == name) {
+                playList.trackDataList.forEach { data ->
+                    serviceTracks.value.forEach { tracks ->
+                        if (data == tracks.data) {
+                            trackList.add(tracks)
+                        }
+                    }
+                }
+            }
+        }
+        _playListMusic.value = trackList.findPlayingMusic(lastMusic.value).toRecyclerViewItemOfList(RV_ITEM)
     }
 
     private fun List<Track>.toRecyclerViewItemOfList(id: Int): List<RecyclerViewBaseDataModel> {

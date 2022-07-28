@@ -67,11 +67,8 @@
             android:id="@+id/source_image"
             android:layout_width="30dp"
             android:layout_height="0dp"
-            android:paddingTop="10dp"
-            android:paddingHorizontal="5dp"
-            app:layout_constraintEnd_toStartOf="@+id/text_usb"
-            app:layout_constraintTop_toBottomOf="@+id/prev"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/text_usb"
+            app:layout_constraintBottom_toBottomOf="@id/text_usb"
             app:layout_constraintStart_toStartOf="parent"/>
 
 
@@ -81,13 +78,13 @@
             android:layout_height="0dp"
             android:text="Источник"
             android:textSize="24sp"
+            android:layout_marginBottom="5dp"
             android:textColor="@color/white"
-            android:gravity="center_vertical"
-            android:layout_marginStart="30dp"
+            android:gravity="bottom"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/prev" />
+             />
 
         <ImageView
             android:id="@+id/next"
@@ -119,17 +116,15 @@
 
     <TextView
         android:id="@+id/artist"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:paddingHorizontal="52dp"
         android:text="@string/song"
-        android:background="@drawable/black_gradient"
         android:textColor="@color/white"
         android:autoSizeTextType="uniform"
         android:fontFamily="sans-serif"
         app:layout_constraintBottom_toTopOf="@+id/seekLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/song"
         app:layout_constraintTop_toBottomOf="@id/song"
         app:layout_constraintVertical_weight="1"/>
 
@@ -137,7 +132,6 @@
         android:id="@+id/seekLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/blurred_black_background"
         app:layout_constraintBottom_toTopOf="@+id/times"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -151,7 +145,7 @@
         android:saveEnabled="false"
         android:paddingBottom="9dp"
         android:paddingTop="9dp"
-        android:layout_marginHorizontal="52dp"
+        android:layout_marginHorizontal="36dp"
         android:progressDrawable="@drawable/seekbar_style"
         android:thumb="@drawable/ic_seekbar_thumb"
         app:layout_constraintTop_toTopOf="@+id/seekLayout"
@@ -168,7 +162,6 @@
         android:layout_height="0dp"
         android:paddingHorizontal="52dp"
         android:orientation="horizontal"
-        android:background="@color/blurred_black_background"
         app:layout_constraintBottom_toTopOf="@+id/music_buttons"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -215,7 +208,6 @@
         android:orientation="horizontal"
         android:paddingBottom="20dp"
         android:paddingHorizontal="52dp"
-        android:background="@color/blurred_black_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

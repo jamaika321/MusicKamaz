@@ -1,13 +1,15 @@
 package ru.kamaz.music.ui.fragments
 
 import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.kamaz.music.R
 import ru.kamaz.music.databinding.FragmentMainListMusicBinding
 import ru.kamaz.music.di.components.MusicComponent
+import ru.kamaz.music.ui.NavAction
 import ru.kamaz.music.ui.NavAction.OPEN_ADD_PLAY_LIST_DIALOG
 import ru.kamaz.music.ui.NavAction.OPEN_MUSIC_FRAGMENT
 import ru.kamaz.music.ui.fragmentDialog.TrackOptionFragment
@@ -56,7 +59,7 @@ class MainListMusicFragment
     }
 
     override fun initVars() {
-        viewModel.service.launchWhenStarted(lifecycleScope){
+        viewModel.service.launchWhenStarted(lifecycleScope) {
             if (it == null) return@launchWhenStarted
             initServiceVars()
         }
@@ -64,7 +67,7 @@ class MainListMusicFragment
     }
 
     override fun onBackPressed() {
-        when(mode) {
+        when (mode) {
             ListState.PLAYLIST -> {
                 backToPlayer()
             }
@@ -87,7 +90,7 @@ class MainListMusicFragment
         super.onBackPressed()
     }
 
-    private fun backToPlayer(){
+    private fun backToPlayer() {
         navigator.navigateTo(
             UiAction(
                 OPEN_MUSIC_FRAGMENT
@@ -95,7 +98,7 @@ class MainListMusicFragment
         )
     }
 
-    enum class ListState(val value: Int){
+    enum class ListState(val value: Int) {
         PLAYLIST(0),
         CATEGORY(1),
         CATPLAYLIST(2),
@@ -111,38 +114,37 @@ class MainListMusicFragment
             viewModel.lastMusic(it, mode)
         }
 
-        viewModel.allMusic.launchWhenStarted(lifecycleScope){
+        viewModel.allMusic.launchWhenStarted(lifecycleScope) {
             if (mode == ListState.PLAYLIST) categoryItemClicked(RV_ITEM)
-
         }
 
-        viewModel.listPlayList.launchWhenStarted(lifecycleScope){
+        viewModel.listPlayList.launchWhenStarted(lifecycleScope) {
             if (mode == ListState.CATPLAYLIST) categoryItemClicked(RV_ITEM_MUSIC_PLAYLIST)
         }
 
-        viewModel.serviceTracks.launchWhenStarted(lifecycleScope){
+        viewModel.serviceTracks.launchWhenStarted(lifecycleScope) {
             viewModel.fillAllTracksList()
             viewModel.loadAllDBLists()
         }
 
-        viewModel.playLists.launchWhenStarted(lifecycleScope){
+        viewModel.playLists.launchWhenStarted(lifecycleScope) {
             Log.i("TAG", "initServiceVars: ")
             if (mode == ListState.CATPLAYLIST) viewModel.getPlayLists()
         }
 
-        viewModel.foldersList.launchWhenStarted(lifecycleScope){
+        viewModel.foldersList.launchWhenStarted(lifecycleScope) {
             if (mode == ListState.FOLDER) viewModel.getFoldersList()
         }
 
-        viewModel.foldersMusic.launchWhenStarted(lifecycleScope){
+        viewModel.foldersMusic.launchWhenStarted(lifecycleScope) {
             if (mode == ListState.FOLDER) categoryItemClicked(RV_ITEM_MUSIC_FOLDER)
         }
 
-        viewModel.favoriteSongs.launchWhenStarted(lifecycleScope){
+        viewModel.favoriteSongs.launchWhenStarted(lifecycleScope) {
             if (mode == ListState.CATFAVORITES) categoryItemClicked(RV_ITEM_MUSIC_FAVORITE)
         }
 
-        viewModel.folderMusicPlaylist.launchWhenStarted(lifecycleScope){
+        viewModel.folderMusicPlaylist.launchWhenStarted(lifecycleScope) {
             if (mode == ListState.FOLDPLAYLIST) categoryItemClicked(RV_ITEM_FOLDER_PLAYLIST)
         }
 
@@ -205,16 +207,6 @@ class MainListMusicFragment
                     .addProducer(AddTrackViewHolder())
                     .build { it }
             }
-            4 -> {//Favorite
-                RecyclerViewAdapter.Builder(this, items)
-                    .addProducer(MusicListViewHolderProducer())
-                    .build { it }
-            }
-            5 -> {//RV_ITEM
-                RecyclerViewAdapter.Builder(this, items)
-                    .addProducer(MusicListViewHolderProducer())
-                    .build { it }
-            }
             6 -> {//CATEGORY
                 RecyclerViewAdapter.Builder(this, items)
                     .addProducer(MusicCategoryViewHolder())
@@ -223,16 +215,6 @@ class MainListMusicFragment
             7 -> {//FOLDERS
                 RecyclerViewAdapter.Builder(this, items)
                     .addProducer(MusicFoldersViewHolder())
-                    .build { it }
-            }
-            8 -> {//PlaylistMusic
-                RecyclerViewAdapter.Builder(this, items)
-                    .addProducer(MusicListViewHolderProducer())
-                    .build { it }
-            }
-            9 -> {//FolderPlayList
-                RecyclerViewAdapter.Builder(this, items)
-                    .addProducer(MusicListViewHolderProducer())
                     .build { it }
             }
             else -> {
@@ -258,7 +240,7 @@ class MainListMusicFragment
         )
     }
 
-    fun addNewPlaylist(){
+    fun addNewPlaylist() {
         navigator.navigateTo(OPEN_ADD_PLAY_LIST_DIALOG)
     }
 
@@ -269,10 +251,18 @@ class MainListMusicFragment
                 viewModel.onItemClick(track, track.data, PlayListSource("all", "all"))
             }
             ListState.PLAYLISTMUSIC -> {
-                viewModel.onItemClick(track, track.data, PlayListSource("playList", viewModel.activePlayListName.value))
+                viewModel.onItemClick(
+                    track,
+                    track.data,
+                    PlayListSource("playList", viewModel.activePlayListName.value)
+                )
             }
             ListState.FOLDPLAYLIST -> {
-                viewModel.onItemClick(track, track.data, PlayListSource("folder", viewModel.activeFolderName.value))
+                viewModel.onItemClick(
+                    track,
+                    track.data,
+                    PlayListSource("folder", viewModel.activeFolderName.value)
+                )
             }
             ListState.CATFAVORITES -> {
                 viewModel.onItemClick(track, track.data, PlayListSource("favorite", "Избранное"))
@@ -285,7 +275,7 @@ class MainListMusicFragment
     }
 
     fun onOptionsItemClicked(position: Int, track: Track) {
-        TrackOptionFragment().show(childFragmentManager, "TrackOptionFragment")
+        showOptionDialog(track)
     }
 
     override fun onStop() {
@@ -348,21 +338,9 @@ class MainListMusicFragment
         viewModel.rvScrollState.value = 0
     }
 
-    fun playListSelected(name: String){
-        val trackList = ArrayList<Track>()
+    fun playListSelected(name: String) {
         viewModel.activePlayListName.value = name
-        viewModel.playLists.value.forEach { playList ->
-            if (playList.title == name){
-                playList.trackDataList.forEach { data ->
-                    viewModel.serviceTracks.value.forEach { tracks ->
-                        if (data == tracks.data){
-                            trackList.add(tracks)
-                        }
-                    }
-                }
-            }
-        }
-        viewModel.getPlayListMusic(trackList)
+        viewModel.getPlayListMusic()
         categoryItemClicked(RV_ITEM_PLAYLIST)
     }
 
@@ -377,48 +355,118 @@ class MainListMusicFragment
         return categoryList
     }
 
-    fun onFolderClicked(data: String, name: String){
+    fun onFolderClicked(data: String, name: String) {
         viewModel.fillFolderPlaylist(data)
-        viewModel.activeFolderName.value = data
+        viewModel.activeFolderName.value = name
         categoryItemClicked(RV_ITEM_FOLDER_PLAYLIST)
     }
 
-    fun deletePlayList(name: String){
+    fun deletePlayList(name: String) {
         viewModel.deletePlaylist(name)
     }
 
-    fun renamePlayList(name: String){
-        Log.i("ReviewTest_Rename", "renamePlayList: ")
-        showAlertDialog(name)
+    fun playListItemLongClickListener(name: String) {
+        val dialog = Dialog(requireContext())
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.context_menu_alert)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(true)
+
+        val titleText: TextView = dialog.findViewById(R.id.tv_question_bt_connection)
+        val close: TextView = dialog.findViewById(R.id.btn_close)
+        val add: TextView = dialog.findViewById(R.id.btn_add_to_playlist)
+        titleText.text = name
+        close.text = getString(R.string.rename)
+        add.text = getString(R.string.delete)
+        add.setOnClickListener {
+            showDeleteAlertDialog(name)
+            dialog.dismiss()
+        }
+        close.setOnClickListener {
+            showRenameAlertDialog(name)
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
-    private fun showAlertDialog(name: String){
-        val builder = Dialog(requireContext())
-        val alertLayout = layoutInflater.inflate(R.layout.rename_alert_dialog,null)
+    private fun showRenameAlertDialog(name: String) {
+        val dialog = Dialog(requireContext())
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.playlist_rename_alert_dialog)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(true)
 
-        builder.setTitle("Введите название")
-        builder.setContentView(alertLayout)
+        val titleText: TextView = dialog.findViewById(R.id.tv_question_bt_connection)
+        val input: EditText = dialog.findViewById(R.id.et_add_play_list)
+        val close: TextView = dialog.findViewById(R.id.btn_close)
+        val add: TextView = dialog.findViewById(R.id.btn_add_to_playlist)
+        titleText.text = getString(R.string.rename)
+        close.text = getString(R.string.cancel_add)
+        add.text = getString(R.string.create_playlist)
+        add.setOnClickListener {
+            viewModel.renamePlayList(name, input.text.toString())
+            dialog.dismiss()
+        }
+        close.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
 
-//        val input : EditText = alertLayout.findViewById(R.id.et_add_play_list)
-//        val close : Button = alertLayout.findViewById(R.id.btn_close)
-//        val add : Button = alertLayout.findViewById(R.id.btn_get)
-//        var answer = ""
-//        close.setOnClickListener {
-//            Toast.makeText(context, "Hello ${input.text}", Toast.LENGTH_SHORT).show()
-//        }
+    private fun showDeleteAlertDialog(name: String) {
+        val dialog = Dialog(requireContext())
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.playlist_delete_alert_dialog)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(true)
 
+        val playlistName: TextView = dialog.findViewById(R.id.tv_question_bt_connection)
+        val deleteText: TextView = dialog.findViewById(R.id.delete_text)
+        val close: TextView = dialog.findViewById(R.id.btn_close)
+        val add: TextView = dialog.findViewById(R.id.btn_add_to_playlist)
 
+        playlistName.text = name
+        deleteText.text = getString(R.string.delete_text)
+        close.text = getString(R.string.no)
+        add.text = getString(R.string.yes)
+        add.setOnClickListener {
+            viewModel.deletePlaylist(name)
+            dialog.dismiss()
+        }
+        close.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
 
-//        val input = EditText(context)
-//        input.setHint("Name")
-//        input.setHintTextColor(resources.getColor(R.color.white))
-//        input.setTextColor(resources.getColor(R.color.white))
-//        input.inputType = InputType.TYPE_CLASS_TEXT
-//        input.gravity = Gravity.CENTER
+    private fun showOptionDialog(track: Track) {
+        val dialog = Dialog(requireContext())
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.track_option_alert)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(true)
 
+        val trackName: TextView = dialog.findViewById(R.id.tv_question_bt_connection)
+        val addToPlaylist: TextView = dialog.findViewById(R.id.btn_close)
+        val delete: TextView = dialog.findViewById(R.id.btn_add_to_playlist)
 
-
-        builder.show()
+        trackName.text = track.title
+        delete.text = getString(R.string.delete)
+        addToPlaylist.text = getString(R.string.add_to_playlist)
+        addToPlaylist.setOnClickListener {
+//            navigator.navigateTo(
+//                UiAction(
+//                    NavAction.OPEN_DIALOG_ADD_TRACK
+//                )
+//            )
+            Toast.makeText(context, "В разработке.", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+        delete.setOnClickListener {
+            Toast.makeText(context, "В разработке.", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
 

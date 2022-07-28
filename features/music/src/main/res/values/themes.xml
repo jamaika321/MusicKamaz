@@ -124,5 +124,18 @@
         <item name="android:paddingEnd">10dp</item>
     </style>
 
+    <style name="AlertDialogMainText">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="AlertDialogBlurText">
+        <item name="android:textColor">@color/alert_dialog_blur_text_color</item>
+        <item name="fontFamily">bold</item>
+        <item name="android:textSize">24sp</item>
+        <item name="hintTextColor">@color/alert_dialog_blur_text_color</item>
+    </style>
+
 
 </resources>

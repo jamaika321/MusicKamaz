@@ -1,10 +1,7 @@
 package ru.kamaz.music.view_models.recyclerViewModels
 
 import android.net.Uri
-import android.util.Log
 import android.view.View
-import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,31 +73,7 @@ class PlayListsViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBindi
             }
         }
         binding.clAllItem.setOnLongClickListener {
-            if (data.albumArt != "create_playlist") {
-                val popupMenu = PopupMenu(binding.root.context, it)
-                popupMenu.inflate(R.menu.context_menu_playlist)
-                popupMenu.setOnMenuItemClickListener { item ->
-                    when (item.itemId) {
-                        R.id.delete -> {
-                            try {
-                                (parent as MainListMusicFragment).deletePlayList(this.data.title)
-                            } catch (e: Exception) {
-                                (parent as DialogAddTrack).deletePlaylist(this.data.title)
-                            }
-                        }
-                        R.id.rename -> {
-                            try {
-                                (parent as MainListMusicFragment).renamePlayList(this.data.title)
-                            } catch (e: Exception) {
-                                (parent as MainListMusicFragment).renamePlayList(this.data.title)
-//                                (parent as DialogAddTrack).deletePlaylist(this.data.title)
-                            }
-                        }
-                    }
-                    true
-                }
-                popupMenu.show()
-            }
+            (parent as MainListMusicFragment).playListItemLongClickListener(data.title)
             return@setOnLongClickListener true
         }
     }

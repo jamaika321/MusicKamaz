@@ -162,6 +162,8 @@ Service, OnCompletionListener,
     private val _isBtModeOn = MutableStateFlow<Boolean>(false)
     val isBtModeOn = _isBtModeOn.asStateFlow()
 
+    private val playListMode = MutableStateFlow("")
+
     private val _isDiskModeOn = MutableStateFlow<Boolean>(false)
     val isDiskModeOn = _isDiskModeOn.asStateFlow()
 
@@ -249,6 +251,7 @@ Service, OnCompletionListener,
     override fun getAllTracks() = allTracks.asStateFlow()
     override fun getPlayLists() = playLists.asStateFlow()
     override fun getFoldersList() = foldersList.asStateFlow()
+    override fun playListModeOn() = playListMode.asStateFlow()
 
     override fun getMusicName(): StateFlow<String> = title
     override fun getArtistName(): StateFlow<String> = artist
@@ -263,6 +266,7 @@ Service, OnCompletionListener,
     override fun checkUSBConnection(): StateFlow<Boolean> = isUSBConnected
     override fun updateWidget(): StateFlow<Boolean> = isNotConnected
     override fun btModeOn(): StateFlow<Boolean> = isBtModeOn
+
     override fun auxModeOn(): StateFlow<Boolean> = isAuxModeOn
     override fun diskModeOn(): StateFlow<Boolean> = isDiskModeOn
     override fun usbModeOn(): StateFlow<Boolean> = isUsbModeOn
@@ -342,7 +346,7 @@ Service, OnCompletionListener,
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
         Log.i("USBstatus", "onUsbStatusChanged:$path ")
         _isUSBConnected.value = isAdded
-        updateTracks("5")
+        updateTracks("all")
         if (isAdded) {
             startUsbMode()
         } else {
@@ -573,6 +577,7 @@ Service, OnCompletionListener,
                 _isPlaylistModeOn.tryEmit(false)
                 _isBtModeOn.tryEmit(true)
                 this.mode = SourceEnum.BT
+                playListMode.value = "bt"
             }
             //Disk
             2 -> {
@@ -582,6 +587,7 @@ Service, OnCompletionListener,
                 _isPlaylistModeOn.tryEmit(false)
                 _isDiskModeOn.tryEmit(true)
                 this.mode = SourceEnum.DISK
+                playListMode.value = "disk"
             }
             //USB
             3 -> {
@@ -591,9 +597,10 @@ Service, OnCompletionListener,
                 _isPlaylistModeOn.tryEmit(false)
                 _isUsbModeOn.tryEmit(true)
                 this.mode = SourceEnum.USB
+                playListMode.value = "usb"
             }
             //PlayLists
-            5 -> {
+            4 -> {
                 _isDiskModeOn.tryEmit(false)
                 _isBtModeOn.tryEmit(false)
                 _isAuxModeOn.tryEmit(false)
@@ -757,55 +764,35 @@ Service, OnCompletionListener,
 
     override fun previousTrack() {
         when (mode) {
-            SourceEnum.DISK -> {
-                if (!tracks.isEmpty()) {
-                    when (currentTrackPosition.value - 1) {
-                        -1 -> _currentTrackPosition.value = tracks.size - 1
-                        else -> _currentTrackPosition.value--
-                    }
-
-                    when (isPlaying.value) {
-                        true -> {
-                            initTrack(
-                                tracks[currentTrackPosition.value],
-                                tracks[currentTrackPosition.value].data
-                            )
-                            resume()
-                        }
-                        false -> initTrack(
-                            tracks[currentTrackPosition.value],
-                            tracks[currentTrackPosition.value].data
-                        )
-                    }
-                }
-
-            }
-            SourceEnum.BT -> {
-                twManager.playerPrev()
-            }
+            SourceEnum.DISK -> prevTrackHelper()
+            SourceEnum.BT -> twManager.playerPrev()
             SourceEnum.AUX -> TODO()
-            SourceEnum.USB -> if (!tracks.isEmpty()) {
-                when (currentTrackPosition.value - 1) {
-                    -1 -> _currentTrackPosition.value = tracks.size - 1
-                    else -> _currentTrackPosition.value--
-                }
+            SourceEnum.USB -> prevTrackHelper()
+            SourceEnum.PLAYLIST -> prevTrackHelper()
+        }
+    }
 
-                when (isPlaying.value) {
-                    true -> {
-                        initTrack(
-                            tracks[currentTrackPosition.value],
-                            tracks[currentTrackPosition.value].data
-                        )
-                        resume()
-                    }
-                    false -> initTrack(
+    private fun prevTrackHelper(){
+        if (!tracks.isEmpty()) {
+            when (currentTrackPosition.value - 1) {
+                -1 -> _currentTrackPosition.value = tracks.size - 1
+                else -> _currentTrackPosition.value--
+            }
+
+            when (isPlaying.value) {
+                true -> {
+                    initTrack(
                         tracks[currentTrackPosition.value],
                         tracks[currentTrackPosition.value].data
                     )
+                    resume()
                 }
+                false -> initTrack(
+                    tracks[currentTrackPosition.value],
+                    tracks[currentTrackPosition.value].data
+                )
             }
         }
-
     }
 
     private fun compilationMusic() {
@@ -817,6 +804,8 @@ Service, OnCompletionListener,
             } else if (isBtModeOn.value) {
                 nextTrack(1)
             } else if (isDiskModeOn.value) {
+                nextTrack(1)
+            } else if (isPlaylistModeOn.value) {
                 nextTrack(1)
             } else {
                 startDiskMode()
@@ -1013,12 +1002,11 @@ Service, OnCompletionListener,
         if (loadMode == "5") {
             loadTracksOnCoroutine("all")
             loadPlayLists()
-            rvAllFolderWithMusic(None()) { it.either({}, ::fillFoldersList) }
         }
         if (isShuffleStatus.value) {
             setShuffleMode()
         }
-
+        rvAllFolderWithMusic(None()) { it.either({}, ::fillFoldersList) }
     }
 
     private fun loadTracksOnCoroutine(loadMode: String) {
@@ -1063,6 +1051,7 @@ Service, OnCompletionListener,
             _musicEmpty.value = tracks.isEmpty()
             when (mode) {
                 SourceEnum.DISK -> {
+                    startUsbMode()
                 }
                 SourceEnum.USB -> {
                     _isUSBConnected.value = false
@@ -1090,7 +1079,8 @@ Service, OnCompletionListener,
     }
 
     override fun initPlayListSource(track: Track, playList: PlayListSource) {
-        startPlayListMode()
+        sourceSelection(SourceEnum.PLAYLIST)
+        playListMode.value = playList.type
         when (playList.type) {
             "all" -> replaceAllTracks(emptyList())
             "folder" -> getFolderTracks(playList)
@@ -1106,7 +1096,11 @@ Service, OnCompletionListener,
         foldersList.value.forEach { data ->
             if (data.dir == folder.name)
                 allTracks.value.forEach {
-                    if (it.data.contains(data.data + File.separator + it.title.replace(" ", "_").replace(",", "_").replace("-", "_").replace("'", "_"))) {
+                    if (it.data.contains(
+                            data.data + File.separator + it.title.replace(" ", "_")
+                                .replace(",", "_").replace("-", "_").replace("'", "_")
+                        )
+                    ) {
                         fillTracks(id.toLong(), it)
                         id++
                     }
@@ -1128,12 +1122,13 @@ Service, OnCompletionListener,
         }
     }
 
-    private fun getFavoritePlayList(playList: PlayListSource){
+    private fun getFavoritePlayList(playList: PlayListSource) {
         tracks.clear()
         _sourceName.value = playList.name
         var id = 0
-        allTracks.value.find { it.favorite == true }.let {
-            if (it != null) {
+        allTracks.value.forEach {
+            Log.i("ReviewTest_favorite", " : ${it.title} = ${it.favorite.toString()} ")
+            if (it.favorite) {
                 fillTracks(id.toLong(), it)
                 id++
             }
@@ -1189,6 +1184,9 @@ Service, OnCompletionListener,
                     Toast.makeText(this, "Файлы не найдены.", Toast.LENGTH_SHORT).show()
                 }
             }
+            SourceEnum.PLAYLIST -> {
+                startPlayListMode()
+            }
         }
     }
 
@@ -1227,6 +1225,15 @@ Service, OnCompletionListener,
     private fun changeFavoriteStatus(list: List<Track>) {
         CoroutineScope(Dispatchers.IO).launch {
             tracks.forEach { track ->
+                list.forEach { list ->
+                    if (track.title == list.title && track.data == list.data) {
+                        track.favorite = true
+                    }
+                }
+            }
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            allTracks.value.forEach { track ->
                 list.forEach { list ->
                     if (track.title == list.title && track.data == list.data) {
                         track.favorite = true

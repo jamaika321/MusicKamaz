@@ -124,7 +124,6 @@ class MusicFragment :
 
         }
         binding.controlPanel.addToFolder.setOnClickListener {
-//            setFragmentResult("musicTitle", bundleOf("bundleKey" to viewModel.title.value))
             navigator.navigateTo(
                 UiAction(
                     OPEN_DIALOG_ADD_TRACK
@@ -205,8 +204,14 @@ class MusicFragment :
 
     private fun initServiceVars() {
         viewModel.isPlay.launchWhenStarted(lifecycleScope) { isPlaying ->
-            if (isPlaying) binding.controlPanel.playPause.setImageResource(R.drawable.ic_pause_white)
-            else binding.controlPanel.playPause.setImageResource(R.drawable.ic_play_center)
+            if (isPlaying) {
+                binding.controlPanel.playPause.setImageResource(R.drawable.ic_pause_white)
+                binding.controlPanel.playPause.setPadding(35, 35,35,35)
+            }
+            else {
+                binding.controlPanel.playPause.setImageResource(R.drawable.ic_play_center)
+                binding.controlPanel.playPause.setPadding(39, 35,31,35)
+            }
         }
 
         viewModel.sourceName.launchWhenStarted(lifecycleScope) {
@@ -237,8 +242,9 @@ class MusicFragment :
             binding.seek.progress = 0
         }
 
-        viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
 
+
+        viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
             val currentPosition = if (it < 0) 0 else it
             binding.seek.progress = currentPosition
             binding.startTime.text = Track.convertDuration(currentPosition.toLong())
@@ -265,11 +271,15 @@ class MusicFragment :
             }
         }
         viewModel.isFavoriteMusic.launchWhenStarted(lifecycleScope) {
-            Log.i("ReviewTest_Favorite", " : ${it} ")
             likeStatus(it)
         }
         viewModel.isBtModeOn.launchWhenStarted(lifecycleScope) {
             if (it) btModeActivation()
+        }
+        viewModel.isPlayListModeOn.launchWhenStarted(lifecycleScope) {
+            if (!viewModel.isBtModeOn.value && !viewModel.isUsbModeOn.value && !viewModel.isDiskModeOn.value && !viewModel.isAuxModeOn.value) {
+                playListModeActivation()
+            }
         }
         viewModel.isDiskModeOn.launchWhenStarted(lifecycleScope) {
             if (it) diskModeActivation()
@@ -279,6 +289,41 @@ class MusicFragment :
         }
         viewModel.isDeviceNotConnectFromBt.launchWhenStarted(lifecycleScope) {
             if (it) dialog()
+        }
+        viewModel.isPlayListModeOn.launchWhenStarted(lifecycleScope) {
+            when (it){
+                "disk" -> {
+                    binding.textUsb.setPadding(0, 0, 0, 0)
+                    binding.sourceImage.visibility = View.INVISIBLE
+                }
+                "usb" -> {
+                    binding.textUsb.setPadding(0, 0, 0, 0)
+                    binding.sourceImage.visibility = View.INVISIBLE
+                }
+                "bt" -> {
+                    binding.textUsb.setPadding(0, 0, 0, 0)
+                    binding.sourceImage.visibility = View.INVISIBLE
+                }
+                "folder" -> {
+                    binding.textUsb.setPadding(35, 0, 0, 0)
+                    binding.sourceImage.visibility = View.VISIBLE
+                    binding.sourceImage.setImageResource(R.drawable.ic_folder_music)
+                }
+                "playList" -> {
+                    binding.textUsb.setPadding(35, 0, 0, 0)
+                    binding.sourceImage.visibility = View.VISIBLE
+                    binding.sourceImage.setImageResource(R.drawable.source_playlist)
+                }
+                "favorite" -> {
+                    binding.textUsb.setPadding(35, 0, 0, 0)
+                    binding.sourceImage.visibility = View.VISIBLE
+                    binding.sourceImage.setImageResource(R.drawable.source_favorite)
+                }
+                else -> {
+                    binding.textUsb.setPadding(0, 0, 0, 0)
+                    binding.sourceImage.visibility = View.INVISIBLE
+                }
+            }
         }
     }
 
@@ -318,8 +363,16 @@ class MusicFragment :
 
     private fun repeatIconChange(repeat: Int) {
         when (repeat) {
-            2 -> binding.controlPanel.repeat.setImageResource(R.drawable.ic_refresh_white)
-            1 -> binding.controlPanel.repeat.setImageResource(R.drawable.repeat_mode_one)
+            2 -> {
+                binding.controlPanel.repeat.setImageResource(R.drawable.repeat_mode_all)
+                binding.controlPanel.repeat.setPadding(22, 22, 22, 22)
+            }
+
+            1 -> {
+                binding.controlPanel.repeat.setImageResource(R.drawable.repeate_mode_single)
+                binding.controlPanel.repeat.setPadding(22, 14, 20, 22)
+            }
+
         }
 
     }
@@ -331,15 +384,18 @@ class MusicFragment :
 
     private fun likeStatus(like: Boolean) {
         if (like) {
-            binding.controlPanel.like.setImageResource(R.drawable.ic_like_true)
+            binding.controlPanel.like.setImageResource(R.drawable.like_true)
         } else {
-            binding.controlPanel.like.setImageResource(R.drawable.ic_like_false)
+            binding.controlPanel.like.setImageResource(R.drawable.like_false)
         }
     }
 
 
     private fun playListModeActivation() {
-
+        binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
+        binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
+        binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
+        binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
     }
 
     fun btModeActivation() {
@@ -390,13 +446,11 @@ class MusicFragment :
         binding.picture.visibility = View.VISIBLE
         binding.pictureDevice.visibility = View.VISIBLE
         //Background
-        binding.sourceImage.setImageResource(R.drawable.ic_folder_music)
+        binding.sourceImage.setImageResource(R.drawable.ic_settings)
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        binding.musicButtons.setBackgroundResource(R.color.blurred_black_background)
-        binding.artist.setBackgroundResource(R.drawable.black_gradient)
     }
 
     fun auxModeActivation() {
@@ -418,6 +472,7 @@ class MusicFragment :
         binding.times.visibility = View.INVISIBLE
         binding.pictureDevice.visibility = View.INVISIBLE
         //Background
+        binding.sourceImage.setImageResource(R.drawable.ic_folder_music)
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
@@ -446,13 +501,12 @@ class MusicFragment :
         binding.times.visibility = View.VISIBLE
         binding.pictureDevice.visibility = View.VISIBLE
         //Background
+        binding.sourceImage.setImageResource(R.drawable.ic_folder_music)
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
 //        binding.pictureDevice.setImageResource(R.drawable.music_png_bg)
-        binding.musicButtons.setBackgroundResource(R.color.blurred_black_background)
-        binding.artist.setBackgroundResource(R.drawable.black_gradient)
     }
 
 

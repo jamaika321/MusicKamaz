@@ -5,16 +5,13 @@
     android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:text="@string/connect_bt"
         android:id="@+id/tv_question_bt_connection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="14dp"
         android:gravity="center"
-        android:textSize="34dp"
         android:drawablePadding="12dp"
-        android:textColor="@color/white"
-        app:drawableEndCompat="@drawable/ic_button_settings"
+        style="@style/AlertDialogBlurText"
         app:layout_constraintBottom_toTopOf="@+id/line"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,38 +23,43 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#707070"
+        android:layout_marginHorizontal="@dimen/line_horizontal_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_question_bt_connection"
-        app:layout_constraintBottom_toTopOf="@+id/add_to_playlist"
+        app:layout_constraintBottom_toTopOf="@+id/btn_close"
         >
     </View>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/add_to_playlist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/bt_question"
-        android:layout_margin="14dp"
-        android:gravity="center"
-        android:textSize="22dp"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/cl_buttons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/line">
-    </androidx.appcompat.widget.AppCompatTextView>
 
-    <include
-        android:id="@+id/cl_buttons"
-        layout="@layout/buttons_add_track"
-        android:layout_margin="10dp"
-        android:layout_marginBottom="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <TextView
+        android:layout_width="0dp"
+        android:id="@+id/btn_close"
+        style="@style/button_add_playlist"
+        android:layout_marginHorizontal="50dp"
+        android:layout_marginTop="@dimen/control_btn_padding"
+        app:layout_constraintBottom_toTopOf="@id/btn_add_to_playlist"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/line"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:textColor="@color/white"
+        />
+
+
+    <TextView
+        android:layout_width="0dp"
+        android:id="@+id/btn_add_to_playlist"
+        style="@style/button_add_playlist"
+        android:layout_marginHorizontal="50dp"
+        android:layout_marginTop="@dimen/control_btn_padding"
+        android:layout_marginBottom="@dimen/control_btn_padding"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_close"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/add_to_playlist" />
+        android:gravity="center"
+        android:textColor="@color/white"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

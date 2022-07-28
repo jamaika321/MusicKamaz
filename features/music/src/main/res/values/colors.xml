@@ -29,6 +29,8 @@
     <color name="blurred_black_background">#8F000000</color>
     <color name="clarity_screen">#00FFFFFF</color>
 
+    <color name="alert_dialog_blur_text_color">#95A4C7</color>
+
 
 
 
