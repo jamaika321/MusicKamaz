@@ -22,10 +22,7 @@ class ItemArtist : RecyclerViewBaseItem<Track, FolderItemRvBinding>(){
                 binding.textCategory.text = "Красота в деталях"
             }
         }
-
-        binding.root.setOnClickListener {
-            binding.imageCategory.setImageResource(R.drawable.music_png_bg)
-        }
+        binding.imageCategory.setImageResource(R.drawable.music_png_bg)
     }
     override fun bindData(data: Track, position: Int) {
         artist.value = data.artist

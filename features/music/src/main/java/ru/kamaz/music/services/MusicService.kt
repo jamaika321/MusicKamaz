@@ -347,7 +347,7 @@ Service, OnCompletionListener,
         Log.i("USBstatus", "onUsbStatusChanged:$path ")
         _isUSBConnected.value = isAdded
         updateTracks("all")
-        if (isAdded) {
+        if (isAdded && isUSBConnected.value) {
             startUsbMode()
         } else {
             startDiskMode()
@@ -522,6 +522,7 @@ Service, OnCompletionListener,
             changeSource(1)
             stopMediaPlayer()
             startBtListener()
+            _sourceName.value = ""
         }
     }
 

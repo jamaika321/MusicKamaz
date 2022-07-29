@@ -25,7 +25,7 @@ class FolderItemViewModel: RecyclerViewBaseItem<AllFolderWithMusic, MainCategory
 
         }
 
-        binding.imageCategory.setImageResource(R.drawable.ic_folder_music)
+        binding.imageCategory.setImageResource(R.drawable.source_folder)
 
 
 

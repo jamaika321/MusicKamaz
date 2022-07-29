@@ -307,7 +307,7 @@ class MusicFragment :
                 "folder" -> {
                     binding.textUsb.setPadding(35, 0, 0, 0)
                     binding.sourceImage.visibility = View.VISIBLE
-                    binding.sourceImage.setImageResource(R.drawable.ic_folder_music)
+                    binding.sourceImage.setImageResource(R.drawable.source_folder)
                 }
                 "playList" -> {
                     binding.textUsb.setPadding(35, 0, 0, 0)
@@ -347,7 +347,7 @@ class MusicFragment :
         } else {
             Log.i("picasso", "updateackCover:${coverPath.trim()}")
             binding.pictureBucket.visibility = View.INVISIBLE
-            binding.pictureDevice.setImageResource(R.drawable.music_png_bg)
+            if (!viewModel.isBtModeOn.value) binding.pictureDevice.setImageResource(R.drawable.music_png_bg)
         }
     }
 
@@ -446,7 +446,6 @@ class MusicFragment :
         binding.picture.visibility = View.VISIBLE
         binding.pictureDevice.visibility = View.VISIBLE
         //Background
-        binding.sourceImage.setImageResource(R.drawable.ic_settings)
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
@@ -472,7 +471,6 @@ class MusicFragment :
         binding.times.visibility = View.INVISIBLE
         binding.pictureDevice.visibility = View.INVISIBLE
         //Background
-        binding.sourceImage.setImageResource(R.drawable.ic_folder_music)
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
@@ -501,7 +499,6 @@ class MusicFragment :
         binding.times.visibility = View.VISIBLE
         binding.pictureDevice.visibility = View.VISIBLE
         //Background
-        binding.sourceImage.setImageResource(R.drawable.ic_folder_music)
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
