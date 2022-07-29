@@ -8,12 +8,10 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import ru.kamaz.music.R
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
@@ -50,8 +48,8 @@ class MainListMusicViewModel @Inject constructor(
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
     val service = _service.asStateFlow()
 
-    private val _foldersMusic = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
-    val foldersMusic = _foldersMusic
+    private val _foldersLists = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
+    val foldersLists = _foldersLists
 
     private val _folderMusicPlaylist =
         MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
@@ -71,6 +69,10 @@ class MainListMusicViewModel @Inject constructor(
 
     private val _playListMusic = MutableStateFlow<List<RecyclerViewBaseDataModel>>(emptyList())
     val playListMusic = _playListMusic.asStateFlow()
+
+    val usbConnected: StateFlow<Boolean> by lazy {
+        service.value?.checkUSBConnection() ?: MutableStateFlow(false)
+    }
 
     val lastMusicChanged: StateFlow<String> by lazy {
         service.value?.lastMusic() ?: MutableStateFlow("")
@@ -241,7 +243,7 @@ class MainListMusicViewModel @Inject constructor(
     }
 
     fun getFoldersList() {
-        _foldersMusic.value = foldersList.value.toRecyclerViewItemsFolder()
+        _foldersLists.value = foldersList.value.toRecyclerViewItemsFolder()
     }
 
     fun getPlayLists() {

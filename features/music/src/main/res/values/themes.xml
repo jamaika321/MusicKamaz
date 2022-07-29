@@ -130,6 +130,12 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="PlayListItemText">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
     <style name="AlertDialogBlurText">
         <item name="android:textColor">@color/alert_dialog_blur_text_color</item>
         <item name="fontFamily">bold</item>

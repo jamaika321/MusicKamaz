@@ -16,5 +16,6 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     <dimen name="margin_list_frag2">36dp</dimen>
     <dimen name="margin_item_top">20dp</dimen>
     <dimen name="line_horizontal_margin">30dp</dimen>
+    <dimen name="context_menu_margin_horizontal">65dp</dimen>
 
 </resources>

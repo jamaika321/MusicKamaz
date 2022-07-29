@@ -1,5 +1,6 @@
 package ru.kamaz.music.view_models.music_category
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.kamaz.music.R
@@ -19,7 +20,7 @@ class ItemArtist : RecyclerViewBaseItem<Track, FolderItemRvBinding>(){
         artist.launchWhenStarted(parent.lifecycleScope){
             binding.textCategory.text = it
             if (it == ""){
-                binding.textCategory.text = "Красота в деталях"
+                binding.textCategory.text = "Artist"
             }
         }
         binding.imageCategory.setImageResource(R.drawable.music_png_bg)

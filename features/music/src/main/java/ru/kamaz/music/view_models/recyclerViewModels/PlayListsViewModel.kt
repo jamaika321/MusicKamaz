@@ -1,7 +1,13 @@
 package ru.kamaz.music.view_models.recyclerViewModels
 
+import android.annotation.SuppressLint
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.util.Log
 import android.view.View
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +20,7 @@ import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
 import java.io.File
 import java.lang.Exception
+import kotlin.coroutines.coroutineContext
 
 class PlayListsViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBinding>() {
 
@@ -31,13 +38,15 @@ class PlayListsViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBindi
         this.data = data
     }
 
+    @SuppressLint("ResourceAsColor")
     override fun initVars() {
         title.launchWhenStarted(parent.lifecycleScope) {
             binding.textCategory.text = title.value
         }
         image.launchWhenStarted(parent.lifecycleScope) {
             if (it == "create_playlist") {
-                binding.imageCategory.setImageResource(R.drawable.ic_plus)
+                binding.imageCategory.setImageResource(R.drawable.add_track_plus)
+                binding.imageCategory.setPadding(60, 60, 60, 60)
             } else if (it.isNotEmpty()) {
                 Picasso.with(parent.context)
                     .load(Uri.fromFile(File(image.value.trim())))
@@ -49,8 +58,10 @@ class PlayListsViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBindi
         selection.launchWhenStarted(parent.lifecycleScope){
             if (it){
                 binding.foregroundImage.visibility = View.VISIBLE
+                binding.textCategory.setTextColor(Color.parseColor("#437DFF"))
             } else {
                 binding.foregroundImage.visibility = View.INVISIBLE
+                binding.textCategory.setTextColor(Color.WHITE)
             }
         }
         setListeners()
@@ -73,7 +84,11 @@ class PlayListsViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBindi
             }
         }
         binding.clAllItem.setOnLongClickListener {
-            (parent as MainListMusicFragment).playListItemLongClickListener(data.title)
+            try {
+                (parent as MainListMusicFragment).playListItemLongClickListener(data.title)
+            } catch (e: Exception) {
+                Log.e("Exception", "$e" )
+            }
             return@setOnLongClickListener true
         }
     }

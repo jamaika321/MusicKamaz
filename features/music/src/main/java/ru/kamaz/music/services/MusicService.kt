@@ -350,6 +350,7 @@ Service, OnCompletionListener,
         if (isAdded && isUSBConnected.value) {
             startUsbMode()
         } else {
+            mediaPlayer.stop()
             startDiskMode()
         }
     }
@@ -665,7 +666,6 @@ Service, OnCompletionListener,
             if (it != null) _currentTrackPosition.value = it.id.toInt()
             else _currentTrackPosition.value = 0
         }
-        Log.i("ReviewTest_InitTrack", " : ${currentTrackPosition.value}  ==  ${tracks.size}")
         val currentTrack = track
         _isFavorite.value = track.favorite
         _lastMusic.value = currentTrack.data
@@ -688,6 +688,10 @@ Service, OnCompletionListener,
                     data1
                 }
             )
+//            setOnErrorListener { mediaPlayer, i, i2 ->
+//                _isPlaylistModeOn.value = false
+//                return@setOnErrorListener false
+//            }
             prepare()
         }
     }
@@ -806,6 +810,8 @@ Service, OnCompletionListener,
                 nextTrack(1)
             } else if (isDiskModeOn.value) {
                 nextTrack(1)
+
+
             } else if (isPlaylistModeOn.value) {
                 nextTrack(1)
             } else {
@@ -881,7 +887,6 @@ Service, OnCompletionListener,
     }
 
     private fun funPlayOneSong() {
-        Log.i("ReviewTest_Position", " : ${currentTrackPosition.value} ")
         when (isPlaying.value) {
             true -> {
                 initTrack(
@@ -889,14 +894,12 @@ Service, OnCompletionListener,
                     tracks[currentTrackPosition.value].data
                 )
                 resume()
-                Log.i("isPlayingWhenPlay", "true${isPlaying.value}")
             }
             false -> {
                 initTrack(
                     tracks[currentTrackPosition.value],
                     tracks[currentTrackPosition.value].data
                 )
-                Log.i("isPlayingWhenStop", "false${isPlaying.value}")
             }
         }
 
@@ -1232,11 +1235,9 @@ Service, OnCompletionListener,
                     }
                 }
             }
-        }
-        CoroutineScope(Dispatchers.IO).launch {
             allTracks.value.forEach { track ->
                 list.forEach { list ->
-                    if (track.title == list.title && track.data == list.data) {
+                    if (track.data == list.data) {
                         track.favorite = true
                     }
                 }

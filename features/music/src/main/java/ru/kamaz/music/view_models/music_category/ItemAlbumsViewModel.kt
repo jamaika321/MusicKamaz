@@ -4,14 +4,14 @@ import android.net.Uri
 import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableStateFlow
-import ru.kamaz.music.databinding.AlbumsItemBinding
+import ru.kamaz.music.databinding.AlbumItemsBinding
 import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
 import java.io.File
 
 
-class ItemAlbumsViewModel: RecyclerViewBaseItem<Track, AlbumsItemBinding>(){
+class ItemAlbumsViewModel: RecyclerViewBaseItem<Track, AlbumItemsBinding>(){
     private val artist = MutableStateFlow("")
     private val title = MutableStateFlow(0)
     private val image = MutableStateFlow("")
@@ -20,7 +20,7 @@ class ItemAlbumsViewModel: RecyclerViewBaseItem<Track, AlbumsItemBinding>(){
 
     override fun initVars() {
         artist.launchWhenStarted(parent.lifecycleScope){
-            binding.textCategory.text= it.toString()
+            binding.textCategory.text= it
         }
         title.launchWhenStarted(parent.lifecycleScope){
 

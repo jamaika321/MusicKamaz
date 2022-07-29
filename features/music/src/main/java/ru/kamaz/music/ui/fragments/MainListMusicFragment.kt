@@ -23,7 +23,6 @@ import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.ui.NavAction
 import ru.kamaz.music.ui.NavAction.OPEN_ADD_PLAY_LIST_DIALOG
 import ru.kamaz.music.ui.NavAction.OPEN_MUSIC_FRAGMENT
-import ru.kamaz.music.ui.fragmentDialog.TrackOptionFragment
 import ru.kamaz.music.ui.producers.*
 import ru.kamaz.music.view_models.fragments.MainListMusicViewModel
 import ru.kamaz.music_api.models.PlayListSource
@@ -118,26 +117,21 @@ class MainListMusicFragment
             if (mode == ListState.PLAYLIST) categoryItemClicked(RV_ITEM)
         }
 
-        viewModel.listPlayList.launchWhenStarted(lifecycleScope) {
-            if (mode == ListState.CATPLAYLIST) categoryItemClicked(RV_ITEM_MUSIC_PLAYLIST)
-        }
-
         viewModel.serviceTracks.launchWhenStarted(lifecycleScope) {
             viewModel.fillAllTracksList()
             viewModel.loadAllDBLists()
         }
 
         viewModel.playLists.launchWhenStarted(lifecycleScope) {
-            Log.i("TAG", "initServiceVars: ")
-            if (mode == ListState.CATPLAYLIST) viewModel.getPlayLists()
+            viewModel.getPlayLists()
+            if (mode == ListState.CATPLAYLIST) categoryItemClicked(RV_ITEM_MUSIC_PLAYLIST)
         }
 
         viewModel.foldersList.launchWhenStarted(lifecycleScope) {
-            if (mode == ListState.FOLDER) viewModel.getFoldersList()
-        }
-
-        viewModel.foldersMusic.launchWhenStarted(lifecycleScope) {
-            if (mode == ListState.FOLDER) categoryItemClicked(RV_ITEM_MUSIC_FOLDER)
+            viewModel.getFoldersList()
+            if (mode == ListState.FOLDER) {
+                categoryItemClicked(RV_ITEM_MUSIC_FOLDER)
+            }
         }
 
         viewModel.favoriteSongs.launchWhenStarted(lifecycleScope) {
@@ -146,6 +140,14 @@ class MainListMusicFragment
 
         viewModel.folderMusicPlaylist.launchWhenStarted(lifecycleScope) {
             if (mode == ListState.FOLDPLAYLIST) categoryItemClicked(RV_ITEM_FOLDER_PLAYLIST)
+        }
+
+        viewModel.usbConnected.launchWhenStarted(lifecycleScope) {
+            if (mode == ListState.FOLDPLAYLIST) {
+                viewModel.foldersList.value.find { it.dir == viewModel.activeFolderName.value }.let {
+                    if (it == null) onBackPressed()
+                }
+            }
         }
 
         binding.rvAllMusic.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -319,7 +321,7 @@ class MainListMusicFragment
             }
             7 -> {//Folders
                 binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.foldersMusic, id)
+                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.foldersLists, id)
                 this.mode = ListState.FOLDER
             }
             8 -> {//PlaylistMusic
@@ -454,12 +456,11 @@ class MainListMusicFragment
         delete.text = getString(R.string.delete)
         addToPlaylist.text = getString(R.string.add_to_playlist)
         addToPlaylist.setOnClickListener {
-//            navigator.navigateTo(
-//                UiAction(
-//                    NavAction.OPEN_DIALOG_ADD_TRACK
-//                )
-//            )
-            Toast.makeText(context, "В разработке.", Toast.LENGTH_SHORT).show()
+            navigator.navigateTo(
+                UiAction(
+                    NavAction.OPEN_DIALOG_ADD_TRACK
+                )
+            )
             dialog.dismiss()
         }
         delete.setOnClickListener {
