@@ -20,9 +20,9 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/picture_bucket"
-        android:layout_width="320dp"
-        android:layout_height="320dp"
-        android:layout_marginTop="5dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="10dp"
         app:cardCornerRadius="5px"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,8 +54,8 @@
 
         <ImageView
             android:id="@+id/prev"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             app:layout_constraintEnd_toStartOf="@id/next"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
@@ -77,9 +77,9 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:text="Источник"
-            android:textSize="24sp"
+            android:textAllCaps="true"
             android:layout_marginBottom="5dp"
-            android:textColor="@color/white"
+            style="@style/ArtistMusic"
             android:gravity="bottom"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -88,8 +88,8 @@
 
         <ImageView
             android:id="@+id/next"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -104,29 +104,27 @@
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/margin"
         android:layout_marginEnd="@dimen/margin"
-        android:text="@string/artist"
-        android:textColor="#999999"
-        android:fontFamily="sans-serif-thin"
+        android:text="@string/song"
+        style="@style/TitleMusic"
         android:autoSizeTextType="uniform"
         app:layout_constraintBottom_toTopOf="@+id/artist"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/next_prev"
-        app:layout_constraintVertical_weight="0.6"/>
+        app:layout_constraintVertical_weight="1"/>
 
     <TextView
         android:id="@+id/artist"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="@string/song"
-        android:textColor="@color/white"
+        android:text="@string/artist"
+        style="@style/ArtistMusic"
         android:autoSizeTextType="uniform"
-        android:fontFamily="sans-serif"
         app:layout_constraintBottom_toTopOf="@+id/seekLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/song"
         app:layout_constraintTop_toBottomOf="@id/song"
-        app:layout_constraintVertical_weight="1"/>
+        app:layout_constraintVertical_weight="0.6"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/seekLayout"
@@ -174,8 +172,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="00:00"
-            android:fontFamily="sans-serif-thin"
-            android:textColor="@color/white"
+            style="@style/ArtistMusic"
             android:autoSizeTextType="uniform"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -188,8 +185,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="--:--"
-            android:fontFamily="sans-serif-thin"
-            android:textColor="@color/white"
+            style="@style/ArtistMusic"
             android:autoSizeTextType="uniform"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -215,9 +211,9 @@
         app:layout_constraintVertical_weight="2">
 
         <ImageView
-            android:id="@+id/folder"
-            style="@style/controlButton"
-            android:background="@drawable/button_click"
+            android:id="@+id/change_source_btn"
+            style="@style/source_button"
+            android:background="@drawable/source_selection_btn"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -230,7 +226,7 @@
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:visibility="visible"
-            app:layout_constraintStart_toEndOf="@id/folder"
+            app:layout_constraintStart_toEndOf="@id/change_source_btn"
             app:layout_constraintEnd_toStartOf="@id/open_list_fragment"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
@@ -239,7 +235,7 @@
             layout="@layout/buttons_music_source"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
-            app:layout_constraintStart_toEndOf="@id/folder"
+            app:layout_constraintStart_toEndOf="@id/change_source_btn"
             app:layout_constraintEnd_toStartOf="@id/open_list_fragment"
             app:layout_constraintTop_toTopOf="parent"
             android:visibility="invisible"
@@ -247,8 +243,8 @@
 
         <ImageView
             android:id="@+id/open_list_fragment"
-            style="@style/controlButton"
-            android:background="@drawable/button_click"
+            style="@style/source_button"
+            android:background="@drawable/source_selection_btn"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/controlPanel"

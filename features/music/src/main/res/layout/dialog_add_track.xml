@@ -59,7 +59,7 @@
         layout="@layout/buttons_add_playlist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/rv_all_music"
         app:layout_constraintStart_toStartOf="@id/rv_all_music" />

@@ -1,7 +1,3 @@
-
-
-
-
 <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/view_change_source"
     android:orientation="horizontal"
@@ -14,21 +10,19 @@
 
     <TextView
         android:id="@+id/aux"
-        style="@style/Button"
+        style="@style/source_buttons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_bt"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf=" parent"
         android:text="AUX"
-        android:textColor="@color/white"
         android:layout_marginStart="@dimen/marginTop"
         android:layout_marginEnd="@dimen/marginTop"
-        android:gravity="center"
        />
 
     <TextView
         android:id="@+id/btn_bt"
-        style="@style/Button"
+        style="@style/source_buttons"
         android:layout_marginStart="@dimen/marginTop"
         android:layout_marginEnd="@dimen/marginTop"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -36,12 +30,10 @@
         app:layout_constraintStart_toEndOf="@id/aux"
         app:layout_constraintTop_toTopOf="parent"
         android:text="BT"
-        android:gravity="center"
-        android:textColor="@color/white"
         />
     <TextView
         android:id="@+id/disk"
-        style="@style/Button"
+        style="@style/source_buttons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/usb"
         app:layout_constraintStart_toEndOf="@id/btn_bt"
@@ -49,13 +41,11 @@
         android:layout_marginStart="@dimen/marginTop"
         android:layout_marginEnd="@dimen/marginTop"
         android:text="DISK"
-        android:gravity="center"
-        android:textColor="@color/white"
        />
 
     <TextView
         android:id="@+id/usb"
-        style="@style/Button"
+        style="@style/source_buttons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/disk"
@@ -63,8 +53,6 @@
         android:layout_marginStart="@dimen/marginTop"
         android:layout_marginEnd="@dimen/marginTop"
         android:text="USB"
-        android:gravity="center"
-        android:textColor="@color/white"
          />
 
 

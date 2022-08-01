@@ -59,21 +59,33 @@
         <item name="appWidgetTextColor">@color/light_blue_50</item>
     </style>
 
+    <style name="source_button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">@dimen/source_selection_btn_padding</item>
+        <item name="android:background">@drawable/big_button_click</item>
+    </style>
+
     <style name="controlButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:padding">@dimen/control_btn_padding</item>
         <item name="android:background">@drawable/ic_btn_background</item>
     </style>
-    <style name="Button">
+    <style name="source_buttons">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:gravity">center</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:padding">@dimen/control_btn_padding</item>
+        <item name="android:padding">@dimen/add_playlist_btn</item>
         <item name="android:background">@drawable/back_item</item>
+        <item name="font">@font/font</item>
     </style>
     <style name="button_add_playlist">
-        <item name="android:textSize">22dp</item>
-        <item name="android:layout_width">0dp</item>
+        <item name="android:textSize">20sp</item>
+        <item name="font">@font/font</item>
+        <item name="android:layout_width">180dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:padding">@dimen/add_playlist_btn</item>
         <item name="android:background">@drawable/back_item_add_playlist</item>
@@ -126,21 +138,33 @@
 
     <style name="AlertDialogMainText">
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="font">@font/font</item>
     </style>
 
     <style name="PlayListItemText">
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:textStyle">normal</item>
+        <item name="font">@font/font</item>
     </style>
 
     <style name="AlertDialogBlurText">
         <item name="android:textColor">@color/alert_dialog_blur_text_color</item>
-        <item name="fontFamily">bold</item>
         <item name="android:textSize">24sp</item>
-        <item name="hintTextColor">@color/alert_dialog_blur_text_color</item>
+        <item name="fontFamily">@font/font</item>
+    </style>
+
+    <style name="TitleMusic">
+        <item name="font">@font/font</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="ArtistMusic">
+        <item name="font">@font/font</item>
+        <item name="android:textSize">21sp</item>
+        <item name="android:textColor">@color/alert_dialog_blur_text_color</item>
     </style>
 
 

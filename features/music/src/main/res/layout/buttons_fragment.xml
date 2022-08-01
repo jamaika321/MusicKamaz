@@ -28,21 +28,21 @@
         app:layout_constraintEnd_toStartOf="@+id/play_pause"
         app:layout_constraintStart_toEndOf="@id/repeat"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_shuffle_music" />
+        app:srcCompat="@drawable/shuffle_mode_false" />
 
     <ImageView
         android:id="@+id/play_pause"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:paddingVertical="35dp"
-        android:paddingStart="39dp"
-        android:paddingEnd="31dp"
-        android:background="@drawable/ic_btn_background_blue"
+        android:paddingStart="37dp"
+        android:paddingEnd="33dp"
+        android:background="@drawable/big_play_back"
         app:layout_constraintBottom_toBottomOf="@+id/rotate"
         app:layout_constraintEnd_toStartOf="@+id/add_to_folder"
         app:layout_constraintStart_toEndOf="@id/rotate"
         app:layout_constraintTop_toTopOf="@+id/rotate"
-        app:srcCompat="@drawable/ic_play_triangle" />
+        app:srcCompat="@drawable/play_triangle" />
 
     <ImageView
         android:id="@+id/add_to_folder"
@@ -63,7 +63,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/add_to_folder"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_like_false" />
+        app:srcCompat="@drawable/like_false" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

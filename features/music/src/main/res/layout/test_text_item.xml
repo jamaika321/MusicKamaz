@@ -33,7 +33,7 @@
             android:visibility="invisible"
             android:padding="30dp"
             android:background="@color/blurred_black_background"
-            android:src="@drawable/ic_music_white"
+            android:src="@drawable/playing_music_icon"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
     </androidx.cardview.widget.CardView>
@@ -79,7 +79,7 @@
     <ImageView
         style="@style/controlButton"
         android:id="@+id/like"
-        android:src="@drawable/ic_like_false"
+        android:src="@drawable/like_false"
         android:layout_margin="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/settings"

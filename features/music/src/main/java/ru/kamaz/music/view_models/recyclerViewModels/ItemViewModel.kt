@@ -66,9 +66,9 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
 
         favorite.launchWhenStarted(parent.lifecycleScope){
             if (it){
-                binding.like.setImageResource(R.drawable.ic_like_true)
+                binding.like.setImageResource(R.drawable.like_true)
             } else {
-                binding.like.setImageResource(R.drawable.ic_like_false)
+                binding.like.setImageResource(R.drawable.like_false)
             }
         }
 

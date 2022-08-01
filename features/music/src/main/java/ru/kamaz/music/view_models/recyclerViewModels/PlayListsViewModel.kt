@@ -84,10 +84,12 @@ class PlayListsViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBindi
             }
         }
         binding.clAllItem.setOnLongClickListener {
-            try {
-                (parent as MainListMusicFragment).playListItemLongClickListener(data.title)
-            } catch (e: Exception) {
-                Log.e("Exception", "$e" )
+            if (data.albumArt != "create_playlist") {
+                try {
+                    (parent as MainListMusicFragment).playListItemLongClickListener(data.title)
+                } catch (e: Exception) {
+                    Log.e("Exception", "$e")
+                }
             }
             return@setOnLongClickListener true
         }

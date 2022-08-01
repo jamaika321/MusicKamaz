@@ -38,14 +38,14 @@
         android:layout_margin="14dp"
         android:gravity="center"
         android:drawablePadding="12dp"
-        style="@style/AlertDialogBlurText"
+        style="@style/AlertDialogMainText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/line">
     </androidx.appcompat.widget.AppCompatTextView>
 
     <TextView
-        android:layout_width="180dp"
+        android:layout_width="0dp"
         android:id="@+id/btn_close"
         style="@style/button_add_playlist"
         android:layout_marginTop="@dimen/marginTop"
@@ -53,6 +53,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/delete_text"
+        app:layout_constraintEnd_toStartOf="@+id/btn_add_to_playlist"
         android:textColor="@color/white"
         android:layout_marginStart="@dimen/marginTop"
         android:layout_marginEnd="@dimen/marginTop"
@@ -61,7 +62,7 @@
 
 
     <TextView
-        android:layout_width="180dp"
+        android:layout_width="0dp"
         android:id="@+id/btn_add_to_playlist"
         style="@style/button_add_playlist"
         android:layout_marginTop="@dimen/marginTop"
@@ -69,6 +70,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/delete_text"
+        app:layout_constraintStart_toEndOf="@+id/btn_close"
         android:layout_marginStart="@dimen/marginTop"
         android:layout_marginEnd="@dimen/marginTop"
         android:gravity="center"

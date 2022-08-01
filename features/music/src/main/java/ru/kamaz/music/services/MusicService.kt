@@ -20,7 +20,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationCompat.PRIORITY_MIN
+import androidx.core.app.NotificationCompat.*
 import androidx.lifecycle.viewModelScope
 import com.eckom.xtlibrary.twproject.music.bean.MusicName
 import com.eckom.xtlibrary.twproject.music.bean.Record
@@ -284,7 +284,7 @@ Service, OnCompletionListener,
             .setUsage(AudioAttributes.USAGE_MEDIA)
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
             .build()
-        mediaPlayer.setOnCompletionListener(this)
+        mediaPlayer.setOnCompletionListener(this)//Слушатель завершения воспроизведения потока(одной песни)
         mediaPlayer.setAudioAttributes(audioAttributes)
     }
 
@@ -310,6 +310,7 @@ Service, OnCompletionListener,
         registerReceiver(br, filter)
 
         twManager.startMonitoring(applicationContext) {
+            Log.i("ReviewTest_Start", " StartMonitoring: ")
             twManager.addListener(this)
             twManager.requestConnectionInfo()
         }
@@ -350,7 +351,6 @@ Service, OnCompletionListener,
         if (isAdded && isUSBConnected.value) {
             startUsbMode()
         } else {
-            mediaPlayer.stop()
             startDiskMode()
         }
     }
@@ -643,6 +643,7 @@ Service, OnCompletionListener,
     }
 
     fun startMusicListener() {
+        Log.i("ReviewTest_Start", "startMusicListener")
         twManagerMusic.addListener(this)
 //        twManager.addListener(this)
     }
@@ -678,21 +679,37 @@ Service, OnCompletionListener,
         } else {
             _cover.value = ""
         }
-        mediaPlayer.apply {
-            stop()
-            reset()
-            setDataSource(
-                if (data1.isEmpty()) {
-                    track.data
-                } else {
-                    data1
+        if (track.source == "usb"){
+            checkUsb()
+            if (!isUSBConnected.value) {
+                nextTrack(1)
+            } else {
+                mediaPlayer.apply {
+                    stop()
+                    reset()
+                    setDataSource(
+                        if (data1.isEmpty()) {
+                            track.data
+                        } else {
+                            data1
+                        }
+                    )
+                    prepare()
                 }
-            )
-//            setOnErrorListener { mediaPlayer, i, i2 ->
-//                _isPlaylistModeOn.value = false
-//                return@setOnErrorListener false
-//            }
-            prepare()
+            }
+        } else {
+            mediaPlayer.apply {
+                stop()
+                reset()
+                setDataSource(
+                    if (data1.isEmpty()) {
+                        track.data
+                    } else {
+                        data1
+                    }
+                )
+                prepare()
+            }
         }
     }
 
@@ -706,13 +723,8 @@ Service, OnCompletionListener,
             twManagerMusic.addListener(this)
             twManager.requestConnectionInfo()
         }
+        twManagerMusic.requestSource(true)
     }
-
-//    override fun firstOpenTrackFound(track: Track) {
-//        updateTracks()
-//        val currentTrack = track
-//        updateMusicName(currentTrack.title, currentTrack.artist, currentTrack.duration)
-//    }
 
     override fun playOrPause(): Boolean {
         when (mode) {
@@ -804,14 +816,13 @@ Service, OnCompletionListener,
         mediaPlayer.setOnCompletionListener {
             Log.i("isPlayingAutoModeMain", "true${isPlaying.value}")
             checkUsb()
+            Log.i("isPlayingAutoModeMain", "tru")
             if (isUSBConnected.value && isUsbModeOn.value) {
                 nextTrack(1)
             } else if (isBtModeOn.value) {
                 nextTrack(1)
             } else if (isDiskModeOn.value) {
                 nextTrack(1)
-
-
             } else if (isPlaylistModeOn.value) {
                 nextTrack(1)
             } else {
@@ -825,6 +836,7 @@ Service, OnCompletionListener,
     }
 
     private fun initMediaPlayer() {
+        Log.i("ReviewTest_Start", "init media player")
         val audioAttributes: AudioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_MEDIA)
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -834,7 +846,6 @@ Service, OnCompletionListener,
     }
 
     override fun nextTrack(auto: Int) {
-        Log.i("ReviewTest", "nextTrack: $auto")
         when (mode) {
             SourceEnum.DISK -> {
                 repeatModeListener(auto)
@@ -924,6 +935,7 @@ Service, OnCompletionListener,
     var playback: Playback? = null
 
     private fun initLifecycleScope() {
+        Log.i("ReviewTest_Start", "initLifecycleScope")
         unsubscribeLifecycleScope()
         lifecycleJob = Job()
         lifecycleScope = CoroutineScope(Dispatchers.Main + lifecycleJob)
@@ -963,6 +975,7 @@ Service, OnCompletionListener,
     }
 
     private fun startForeground() {
+        Log.i("ReviewTest_Start", "startForeground")
         val channelId =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 createNotificationChannel("my_service", "My Background Service")
@@ -975,7 +988,7 @@ Service, OnCompletionListener,
         val notification = notificationBuilder
             .setOngoing(true)
             .setSmallIcon(R.mipmap.sym_def_app_icon)
-            .setPriority(PRIORITY_MIN)
+            .setPriority(PRIORITY_MAX)
             .setCategory(Notification.CATEGORY_SERVICE)
             .build()
         startForeground(101, notification)
@@ -1147,22 +1160,8 @@ Service, OnCompletionListener,
         }
     }
 
-    private fun loadFolderList() {
-
-    }
-
     private fun fillFoldersList(allFoldersList: List<AllFolderWithMusic>) {
         foldersList.value = allFoldersList
-    }
-
-    override fun intMediaPlayer() {
-        Log.d(TAG, "init")
-        val audioAttributes: AudioAttributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_MEDIA)
-            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-            .build()
-        mediaPlayer.setOnCompletionListener(this)
-        mediaPlayer.setAudioAttributes(audioAttributes)
     }
 
     override fun sourceSelection(action: SourceEnum) {

@@ -96,7 +96,7 @@ class MusicFragment :
                 )
             )
         }
-        binding.folder.setOnClickListener {
+        binding.changeSourceBtn.setOnClickListener {
             changeSourceViewButtons()
         }
         binding.sourceSelection.btnBt.setOnClickListener {
@@ -205,12 +205,12 @@ class MusicFragment :
     private fun initServiceVars() {
         viewModel.isPlay.launchWhenStarted(lifecycleScope) { isPlaying ->
             if (isPlaying) {
-                binding.controlPanel.playPause.setImageResource(R.drawable.ic_pause_white)
+                binding.controlPanel.playPause.setImageResource(R.drawable.pause_twix)
                 binding.controlPanel.playPause.setPadding(35, 35,35,35)
             }
             else {
-                binding.controlPanel.playPause.setImageResource(R.drawable.ic_play_center)
-                binding.controlPanel.playPause.setPadding(39, 35,31,35)
+                binding.controlPanel.playPause.setImageResource(R.drawable.play_triangle)
+                binding.controlPanel.playPause.setPadding(37, 35,33,35)
             }
         }
 
@@ -219,11 +219,11 @@ class MusicFragment :
         }
 
         viewModel.title.launchWhenStarted(lifecycleScope) {
-            binding.artist.text = it
+            binding.song.text = it
         }
 
         viewModel.artist.launchWhenStarted(lifecycleScope) {
-            binding.song.text = it
+            binding.artist.text = it
         }
 
         viewModel.cover.launchWhenStarted(lifecycleScope) { updateTrackCover(it) }
@@ -341,7 +341,7 @@ class MusicFragment :
             Picasso.with(context)
                 .load(Uri.fromFile(File(coverPath.trim())))
                 .transform(BlurTransformation(context, 50, 10))
-                .resize(1100, 600)
+                .resize(1024, 555)
                 .into(binding.pictureDevice)
             binding.pictureBucket.visibility = View.VISIBLE
         } else {
@@ -378,8 +378,8 @@ class MusicFragment :
     }
 
     private fun randomSongStatus(random: Boolean) {
-        if (random) binding.controlPanel.rotate.setImageResource(R.drawable.ic_shuffle_blue)
-        else binding.controlPanel.rotate.setImageResource(R.drawable.ic_shuffle_white)
+        if (random) binding.controlPanel.rotate.setImageResource(R.drawable.shuffle_mode_true)
+        else binding.controlPanel.rotate.setImageResource(R.drawable.shuffle_mode_false)
     }
 
     private fun likeStatus(like: Boolean) {

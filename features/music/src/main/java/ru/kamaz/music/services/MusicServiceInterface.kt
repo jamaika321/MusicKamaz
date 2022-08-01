@@ -23,7 +23,6 @@ interface MusicServiceInterface{
         fun previousTrack()
         fun nextTrack(auto:Int)
         fun updateTracks(loadMode: String)
-        fun intMediaPlayer()
         fun sourceSelection(action: MusicService.SourceEnum)
         fun getAllTracks(): StateFlow<List<Track>>
         fun getPlayLists(): StateFlow<List<PlayListModel>>

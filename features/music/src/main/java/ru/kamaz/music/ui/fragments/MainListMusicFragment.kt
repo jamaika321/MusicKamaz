@@ -337,7 +337,6 @@ class MainListMusicFragment
                 this.mode = ListState.FOLDPLAYLIST
             }
         }
-        viewModel.rvScrollState.value = 0
     }
 
     fun playListSelected(name: String) {
