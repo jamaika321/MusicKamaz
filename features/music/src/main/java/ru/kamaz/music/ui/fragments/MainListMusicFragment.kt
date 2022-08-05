@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -403,7 +402,7 @@ class MainListMusicFragment
         val add: TextView = dialog.findViewById(R.id.btn_add_to_playlist)
         titleText.text = getString(R.string.rename)
         close.text = getString(R.string.cancel_add)
-        add.text = getString(R.string.create_playlist)
+        add.text = getString(R.string.create)
         add.setOnClickListener {
             viewModel.renamePlayList(name, input.text.toString())
             dialog.dismiss()

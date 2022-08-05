@@ -229,8 +229,15 @@ class MusicFragment :
         viewModel.cover.launchWhenStarted(lifecycleScope) { updateTrackCover(it) }
 
         viewModel.duration.launchWhenStarted(lifecycleScope) {
-            binding.seek.max = it
-            binding.endTime.text = Track.convertDuration(it.toLong())
+            if (it != 0){
+                viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
+                    val currentPosition = if (it < 0) 0 else it
+                    binding.seek.progress = currentPosition
+                    binding.startTime.text = Track.convertDuration(currentPosition.toLong())
+                }
+                binding.seek.max = it
+                binding.endTime.text = Track.convertDuration(it.toLong())
+            }
         }
 
         viewModel.repeatHowModeNow.launchWhenStarted(lifecycleScope) {
@@ -242,23 +249,21 @@ class MusicFragment :
             binding.seek.progress = 0
         }
 
-
-
-        viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
-            val currentPosition = if (it < 0) 0 else it
-            binding.seek.progress = currentPosition
-            binding.startTime.text = Track.convertDuration(currentPosition.toLong())
-        }
-
-
-//        viewModel.isNotConnected.launchWhenStarted(lifecycleScope) {
-//            if (it) {
-//                diskModeActivation()
-//            } else {
-//                viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
-//                btModeActivation()
-//            }
+//        viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
+//                val currentPosition = if (it < 0) 0 else it
+//                binding.seek.progress = currentPosition
+//                binding.startTime.text = Track.convertDuration(currentPosition.toLong())
 //        }
+
+
+        viewModel.isNotConnected.launchWhenStarted(lifecycleScope) {
+            if (it) {
+                diskModeActivation()
+            } else {
+                viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
+                btModeActivation()
+            }
+        }
 
         viewModel.isShuffleOn.launchWhenStarted(lifecycleScope) {
             randomSongStatus(it)

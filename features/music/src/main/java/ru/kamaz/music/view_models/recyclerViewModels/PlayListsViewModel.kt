@@ -1,6 +1,7 @@
 package ru.kamaz.music.view_models.recyclerViewModels
 
 import android.annotation.SuppressLint
+import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -41,7 +42,11 @@ class PlayListsViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBindi
     @SuppressLint("ResourceAsColor")
     override fun initVars() {
         title.launchWhenStarted(parent.lifecycleScope) {
-            binding.textCategory.text = title.value
+            if (it != "create_050820221536"){
+                binding.textCategory.text = title.value
+            } else {
+                binding.textCategory.text = parent.context?.getString(R.string.create)
+            }
         }
         image.launchWhenStarted(parent.lifecycleScope) {
             if (it == "create_playlist") {

@@ -8,6 +8,7 @@ import android.content.ServiceConnection
 import android.media.MediaPlayer
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
@@ -121,7 +122,11 @@ class MusicFragmentViewModel @Inject constructor(
 
     fun remoteNextPrevControlButton() {
         testSettings.start {
+            Log.i("ReviewTest_AUX",  "  $it: ")
             when (it) {
+                //Законменчено переключение правой крутилкой
+//                5 -> nextTrack()
+//                6 -> previousTrack()
                 19 -> nextTrack()
                 21 -> previousTrack()
             }

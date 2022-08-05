@@ -1,20 +1,23 @@
 <resources>
-    <string name="app_name">ViewPager2</string>
+    <string name="app_name">MusicKamaz</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="add_new_playlist">Добавить новый плайлист</string>
     <string name="playlist">Плейлист</string>
-    <string name="artist">Artist</string>
-    <string name="song">Song</string>
+    <string name="artist">Исполнитель</string>
+    <string name="song">Музыка</string>
+    <string name="saved">Сохранено</string>
     <string name="connect_bt">Подключите телефон в</string>
     <string name="bt_question">Перейти в настройки?</string>
     <string name="add_to_playlist">Добавить в плейлист</string>
     <string name="delete">Удалить</string>
     <string name="options">Опции</string>
     <string name="add_playlist">Добавить</string>
-    <string name="create_playlist">Создать</string>
+    <string name="create">Создать</string>
+    <string name="create_playlist">Создать плейлист</string>
+    <string name="artists">Исполнители</string>
     <string name="cancel_add">Отмена</string>
     <string name="rename">Переименовать</string>
     <string name="music_added">Аудиозапись добавлена в плейлист</string>
@@ -22,4 +25,8 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="delete_text">Удалить выбранный плейлист?</string>
+    <string name="albums">Альбомы</string>
+    <string name="playlists">Плейлисты</string>
+    <string name="favorites">Избранное</string>
+    <string name="unknown">Неизвестно</string>
 </resources>

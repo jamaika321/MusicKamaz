@@ -3,14 +3,17 @@ package ru.kamaz.music.domain
 import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Message
+import android.tw.john.TWUtil
+import android.util.Log
 import ru.kamaz.music.utils.TWSetting
 //ByAirat and Chinese man
+
 interface TestSettings {
 
     fun start(start: (Int) -> Unit)
     fun stop()
 
-    class Base(private val settingsUtil: TWSetting): TestSettings {
+    class Base(private val settingsUtil: TWUtil): TestSettings {
 
         companion object{
             private const val TAG = "TestSettings"
@@ -24,6 +27,7 @@ interface TestSettings {
         private var mTWEQUtilHandler: Handler = @SuppressLint("HandlerLeak")
         object : Handler() {
             override fun handleMessage(msg: Message) {
+                Log.i("ReviewTest_AUX2", " ${msg.what}: ")
                 when (msg.what) {
                     0x201 -> {
                         MSGBYTE = msg.arg2

@@ -299,7 +299,6 @@ Service, OnCompletionListener,
         startMusicListener()
         initLifecycleScope()
 
-
         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION).apply {
             addAction(ACTIONPP)
             addAction(ACTIONCMD)
@@ -332,6 +331,7 @@ Service, OnCompletionListener,
         }
 
         compilationMusic()
+        playOrPause()
         // queryLastMusic()
     }
 
@@ -540,6 +540,12 @@ Service, OnCompletionListener,
         }
     }
 
+    private fun clearMainScreen(){
+        initTrack(Track(0L, "Unknown", "Unknown","Unknown",
+            0,"Unknown","Unknown",
+            source = "source"), "")
+    }
+
 
     private fun startUsbMode() {
         if (!isUsbModeOn.value && isUSBConnected.value) {
@@ -679,7 +685,7 @@ Service, OnCompletionListener,
         } else {
             _cover.value = ""
         }
-        if (track.source == "usb"){
+        if (track.source == "usb") {
             checkUsb()
             if (!isUSBConnected.value) {
                 nextTrack(1)
@@ -789,13 +795,12 @@ Service, OnCompletionListener,
         }
     }
 
-    private fun prevTrackHelper(){
+    private fun prevTrackHelper() {
         if (!tracks.isEmpty()) {
             when (currentTrackPosition.value - 1) {
                 -1 -> _currentTrackPosition.value = tracks.size - 1
                 else -> _currentTrackPosition.value--
             }
-
             when (isPlaying.value) {
                 true -> {
                     initTrack(
@@ -846,6 +851,7 @@ Service, OnCompletionListener,
     }
 
     override fun nextTrack(auto: Int) {
+        if (!musicEmpty.value)
         when (mode) {
             SourceEnum.DISK -> {
                 repeatModeListener(auto)
@@ -913,7 +919,6 @@ Service, OnCompletionListener,
                 )
             }
         }
-
     }
 
     private fun restartPlaylist() {
@@ -1012,8 +1017,8 @@ Service, OnCompletionListener,
         val result = mediaManager.getMediaFilesFromPath("all", loadMode)
         if (result is Either.Right) {
             replaceAllTracks(result.r)
-            _musicEmpty.value = false
         } else {
+            loadTracksOnCoroutine("all")
             _musicEmpty.value = true
         }
         if (loadMode == "5") {
@@ -1065,16 +1070,19 @@ Service, OnCompletionListener,
             }
         }
         if (tracks.isEmpty()) {
-            _musicEmpty.value = tracks.isEmpty()
+            _musicEmpty.value = true
             when (mode) {
                 SourceEnum.DISK -> {
-                    startUsbMode()
+
                 }
                 SourceEnum.USB -> {
                     _isUSBConnected.value = false
                     startDiskMode()
                 }
             }
+        } else {
+            _musicEmpty.value = false
+            clearMainScreen()
         }
     }
 

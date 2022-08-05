@@ -41,7 +41,6 @@
         android:hint="@string/playlist_name_hint"
         android:textColorHint="@color/alert_dialog_blur_text_color"
         android:background="@drawable/ic_back_et_add_play_list"
-        app:layout_constraintBottom_toTopOf="@+id/btn_close"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/line">

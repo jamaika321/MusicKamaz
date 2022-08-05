@@ -93,7 +93,7 @@
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/bt_fragment.xml" value="0.3009833262077811" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/buttons_add_playlist.xml" value="0.25" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/buttons_add_track.xml" value="0.33" />
-        <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/buttons_fragment.xml" value="0.25" />
+        <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/buttons_fragment.xml" value="1.25" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/buttons_music_source.xml" value="0.25" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/category_buttons_group.xml" value="0.12013681060282172" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/context_menu_alert.xml" value="0.30012825994014536" />
@@ -104,7 +104,7 @@
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/fragment_list.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/fragment_list_music.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/fragment_main_list_music.xml" value="0.25" />
-        <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/fragment_player.xml" value="0.2" />
+        <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/fragment_player.xml" value="0.33" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/fragment_track_option.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/genres_item.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/image_text_item.xml" value="0.3009833262077811" />
@@ -113,7 +113,7 @@
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/playlist_context_menu.xml" value="0.33" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/playlist_delete_alert_dialog.xml" value="0.22" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/playlist_item.xml" value="0.22" />
-        <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/playlist_rename_alert_dialog.xml" value="0.25" />
+        <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/playlist_rename_alert_dialog.xml" value="0.5" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/rename_alert_dialog.xml" value="0.25" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/test_text_item.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/test_widget.xml" value="0.15433946130825138" />

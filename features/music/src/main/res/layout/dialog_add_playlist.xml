@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:text="Создать плейлист"
+        android:text="@string/create_playlist"
         android:id="@+id/tv_question_bt_connection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,8 +36,10 @@
         android:id="@+id/et_add_play_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="25dp"
-        android:gravity="center"
+        android:layout_marginVertical="25dp"
+        android:layout_marginHorizontal="30dp"
+        android:paddingStart="10dp"
+        android:gravity="center|start"
         android:hint="@string/playlist_name_hint"
         style="@style/AlertDialogBlurText"
         android:textColorHint="#95A4C7"

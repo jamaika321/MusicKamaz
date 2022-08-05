@@ -5,11 +5,9 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.View
 import android.view.Window
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,7 +52,7 @@ class DialogAddPlaylistFragment : DialogFragment() {
         dialog!!.window?.setLayout(width, height)
         setListener()
         binding.addButtons.btnClose.text = getString(R.string.cancel_add)
-        binding.addButtons.btnAddToPlaylist.text = getString(R.string.create_playlist)
+        binding.addButtons.btnAddToPlaylist.text = getString(R.string.create)
     }
 
     private fun addPlayList(){

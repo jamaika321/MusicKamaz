@@ -102,7 +102,7 @@ class MainListMusicViewModel @Inject constructor(
                 InsertPlayList.Params(
                     PlayListModel(
                         0L,
-                        context.resources!!.getString(R.string.create_playlist),
+                        "create_050820221536",
                         "create_playlist",
                         arrayListOf("")
                     )
@@ -203,7 +203,7 @@ class MainListMusicViewModel @Inject constructor(
             CoroutineScope(Dispatchers.IO).launch {
                 updatePlayListName.run(UpdatePlayListName.Params(name, newName))
             }
-            Toast.makeText(context, "Сохранено.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.saved , Toast.LENGTH_SHORT).show()
         } else {
 
         }

@@ -10,7 +10,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -158,7 +157,7 @@ class DialogAddTrack : DialogFragment(), ServiceConnection, MusicServiceInterfac
         CoroutineScope(Dispatchers.IO).launch {
             insertPlayList.run(
                 InsertPlayList.Params(
-                PlayListModel(0L, context?.resources!!.getString(R.string.create_playlist), "create_playlist",  arrayListOf(""))
+                PlayListModel(0L, "create_050820221536", "create_playlist",  arrayListOf(""))
             ))
         }
     }

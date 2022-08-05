@@ -219,10 +219,10 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         val array = ArrayList<CategoryMusicModel>()
 
         val category = listOf(
-            CategoryMusicModel(R.drawable.ic_songers, "Исполнители", 0),
-            CategoryMusicModel(R.drawable.ic_albom, "Альбомы", 2),
-            CategoryMusicModel(R.drawable.ic_play_list, "Плейлисты", 3),
-            CategoryMusicModel(R.drawable.ic_like_for_list, "Избранное", 4)
+            CategoryMusicModel(R.drawable.ic_songers, context.getString(R.string.artists), 0),
+            CategoryMusicModel(R.drawable.ic_albom, context.getString(R.string.albums), 2),
+            CategoryMusicModel(R.drawable.ic_play_list, context.getString(R.string.playlists), 3),
+            CategoryMusicModel(R.drawable.ic_like_for_list, context.getString(R.string.favorites), 4)
         )
         array.addAll(category)
         return Either.Right(array)
