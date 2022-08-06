@@ -49,6 +49,7 @@ interface MusicServiceInterface{
         fun insertLastMusic()
         fun getRepeat(): StateFlow<Int>
         fun changeRepeatMode()
+        fun fillSelectedTrack()
         fun isShuffleOn(): StateFlow<Boolean>
         fun getMusicData(): StateFlow<String>
         fun initTrack(track: Track, data1: String)

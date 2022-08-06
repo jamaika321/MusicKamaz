@@ -158,6 +158,10 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.insertLastMusic()
     }
 
+    fun fillSelectedTrack() {
+        service.value?.fillSelectedTrack()
+    }
+
     fun nextTrack() {
         service.value?.nextTrack(0)
     }

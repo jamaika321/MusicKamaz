@@ -124,6 +124,7 @@ class MusicFragment :
 
         }
         binding.controlPanel.addToFolder.setOnClickListener {
+            viewModel.fillSelectedTrack()
             navigator.navigateTo(
                 UiAction(
                     OPEN_DIALOG_ADD_TRACK

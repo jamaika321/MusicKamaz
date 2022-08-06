@@ -243,7 +243,7 @@ Service, OnCompletionListener,
                 tracks.shuffle()
             }
             false -> {
-                replaceAllTracks(emptyList())
+                replaceAllTracks(emptyList(), false)
             }
         }
     }
@@ -348,7 +348,7 @@ Service, OnCompletionListener,
         Log.i("USBstatus", "onUsbStatusChanged:$path ")
         _isUSBConnected.value = isAdded
         updateTracks("all")
-        if (isAdded && isUSBConnected.value) {
+        if (!isUsbModeOn.value && isAdded) {
             startUsbMode()
         } else {
             startDiskMode()
@@ -533,7 +533,7 @@ Service, OnCompletionListener,
             if (allTracks.value.isEmpty()) {
                 updateTracks("5")
             } else {
-                replaceAllTracks(emptyList())
+                replaceAllTracks(emptyList(), false)
             }
             _sourceName.value = "Disk"
             nextTrack(2)
@@ -541,8 +541,8 @@ Service, OnCompletionListener,
     }
 
     private fun clearMainScreen(){
-        initTrack(Track(0L, "Unknown", "Unknown","Unknown",
-            0,"Unknown","Unknown",
+        initTrack(Track(0L, "Unknown", "Unknown","",
+            0,"Unknown","",
             source = "source"), "")
     }
 
@@ -553,7 +553,7 @@ Service, OnCompletionListener,
             if (allTracks.value.isEmpty()) {
                 updateTracks("5")
             } else {
-                replaceAllTracks(emptyList())
+                replaceAllTracks(emptyList(), false)
             }
             _sourceName.value = "USB"
             nextTrack(2)
@@ -642,13 +642,13 @@ Service, OnCompletionListener,
 //        twManagerMusic.close()
     }
 
-    fun startBtListener() {
+    private fun startBtListener() {
         onBluetoothMusicDataChanged("Name", "Artist")
         playOrPause()
         _cover.value = ""
     }
 
-    fun startMusicListener() {
+    private fun startMusicListener() {
         Log.i("ReviewTest_Start", "startMusicListener")
         twManagerMusic.addListener(this)
 //        twManager.addListener(this)
@@ -685,43 +685,44 @@ Service, OnCompletionListener,
         } else {
             _cover.value = ""
         }
-        if (track.source == "usb") {
-            checkUsb()
-            if (!isUSBConnected.value) {
-                nextTrack(1)
-            } else {
+        when (track.source){
+            "usb" -> {
+                checkUsb()
+                if (!isUSBConnected.value) {
+                    nextTrack(1)
+                } else {
+                    mediaPlayer.apply {
+                        stop()
+                        reset()
+                        setDataSource(
+                            data1.ifEmpty {
+                                track.data
+                            }
+                        )
+                        prepare()
+                    }
+                }
+            }
+            "disk" -> {
                 mediaPlayer.apply {
                     stop()
                     reset()
                     setDataSource(
-                        if (data1.isEmpty()) {
+                        data1.ifEmpty {
                             track.data
-                        } else {
-                            data1
                         }
                     )
                     prepare()
                 }
             }
-        } else {
-            mediaPlayer.apply {
-                stop()
-                reset()
-                setDataSource(
-                    if (data1.isEmpty()) {
-                        track.data
-                    } else {
-                        data1
-                    }
-                )
-                prepare()
+            "source" -> {
+                mediaPlayer.stop()
             }
         }
     }
 
     private fun stopMediaPlayer() {
         mediaPlayer.stop()
-//        tracks.clear()
     }
 
     override fun lastSavedState() {
@@ -796,7 +797,7 @@ Service, OnCompletionListener,
     }
 
     private fun prevTrackHelper() {
-        if (!tracks.isEmpty()) {
+        if (tracks.isNotEmpty()) {
             when (currentTrackPosition.value - 1) {
                 -1 -> _currentTrackPosition.value = tracks.size - 1
                 else -> _currentTrackPosition.value--
@@ -819,16 +820,10 @@ Service, OnCompletionListener,
 
     private fun compilationMusic() {
         mediaPlayer.setOnCompletionListener {
-            Log.i("isPlayingAutoModeMain", "true${isPlaying.value}")
             checkUsb()
-            Log.i("isPlayingAutoModeMain", "tru")
-            if (isUSBConnected.value && isUsbModeOn.value) {
-                nextTrack(1)
-            } else if (isBtModeOn.value) {
-                nextTrack(1)
-            } else if (isDiskModeOn.value) {
-                nextTrack(1)
-            } else if (isPlaylistModeOn.value) {
+            if (isUSBConnected.value && isUsbModeOn.value ||
+                isBtModeOn.value || isDiskModeOn.value ||
+                isPlaylistModeOn.value) {
                 nextTrack(1)
             } else {
                 startDiskMode()
@@ -1016,8 +1011,9 @@ Service, OnCompletionListener,
     override fun updateTracks(loadMode: String) {
         val result = mediaManager.getMediaFilesFromPath("all", loadMode)
         if (result is Either.Right) {
-            replaceAllTracks(result.r)
+            replaceAllTracks(result.r, true)
         } else {
+            replaceAllTracks(emptyList(), true)
             loadTracksOnCoroutine("all")
             _musicEmpty.value = true
         }
@@ -1042,8 +1038,8 @@ Service, OnCompletionListener,
         job.start()
     }
 
-    private fun replaceAllTracks(trackList: List<Track>, source: String = "") {
-        if (trackList.isNotEmpty()) {
+    private fun replaceAllTracks(trackList: List<Track>, replace: Boolean) {
+        if (replace) {
             allTracks.value = trackList
         }
         tracks.clear()
@@ -1070,6 +1066,7 @@ Service, OnCompletionListener,
             }
         }
         if (tracks.isEmpty()) {
+            clearMainScreen()
             _musicEmpty.value = true
             when (mode) {
                 SourceEnum.DISK -> {
@@ -1082,7 +1079,6 @@ Service, OnCompletionListener,
             }
         } else {
             _musicEmpty.value = false
-            clearMainScreen()
         }
     }
 
@@ -1107,7 +1103,7 @@ Service, OnCompletionListener,
         sourceSelection(SourceEnum.PLAYLIST)
         playListMode.value = playList.type
         when (playList.type) {
-            "all" -> replaceAllTracks(emptyList())
+            "all" -> replaceAllTracks(emptyList(), false)
             "folder" -> getFolderTracks(playList)
             "playList" -> getPlayListTracks(playList)
             "favorite" -> getFavoritePlayList(playList)
@@ -1250,6 +1246,10 @@ Service, OnCompletionListener,
                 }
             }
         }
+    }
+
+    override fun fillSelectedTrack() {
+
     }
 
     override fun insertLastMusic() {
