@@ -79,17 +79,20 @@ class RepositoryImpl(
     override fun deletePlayList(playList: String): Either<Failure, None> =
         testDBDao.deletePlayList(playList)
 
-    override fun insertHistorySong(song: HistorySongs): Either<Failure, None> {
-        val r = testDBDao.insertHistorySong(song.toDao())
-        return r
-    }
+    override fun insertHistorySong(song: HistorySongs): Either<Failure, None> =
+        testDBDao.insertHistorySong(song.toDao())
 
     override fun queryFavoriteSongs(data: String): Either<Failure, String> =
         testDBDao.queryFavoriteSongs(data)
 
-    // override fun queryFavoriteSongs():  Either<Failure, String> = testDBDao.queryFavoriteSongs()
-
-    override fun queryHistorySongs(): Either<Failure, String> = testDBDao.queryHistorySongs()
+    override fun queryHistorySongs(id: Int): Either<None, List<HistorySongs>> {
+        val result = testDBDao.queryHistorySongs(id)
+        return if (result is Either.Right)  {
+            Either.Right(result.r)
+        } else {
+            Either.Left(None())
+        }
+    }
     override fun getCurrentPath(): String {
         TODO("Not yet implemented")
     }
@@ -114,21 +117,11 @@ class RepositoryImpl(
         this.favorite)
     private fun PlayListModel.toDao() = PlayListEntity(this.id, this.title, this.albumArt, this.trackDataList)
     private fun HistorySongs.toDao() = HistorySongsEntity(
-        this.dbID,
-        this.idCursor,
-        this.title,
-        this.trackNumber,
-        this.year,
-        this.duration,
+        this.id,
         this.data,
-        this.dateModified,
-        this.albumArt,
-        this.albumName,
-        this.artistId,
-        this.artistName,
-        this.albumArtist,
-        this.albumArtist,
-        this.timePlayed
+        this.timePlayed,
+        this.source,
+        this.sourceName
     )
     private fun Track.toDao() = TrackEntity(
         this.id,

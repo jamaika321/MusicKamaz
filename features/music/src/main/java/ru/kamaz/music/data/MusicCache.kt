@@ -8,6 +8,7 @@ import ru.kamaz.music.domain.TrackEntity
 import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.interactor.InsertPlayList
 import ru.kamaz.music_api.models.FavoriteSongs
+import ru.kamaz.music_api.models.HistorySongs
 import ru.kamaz.music_api.models.PlayListModel
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
@@ -24,10 +25,9 @@ interface MusicCache {
     fun queryFavoriteSongs(data:String) :  Either<Failure, String>
     fun getAllFavoriteSongs(): Flow<List<Track>>
     fun getAllPlayList(): Flow<List<PlayListModel>>
-    fun queryHistorySongs(): Either<Failure, String>
+    fun queryHistorySongs(id: Int): Either<None, List<HistorySongs>>
     fun updatePlayList(name: String, data: List<String>)
     fun updatePlayListName(name: String, newName: String)
 
-    fun insertTrackList(tracks: List<TrackEntity>) : Either<Failure, None>
     fun getTrackList(): List<TrackEntity>
 }

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.kamaz.music.R
+import ru.kamaz.music.media.AppMediaManager
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music.ui.fragments.MainListMusicFragment
@@ -32,7 +33,8 @@ class MainListMusicViewModel @Inject constructor(
     private val categoryData: CategoryLoadRV,
     private val insertPlayList: InsertPlayList,
     private val deletePlayList: DeletePlayList,
-    private val updatePlayListName: UpdatePlayListName
+    private val updatePlayListName: UpdatePlayListName,
+    private val mediaManager: AppMediaManager
 ) : BaseViewModel(application), ServiceConnection, MusicServiceInterface.ViewModel {
 
     companion object {
@@ -138,6 +140,10 @@ class MainListMusicViewModel @Inject constructor(
             if (data != "") this[i].playing = this[i].data == data
         }
         return this
+    }
+
+    fun deleteTrackFromMemory(data: String){
+        mediaManager.deleteTrackFromMemory(data)
     }
 
 

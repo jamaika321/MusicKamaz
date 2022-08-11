@@ -15,11 +15,11 @@ interface HistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(users: HistorySongsEntity)
 
-    @Query("SELECT * FROM history_songs")
-    fun loadAll(): List<HistorySongsEntity>
+    @Query("SELECT * FROM history_songs Where id = :id")
+    fun loadAll(id: Int): List<HistorySongsEntity>
 
-    @Query("SELECT * FROM history_songs")
-    fun getLastMusic(): HistorySongsEntity
+    @Query("SELECT * FROM history_songs WHERE id = :id")
+    fun getLastMusic(id: Int): HistorySongsEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTrackList(tracks: List<TrackEntity>)

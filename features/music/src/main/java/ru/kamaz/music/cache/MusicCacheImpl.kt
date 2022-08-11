@@ -1,5 +1,6 @@
 package ru.kamaz.music.cache
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.kamaz.music.cache.db.AppDatabase
@@ -10,13 +11,14 @@ import ru.kamaz.music.domain.PlayListEntity
 import ru.kamaz.music.domain.TrackEntity
 import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.models.ErrorMessage
+import ru.kamaz.music_api.models.HistorySongs
 import ru.kamaz.music_api.models.PlayListModel
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.core.None
-import java.lang.Exception
 
-class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val db: AppDatabase): MusicCache {
+class MusicCacheImpl(private val prefsManager: SharedPrefsManager, private val db: AppDatabase) :
+    MusicCache {
     override fun getLastMusic(): String = prefsManager.getLastMusic()
     override fun saveLastMusic(lastMusic: String) = prefsManager.saveMusicInfo(lastMusic)
     override fun insertFavoriteSong(song: FavoriteSongsEntity): Either<Failure, None> {
@@ -39,25 +41,22 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         return Either.Right(None())
     }
 
-    override fun queryHistorySongs(): Either<Failure, String> {
+    override fun queryHistorySongs(id: Int): Either<None, List<HistorySongs>> {
+//        return Either.Right(db.historySongsDao().loadAll(id).map { convertEntityToHistorySongs(it) })
         return try {
-            Either.Right(db.historySongsDao().getLastMusic().title)
+            Either.Right(db.historySongsDao().loadAll(id).map {convertEntityToHistorySongs(it)})
         } catch (e: Exception) {
-            Either.Left(Failure.AuthorizationError(ErrorMessage(404, e.message.toString(), e.localizedMessage ?: "")))
+            Log.i("ReviewTest_LastMusic", "queryHistorySongs: catch ")
+            Either.Left(None())
         }
     }
 
-    override fun updatePlayList(name: String,  data: List<String>) {
-        db.playListDao().updatePlayList(name,  data)
+    override fun updatePlayList(name: String, data: List<String>) {
+        db.playListDao().updatePlayList(name, data)
     }
 
     override fun updatePlayListName(name: String, newName: String) {
         db.playListDao().updatePlayListName(name, newName)
-    }
-
-    override fun insertTrackList(tracks: List<TrackEntity>) : Either<Failure, None> {
-        db.historySongsDao().insertTrackList(tracks)
-        return Either.Right(None())
     }
 
     override fun getTrackList(): List<TrackEntity> {
@@ -65,7 +64,8 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
     }
 
     override fun insertHistorySong(song: HistorySongsEntity): Either<Failure, None> {
-         db.historySongsDao().insertAll(song)
+        db.historySongsDao().insertAll(song)
+        Log.i("ReviewTest_LastMusic", "insertHistorySong:  ")
         return Either.Right(None())
     }
 
@@ -73,7 +73,15 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
         return try {
             Either.Right(db.userDao().loadAll(data).data)
         } catch (e: Exception) {
-            Either.Left(Failure.AuthorizationError(ErrorMessage(404, e.message.toString(), e.localizedMessage ?: "")))
+            Either.Left(
+                Failure.AuthorizationError(
+                    ErrorMessage(
+                        404,
+                        e.message.toString(),
+                        e.localizedMessage ?: ""
+                    )
+                )
+            )
         }
     }
 
@@ -84,24 +92,50 @@ class MusicCacheImpl (private val prefsManager: SharedPrefsManager, private val 
     override fun getAllPlayList(): Flow<List<PlayListModel>> {
         return db.playListDao().getData().map { convertEntityPlayListModelList(it) }
     }
-    private fun convertEntityListFavoriteModelList(entity: List<FavoriteSongsEntity>): List<Track>{
+
+    private fun convertEntityListFavoriteModelList(entity: List<FavoriteSongsEntity>): List<Track> {
         val data = mutableListOf<Track>()
-        entity.forEach { data.add(Track(
-            it.id,
-            it.title,
-            it.artist,
-            it.data,
-            it.duration,
-            it.album,
-            it.albumArt,
-            it.playing,
-            it.favorite)) }
+        entity.forEach {
+            data.add(
+                Track(
+                    it.id,
+                    it.title,
+                    it.artist,
+                    it.data,
+                    it.duration,
+                    it.album,
+                    it.albumArt,
+                    it.playing,
+                    it.favorite
+                )
+            )
+        }
         return data
     }
 
-    private fun convertEntityPlayListModelList(entity: List<PlayListEntity>):List<PlayListModel>{
+    private fun convertEntityToHistorySongs(entity: HistorySongsEntity): HistorySongs {
+        val data = HistorySongs(
+            entity.id,
+            entity.data,
+            entity.timePlayed,
+            entity.source,
+            entity.sourceName,
+        )
+        return data
+    }
+
+    private fun convertEntityPlayListModelList(entity: List<PlayListEntity>): List<PlayListModel> {
         val data = mutableListOf<PlayListModel>()
-        entity.forEach { data.add(PlayListModel(it.idPlayList,it.name, it.albumArt, it.trackDataList as ArrayList<String>)) }
+        entity.forEach {
+            data.add(
+                PlayListModel(
+                    it.idPlayList,
+                    it.name,
+                    it.albumArt,
+                    it.trackDataList as ArrayList<String>
+                )
+            )
+        }
         return data
     }
 

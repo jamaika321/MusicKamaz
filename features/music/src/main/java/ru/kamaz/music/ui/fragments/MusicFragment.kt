@@ -41,11 +41,6 @@ class MusicFragment :
         app.getComponent<MusicComponent>().inject(this)
     }
 
-    override fun onPause() {
-        viewModel.isSaveLastMusic()
-        super.onPause()
-    }
-
     override fun onDestroy() {
         viewModel.isSaveLastMusic()
         viewModel.appClosed()

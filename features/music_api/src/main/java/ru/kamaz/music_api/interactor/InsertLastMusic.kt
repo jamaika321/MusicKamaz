@@ -9,6 +9,5 @@ import ru.sir.core.None
 
 class InsertLastMusic(private val repository: Repository) : AsyncUseCase<None, InsertLastMusic.Params, Failure>() {
         data class Params(val list: HistorySongs)
-
         override suspend fun run(params: Params): Either<Failure, None> = repository.insertHistorySong(params.list)
 }

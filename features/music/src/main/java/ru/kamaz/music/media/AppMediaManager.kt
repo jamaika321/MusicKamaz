@@ -81,6 +81,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
                     ?.toLong() ?: (180)
             val data = trackPaths[i]
+            Log.i("ReviewTest_Path", " $data: ")
             val id = i.toLong()
             val source = if (data.contains("/storage/usb")){
                     "usb"
@@ -121,6 +122,11 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             )
         }
         return listWithTrackData
+    }
+
+    override fun deleteTrackFromMemory(data: String){
+        var file = File(data)
+        file.delete()
     }
 
 

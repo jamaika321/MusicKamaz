@@ -1,8 +1,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/dialog_background"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_width="@dimen/alert_dialog_width"
+    android:layout_height="@dimen/alert_dialog_height">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_question_bt_connection"
@@ -35,9 +35,7 @@
     <TextView
         android:layout_width="0dp"
         android:id="@+id/btn_close"
-        style="@style/button_add_playlist"
-        android:layout_marginHorizontal="@dimen/context_menu_margin_horizontal"
-        android:layout_marginTop="@dimen/control_btn_padding"
+        style="@style/button_playlist_option"
         app:layout_constraintBottom_toTopOf="@id/btn_add_to_playlist"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/line"
@@ -50,13 +48,9 @@
     <TextView
         android:layout_width="0dp"
         android:id="@+id/btn_add_to_playlist"
-        style="@style/button_add_playlist"
-        android:layout_marginHorizontal="@dimen/context_menu_margin_horizontal"
-        android:layout_marginTop="@dimen/control_btn_padding"
-        android:layout_marginBottom="@dimen/control_btn_padding"
+        style="@style/button_playlist_option"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_close"
         app:layout_constraintStart_toStartOf="parent"
         android:gravity="center"
         android:textColor="@color/white"

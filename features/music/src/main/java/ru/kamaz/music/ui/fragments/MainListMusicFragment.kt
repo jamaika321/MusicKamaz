@@ -42,7 +42,7 @@ class MainListMusicFragment
         app.getComponent<MusicComponent>().inject(this)
     }
 
-    private var mode = ListState.PLAYLIST
+    private var mode = ListState.CATEGORY
 
     companion object {
         const val RV_ITEM_MUSIC_ARTIST = 0
@@ -103,8 +103,7 @@ class MainListMusicFragment
         FOLDER(3),
         FOLDPLAYLIST(4),
         PLAYLISTMUSIC(5),
-        CATFAVORITES(6),
-        CATARTIST(7)
+        CATFAVORITES(6)
     }
 
     private fun initServiceVars() {
@@ -160,6 +159,7 @@ class MainListMusicFragment
                 }
             }
         })
+//        binding.search.queryHint = getString(R.string.search)
     }
 
 
@@ -226,6 +226,12 @@ class MainListMusicFragment
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        binding.rvAllMusic.layoutManager = null
+        binding.rvAllMusic.adapter = null
+    }
+
     private fun searchActive() {
         val searchView = binding.search
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -288,11 +294,13 @@ class MainListMusicFragment
         when (id) {
             0 -> {//Artist
                 viewModel.getCategoryList(id)
+                binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList, id)
-                this.mode = ListState.CATARTIST
+                this.mode = ListState.CATPLAYLIST
             }
             2 -> {//Albums
                 viewModel.getCategoryList(id)
+                binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
                 binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList, id)
                 this.mode = ListState.CATPLAYLIST
             }
@@ -336,6 +344,19 @@ class MainListMusicFragment
                 this.mode = ListState.FOLDPLAYLIST
             }
         }
+        searchViewVisibility()
+    }
+
+    private fun searchViewVisibility() {
+        if (mode == ListState.PLAYLIST /*|| mode == ListState.PLAYLISTMUSIC || mode == ListState.FOLDPLAYLIST*/) {
+            binding.search.visibility = View.VISIBLE
+            binding.rvAllMusic.setPadding(0, 60, 0, 0)
+        } else {
+            viewModel.rvScrollState.value = 0
+            binding.search.visibility = View.GONE
+            binding.rvAllMusic.setPadding(0, 30, 0, 0)
+        }
+
     }
 
     fun playListSelected(name: String) {
@@ -462,7 +483,76 @@ class MainListMusicFragment
             dialog.dismiss()
         }
         delete.setOnClickListener {
-            Toast.makeText(context, "В разработке.", Toast.LENGTH_SHORT).show()
+            deleteTrack(track)
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    private fun deleteTrack(track: Track){
+        when (mode) {
+            ListState.PLAYLISTMUSIC -> {
+                showPlayListTrackDeleteAlertDialog(track)
+            }
+            else -> {
+                showFileDeleteAlertDialog(track)
+            }
+        }
+    }
+
+    private fun showPlayListTrackDeleteAlertDialog(data: Track){
+        val dialog = Dialog(requireContext())
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.playlist_delete_alert_dialog)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(true)
+
+        val playlistName: TextView = dialog.findViewById(R.id.tv_question_bt_connection)
+        val deleteText: TextView = dialog.findViewById(R.id.delete_text)
+        val close: TextView = dialog.findViewById(R.id.btn_close)
+        val add: TextView = dialog.findViewById(R.id.btn_add_to_playlist)
+
+        playlistName.text = data.title
+        deleteText.text = getString(R.string.delete_from_playlist) + " ${viewModel.activePlayListName.value}?"
+        close.text = getString(R.string.no)
+        add.text = getString(R.string.yes)
+        add.setOnClickListener {
+            viewModel.playLists.value.find { it.title == viewModel.activePlayListName.value }.let {
+                it?.trackDataList?.forEach { playlist ->
+                    if (playlist == data.data){
+                        it?.trackDataList.remove(playlist)
+                    }
+                }
+            }
+            dialog.dismiss()
+        }
+        close.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    private fun showFileDeleteAlertDialog(data: Track) {
+        val dialog = Dialog(requireContext())
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.playlist_delete_alert_dialog)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(true)
+
+        val playlistName: TextView = dialog.findViewById(R.id.tv_question_bt_connection)
+        val deleteText: TextView = dialog.findViewById(R.id.delete_text)
+        val close: TextView = dialog.findViewById(R.id.btn_close)
+        val add: TextView = dialog.findViewById(R.id.btn_add_to_playlist)
+
+        playlistName.text = data.title
+        deleteText.text = getString(R.string.file_delete)
+        close.text = getString(R.string.no)
+        add.text = getString(R.string.yes)
+        add.setOnClickListener {
+            viewModel.deleteTrackFromMemory(data.data)
+            dialog.dismiss()
+        }
+        close.setOnClickListener {
             dialog.dismiss()
         }
         dialog.show()

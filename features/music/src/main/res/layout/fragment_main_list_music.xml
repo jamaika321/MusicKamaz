@@ -5,16 +5,26 @@
     android:layout_height="match_parent"
     android:background="@color/black">
 
+    <include
+        android:id="@+id/source_selection"
+        layout="@layout/category_buttons_group"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/rv_cl"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintVertical_weight="9"
         android:background="@drawable/main_list_background"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/source_selection"
+        android:layout_marginBottom="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_all_music"
@@ -27,7 +37,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_weight="9"></androidx.recyclerview.widget.RecyclerView>
+            app:layout_constraintVertical_weight="9"/>
 
         <androidx.appcompat.widget.SearchView
             android:id="@+id/search"
@@ -36,32 +46,19 @@
             android:layout_marginStart="@dimen/margin_list_frag"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="@dimen/margin_list_frag"
-            android:background="@drawable/ic_back_search"
+            android:background="@drawable/search_view_background"
+            android:foreground="@drawable/search_view_background_perimeter"
             android:layoutDirection="rtl"
-            android:outlineAmbientShadowColor="@color/white"
-            android:outlineSpotShadowColor="@color/white"
-            android:queryHint="Поиск..."
+            android:visibility="gone"
             android:textColorHint="@color/white"
             android:textSize="@dimen/marginTop"
             android:theme="@style/ThemeOverlay.SearchView"
-            app:goIcon="@drawable/ic_music_white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_weight="1.5"></androidx.appcompat.widget.SearchView>
+            app:layout_constraintVertical_weight="1.5"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <include
-        android:id="@+id/source_selection"
-        layout="@layout/category_buttons_group"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rv_cl"
-        app:layout_constraintVertical_weight="2" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

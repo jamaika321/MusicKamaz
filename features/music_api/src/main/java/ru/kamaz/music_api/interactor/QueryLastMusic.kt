@@ -1,13 +1,13 @@
 package ru.kamaz.music_api.interactor
 
-import ru.kamaz.music_api.Failure
 import ru.kamaz.music_api.interfaces.Repository
+import ru.kamaz.music_api.models.HistorySongs
 import ru.sir.core.AsyncUseCase
 import ru.sir.core.Either
 import ru.sir.core.None
 
-class QueryLastMusic(private val repository: Repository): AsyncUseCase<String,None,Failure>()  {
-
-    override suspend fun run(params: None): Either<Failure, String> = repository.queryHistorySongs()
+class QueryLastMusic(private val repository: Repository): AsyncUseCase<List<HistorySongs>, QueryLastMusic.Params, None>()  {
+    data class Params(val id: Int)
+    override suspend fun run(params: Params): Either<None, List<HistorySongs>> = repository.queryHistorySongs(params.id)
 }
 
