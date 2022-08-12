@@ -79,13 +79,15 @@ class RepositoryImpl(
     override fun deletePlayList(playList: String): Either<Failure, None> =
         testDBDao.deletePlayList(playList)
 
-    override fun insertHistorySong(song: HistorySongs): Either<Failure, None> =
-        testDBDao.insertHistorySong(song.toDao())
+    override fun insertHistorySong(song: HistorySongs): Either<Failure, None> {
+        Log.i("ReviewTest_LastMusicRe", " ${song.toDao().data}: ")
+        return testDBDao.insertHistorySong(song.toDao())
+    }
 
     override fun queryFavoriteSongs(data: String): Either<Failure, String> =
         testDBDao.queryFavoriteSongs(data)
 
-    override fun queryHistorySongs(id: Int): Either<None, List<HistorySongs>> {
+    override fun queryHistorySongs(id: Int): Either<None, HistorySongs> {
         val result = testDBDao.queryHistorySongs(id)
         return if (result is Either.Right)  {
             Either.Right(result.r)

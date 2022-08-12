@@ -69,6 +69,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         val listWithTrackData = ArrayList<Track>()
         metaRetriver = MediaMetadataRetriever()
         for (i in 0 until cycleNum) {
+            Log.i("ReviewTest_Paths", " ${trackPaths[i]}: ")
             metaRetriver.setDataSource(trackPaths[i])
 
             val artist =
@@ -81,7 +82,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
                     ?.toLong() ?: (180)
             val data = trackPaths[i]
-            Log.i("ReviewTest_Path", " $data: ")
             val id = i.toLong()
             val source = if (data.contains("/storage/usb")){
                     "usb"

@@ -41,10 +41,9 @@ class MusicCacheImpl(private val prefsManager: SharedPrefsManager, private val d
         return Either.Right(None())
     }
 
-    override fun queryHistorySongs(id: Int): Either<None, List<HistorySongs>> {
-//        return Either.Right(db.historySongsDao().loadAll(id).map { convertEntityToHistorySongs(it) })
+    override fun queryHistorySongs(id: Int): Either<None, HistorySongs> {
         return try {
-            Either.Right(db.historySongsDao().loadAll(id).map {convertEntityToHistorySongs(it)})
+            Either.Right(convertEntityToHistorySongs(db.historySongsDao().getLastMusic(id)))
         } catch (e: Exception) {
             Log.i("ReviewTest_LastMusic", "queryHistorySongs: catch ")
             Either.Left(None())

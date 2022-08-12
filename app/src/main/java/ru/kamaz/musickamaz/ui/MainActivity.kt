@@ -20,14 +20,8 @@ class MainActivity : BaseActivity() {
             NavAction.OPEN_TRACK_LIST_FRAGMENT -> {
                 navigator.navigate(R.id.mainListMusicFragment)
             }
-            NavAction.OPEN_DIALOG_BT_FRAGMENT -> {
-                navigator.navigate(R.id.fragment_dialog)
-            }
             NavAction.OPEN_ADD_PLAY_LIST_DIALOG -> {
                 navigator.navigate(R.id.dialogAddPlaylistFragment)
-            }
-            NavAction.OPEN_DIALOG_TRACK_OPTION -> {
-                navigator.navigate(R.id.trackOptionFragment)
             }
             NavAction.OPEN_MUSIC_FRAGMENT -> {
                 navigator.navigate(R.id.musicFragment)

@@ -159,7 +159,6 @@ class MainListMusicFragment
                 }
             }
         })
-//        binding.search.queryHint = getString(R.string.search)
     }
 
 

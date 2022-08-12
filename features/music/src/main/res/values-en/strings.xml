@@ -33,4 +33,6 @@
     <string name="search">Search</string>
     <string name="file_delete">Delete audio file from device ?</string>
     <string name="delete_from_playlist">Delete audio file from</string>
+    <string name="settings_close">Close</string>
+    <string name="settings">Settings</string>
 </resources>

@@ -5,8 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 @Entity (tableName = "history_songs")
 class HistorySongsEntity (
-    @ColumnInfo(name = "id")
     @PrimaryKey
+    @ColumnInfo(name = "id")
     val id: Int,
     @ColumnInfo(name = "data")
     val data: String,

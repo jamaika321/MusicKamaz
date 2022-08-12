@@ -5,14 +5,14 @@ import android.os.Handler
 import android.os.Message
 import android.tw.john.TWUtil
 import android.util.Log
-import com.tw.auxin.AuxInActivity
-
 //ByAirat and Chinese man
 
 interface TestSettings {
 
     fun start(start: (Int) -> Unit)
     fun stop()
+    fun onResume()
+    fun onPause()
 
     class Base(private val settingsUtil: TWUtil): TestSettings {
 
@@ -49,26 +49,34 @@ interface TestSettings {
 
         override fun start(start: (Int) -> Unit) {
             onHandleMessage = start
-//            settingsUtil.open(shortArrayOf(0x0301))
 //            settingsUtil.start()
-            onResume()
-//            settingsUtil.write(0x0301)
         }
 
-        private fun onResume(){
-//            settingsUtil.write(0x020c)
+        override fun onResume(){
+            settingsUtil.start()
+            requestService(ACTIVITY_RUSEME)
             settingsUtil.addHandler(TAG, mTWEQUtilHandler)
             requestSource(true)
             requestBrake()
         }
 
-        fun requestBrake() {
-            settingsUtil.write(128, 1)
+        private fun requestService(activity: Int){
+            settingsUtil.write(REQUEST_SERVICE, activity)
         }
 
-        fun requestSource(lois: Boolean) {
+        private fun requestBrake() {
+            settingsUtil.write(REQUEST_BRAKE, 0xff)
+        }
+
+        override fun onPause(){
+            settingsUtil.removeHandler(TAG)
+            requestService(ACTIVITY_PAUSE)
+            settingsUtil.stop()
+        }
+
+        private fun requestSource(lois: Boolean) {
             if (lois) {
-                settingsUtil!!.write(REQUEST_SOURCE2, 1 shl 7 or (1 shl 6), 0x07)
+                settingsUtil!!.write(REQUEST_SOURCE, 1 shl 7 or (1 shl 6), 0x07)
             } else {
                 settingsUtil!!.write(REQUEST_SOURCE, 1 shl 7 or (1 shl 6), 0x87)
             }
@@ -78,6 +86,7 @@ interface TestSettings {
             requestSource(false)
             settingsUtil.removeHandler(TAG)
             settingsUtil.close()
+
         }
     }
 

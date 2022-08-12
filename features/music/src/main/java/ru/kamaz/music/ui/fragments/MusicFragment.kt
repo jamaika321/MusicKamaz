@@ -1,7 +1,11 @@
 package ru.kamaz.music.ui.fragments
 
 import android.app.Activity
+import android.app.Dialog
+import android.content.ComponentName
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
@@ -22,7 +27,6 @@ import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.domain.GlobalConstants
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.ui.NavAction.OPEN_DIALOG_ADD_TRACK
-import ru.kamaz.music.ui.NavAction.OPEN_DIALOG_BT_FRAGMENT
 import ru.kamaz.music.ui.NavAction.OPEN_TRACK_LIST_FRAGMENT
 import ru.kamaz.music.ui.enums.PlayListFlow
 import ru.kamaz.music.view_models.fragments.MusicFragmentViewModel
@@ -39,6 +43,11 @@ class MusicFragment :
 
     override fun inject(app: BaseApplication) {
         app.getComponent<MusicComponent>().inject(this)
+    }
+
+    override fun onPause() {
+        viewModel.isSaveLastMusic()
+        super.onPause()
     }
 
     override fun onDestroy() {
@@ -104,7 +113,7 @@ class MusicFragment :
         }
         binding.sourceSelection.aux.setOnClickListener {
             changeSourceViewButtons()
-            Toast.makeText(context, "В разработке", Toast.LENGTH_SHORT).show()
+            viewModel.vmSourceSelection(MusicService.SourceEnum.AUX)
         }
 
         binding.sourceSelection.usb.setOnClickListener {
@@ -147,7 +156,7 @@ class MusicFragment :
     val ALARM_MESSAGE = "Срочно пришлите кота!"
     val PREV = "com.tw.music.action.prev"
 
-    fun addEvent() {
+    private fun addEvent() {
         val intent = Intent()
         intent.action = WHERE_MY_CAT_ACTION
         intent.putExtra("ru.kamaz.musickamaz", ALARM_MESSAGE)
@@ -156,7 +165,7 @@ class MusicFragment :
         context?.sendBroadcast(intent)
     }
 
-    fun addEvent2() {
+    private fun addEvent2() {
         val intent = Intent()
         intent.action = PREV
         intent.putExtra("com.tw.music.action.prev", ALARM_MESSAGE)
@@ -178,12 +187,12 @@ class MusicFragment :
         }
     }
 
-    fun changeSourceViewButtons() {
+    private fun changeSourceViewButtons() {
         changeSource(binding.controlPanel.viewPlayPause)
         changeSource(binding.sourceSelection.viewChangeSource)
     }
 
-    fun changeSource(view: View) {
+    private fun changeSource(view: View) {
         view.visibility = if (view.visibility == View.VISIBLE) {
             View.INVISIBLE
         } else {
@@ -282,6 +291,9 @@ class MusicFragment :
                 playListModeActivation()
             }
         }
+        viewModel.isAuxModeOn.launchWhenStarted(lifecycleScope) {
+            if (it) auxModeActivation()
+        }
         viewModel.isDiskModeOn.launchWhenStarted(lifecycleScope) {
             if (it) diskModeActivation()
         }
@@ -289,7 +301,7 @@ class MusicFragment :
             if (it) usbModeActivation()
         }
         viewModel.isDeviceNotConnectFromBt.launchWhenStarted(lifecycleScope) {
-            if (it) dialog()
+            if (it) showBtSettingsDialog()
         }
         viewModel.isPlayListModeOn.launchWhenStarted(lifecycleScope) {
             when (it){
@@ -353,15 +365,6 @@ class MusicFragment :
     }
 
 
-    private fun dialog() {
-        navigator.navigateTo(
-            UiAction(
-                OPEN_DIALOG_BT_FRAGMENT
-            )
-        )
-    }
-
-
     private fun repeatIconChange(repeat: Int) {
         when (repeat) {
             2 -> {
@@ -399,7 +402,7 @@ class MusicFragment :
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
     }
 
-    fun btModeActivation() {
+    private fun btModeActivation() {
         //Invisible
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
         binding.controlPanel.repeat.visibility = View.INVISIBLE
@@ -427,7 +430,8 @@ class MusicFragment :
 
     }
 
-    fun diskModeActivation() {
+    private fun diskModeActivation() {
+        updateTrackCover(viewModel.cover.value)
         //Invisible
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
         //Visible
@@ -446,6 +450,8 @@ class MusicFragment :
         binding.times.visibility = View.VISIBLE
         binding.picture.visibility = View.VISIBLE
         binding.pictureDevice.visibility = View.VISIBLE
+        binding.seek.visibility = View.VISIBLE
+        binding.pictureBucket.visibility = View.VISIBLE
         //Background
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
@@ -453,7 +459,7 @@ class MusicFragment :
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
     }
 
-    fun auxModeActivation() {
+    private fun auxModeActivation() {
         //Visible
         binding.picture.visibility = View.VISIBLE
         binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
@@ -470,17 +476,18 @@ class MusicFragment :
         binding.artist.visibility = View.INVISIBLE
         binding.song.visibility = View.INVISIBLE
         binding.times.visibility = View.INVISIBLE
-        binding.pictureDevice.visibility = View.INVISIBLE
+        binding.pictureBucket.visibility = View.INVISIBLE
         //Background
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        binding.picture.setImageResource(R.drawable.auxx)
+        binding.pictureDevice.setImageResource(R.drawable.auxx)
 
     }
 
-    fun usbModeActivation() {
+    private fun usbModeActivation() {
+        updateTrackCover(viewModel.cover.value)
         //Invisible
         binding.picture.visibility = View.VISIBLE
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
@@ -499,12 +506,51 @@ class MusicFragment :
         binding.song.visibility = View.VISIBLE
         binding.times.visibility = View.VISIBLE
         binding.pictureDevice.visibility = View.VISIBLE
+        binding.seek.visibility = View.VISIBLE
+        binding.pictureBucket.visibility = View.VISIBLE
         //Background
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
 //        binding.pictureDevice.setImageResource(R.drawable.music_png_bg)
+    }
+
+
+    private fun showBtSettingsDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.bt_settings_alert)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(true)
+
+        val playlistName: TextView = dialog.findViewById(R.id.tv_question_bt_connection)
+        val deleteText: TextView = dialog.findViewById(R.id.delete_text)
+        val close: TextView = dialog.findViewById(R.id.btn_close)
+        val add: TextView = dialog.findViewById(R.id.btn_add_to_playlist)
+
+        playlistName.text = getString(R.string.connect_bt)
+        deleteText.text = getString(R.string.bt_question)
+        close.text = getString(R.string.settings_close)
+        add.text = getString(R.string.settings)
+        add.setOnClickListener {
+            openBluetoothSettings()
+            dialog.dismiss()
+        }
+        close.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    private fun openBluetoothSettings() {
+        val intent = Intent(Intent.ACTION_MAIN, null)
+        val componentName = ComponentName("ru.bis.settings", "ru.bis.settings.presentation.StartActivity")
+        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+        intent.component = componentName
+        intent.putExtra("BluetoothSettings", true)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        startActivity(intent)
     }
 
 

@@ -6,8 +6,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.appwidget.AppWidgetManager
-import android.content.*
-import android.content.ContentValues.TAG
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.MediaPlayer
@@ -17,23 +19,26 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.view.ActionMode
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationCompat.*
-import androidx.lifecycle.viewModelScope
+import androidx.core.app.NotificationCompat.PRIORITY_MAX
 import com.eckom.xtlibrary.twproject.music.bean.MusicName
 import com.eckom.xtlibrary.twproject.music.bean.Record
 import com.eckom.xtlibrary.twproject.music.utils.TWMusic
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.biozzlab.twmanager.managers.BluetoothManager
 import ru.biozzlab.twmanager.managers.MusicManager
-import ru.kamaz.music.cache.db.dao.Playback
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
+import ru.kamaz.music.domain.TestSettings
 import ru.kamaz.music.receiver.BrReceiver
 import ru.kamaz.music.ui.TestWidget
 import ru.kamaz.music_api.BaseConstants.ACTION_NEXT
@@ -72,6 +77,9 @@ Service, OnCompletionListener,
 
     @Inject
     lateinit var insertFavoriteMusic: InsertFavoriteMusic
+
+    @Inject
+    lateinit var testSettings: TestSettings
 
     @Inject
     lateinit var insertLastMusic: InsertLastMusic
@@ -240,18 +248,6 @@ Service, OnCompletionListener,
     private val _isShuffleStatus = MutableStateFlow(false)
     val isShuffleStatus = _isShuffleStatus.asStateFlow()
 
-
-    private fun setShuffleMode() {
-        when (isShuffleStatus.value) {
-            true -> {
-                tracks.shuffle()
-            }
-            false -> {
-                replaceAllTracks(emptyList(), false)
-            }
-        }
-    }
-
     override fun getAllTracks() = allTracks.asStateFlow()
     override fun getPlayLists() = playLists.asStateFlow()
     override fun getFoldersList() = foldersList.asStateFlow()
@@ -313,7 +309,6 @@ Service, OnCompletionListener,
         registerReceiver(br, filter)
 
         twManager.startMonitoring(applicationContext) {
-            Log.i("ReviewTest_Start", " StartMonitoring: ")
             twManager.addListener(this)
             twManager.requestConnectionInfo()
         }
@@ -343,40 +338,42 @@ Service, OnCompletionListener,
         val scope = CoroutineScope(Job() + Dispatchers.IO)
         val job = scope.launch {
             val loading = queryLastMusic.run(QueryLastMusic.Params(666))
-            val result = async {
-                if (loading is Either.Right){
-//                    loading.r[0].let { track ->
-//                        Log.i("ReviewTest_LasMusic", " ${track.data}: ")
-//                        when (track.source){
-//                            "disk" -> {
-//                                startDiskMode()
-//                            }
-//                            "usb" -> {
-//                                checkUsb()
-//                                if (isUSBConnected.value) startUsbMode()
-//                                else startDiskMode()
-//                            }
-//                            "folder" -> {
-//
-//                            }
-//                            "all" -> {
-//
-//                            }
-//                            "playList" -> {
-//
-//                            }
-//                            "favorite" -> {
-//
-//                            }
-//
-//                        }
-//                        initTrack(tracks.find { it.data == track.data } ?: emptyTrack, track.data ?: "")
-//                    }
+            withContext(Dispatchers.Default) {
+                if (loading is Either.Right) {
+                    loading.r.let { track ->
+                        Log.i("ReviewTest_LasMusic", " ${track.data}: ")
+                        when (track.source) {
+                            "disk" -> {
+                                startDiskMode()
+                            }
+                            "usb" -> {
+                                checkUsb()
+                                if (isUSBConnected.value) startUsbMode()
+                                else startDiskMode()
+                            }
+                            "folder" -> {
+
+                            }
+                            "all" -> {
+
+                            }
+                            "playList" -> {
+
+                            }
+                            "favorite" -> {
+
+                            }
+
+                        }
+                        async { initTrack(tracks.find { it.data == track.data } ?: emptyTrack,
+                            track.data ?: "") }
+
+                    }
                 } else {
                     Log.i("ReviewTest_LasMusic", " empty: ")
                     playOrPause()
                 }
-            }.await()
+            }
         }
         job.start()
 //            val result = async {
@@ -503,6 +500,7 @@ Service, OnCompletionListener,
     inner class MyBinder : Binder() {
         fun getService(): MusicServiceInterface.Service {
             Log.i("ReviewTest_Binder", "MyBinder")
+//            loadLastSavedMusic()
             return this@MusicService
         }
     }
@@ -559,10 +557,11 @@ Service, OnCompletionListener,
         }
     }
 
-    fun startAuxMode() {
+    private fun startAuxMode() {
         changeSource(0)
-        _isAuxModeOn.tryEmit(true)
-        Toast.makeText(this, "В разработке.", Toast.LENGTH_LONG).show()
+        testSettings.onResume()
+        stopMediaPlayer()
+        twManagerMusic.requestSource(false)
     }
 
 
@@ -615,13 +614,19 @@ Service, OnCompletionListener,
             stopBtListener()
             startMusicListener()
         }
+        if (auxModeOn().value) {
+            testSettings.onPause()
+            twManagerMusic.requestSource(true)
+        }
         when (sourceEnum) {
             //AUX
             0 -> {
+                _isAuxModeOn.tryEmit(true)
                 _isUsbModeOn.tryEmit(false)
                 _isDiskModeOn.tryEmit(false)
                 _isBtModeOn.tryEmit(false)
                 _isPlaylistModeOn.tryEmit(false)
+                this.mode = SourceEnum.AUX
             }
             //BT
             1 -> {
@@ -695,7 +700,6 @@ Service, OnCompletionListener,
     }
 
     private fun startMusicListener() {
-        Log.i("ReviewTest_Start", "startMusicListener")
         twManagerMusic.addListener(this)
 //        twManager.addListener(this)
     }
@@ -846,17 +850,21 @@ Service, OnCompletionListener,
 
     private fun prevTrackHelper() {
         if (tracks.isNotEmpty()) {
-            when (currentTrackPosition.value - 1) {
-                -1 -> {
-                    if (mediaPlayer.currentPosition < 5000) {
-                        _currentTrackPosition.value = tracks.size - 1
+            if (!isShuffleStatus.value){
+                when (currentTrackPosition.value - 1) {
+                    -1 -> {
+                        if (mediaPlayer.currentPosition < 5000) {
+                            _currentTrackPosition.value = tracks.size - 1
+                        }
+                    }
+                    else -> {
+                        if (mediaPlayer.currentPosition < 5000) {
+                            _currentTrackPosition.value--
+                        }
                     }
                 }
-                else -> {
-                    if (mediaPlayer.currentPosition < 5000) {
-                        _currentTrackPosition.value--
-                    }
-                }
+            } else {
+                _currentTrackPosition.value = (0 until tracks.size).random()
             }
             when (isPlaying.value) {
                 true -> {
@@ -892,7 +900,6 @@ Service, OnCompletionListener,
     }
 
     private fun initMediaPlayer() {
-        Log.i("ReviewTest_Start", "init media player")
         val audioAttributes: AudioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_MEDIA)
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -944,11 +951,14 @@ Service, OnCompletionListener,
 
     private fun funRepeatAll() {
         if (tracks.isNotEmpty()) {
+            if (!isShuffleStatus.value)
             when (currentTrackPosition.value == tracks.size - 1) {
                 true -> {
                     _currentTrackPosition.value = 0
                 }
                 false -> _currentTrackPosition.value++
+            } else {
+                _currentTrackPosition.value = (0 until tracks.size).random()
             }
             funPlayOneSong()
         }
@@ -990,7 +1000,6 @@ Service, OnCompletionListener,
     }
 
     private fun initLifecycleScope() {
-        Log.i("ReviewTest_Start", "initLifecycleScope")
         unsubscribeLifecycleScope()
         lifecycleJob = Job()
         lifecycleScope = CoroutineScope(Dispatchers.Main + lifecycleJob)
@@ -1030,7 +1039,6 @@ Service, OnCompletionListener,
     }
 
     private fun startForeground() {
-        Log.i("ReviewTest_Start", "startForeground")
         val channelId =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 createNotificationChannel("my_service", "My Background Service")
@@ -1075,9 +1083,6 @@ Service, OnCompletionListener,
         if (loadMode == "5") {
             loadTracksOnCoroutine("all")
             loadPlayLists()
-        }
-        if (isShuffleStatus.value) {
-            setShuffleMode()
         }
         rvAllFolderWithMusic(None()) { it.either({}, ::fillFoldersList) }
     }
@@ -1157,6 +1162,10 @@ Service, OnCompletionListener,
     override fun initPlayListSource(track: Track, playList: PlayListSource) {
         sourceSelection(SourceEnum.PLAYLIST)
         playListMode.value = playList.type
+        selectPlayListMode(playList)
+    }
+
+    private fun selectPlayListMode(playList: PlayListSource){
         when (playList.type) {
             "all" -> replaceAllTracks(emptyList(), false)
             "folder" -> getFolderTracks(playList)
@@ -1226,9 +1235,7 @@ Service, OnCompletionListener,
     override fun sourceSelection(action: SourceEnum) {
         when (action) {
             SourceEnum.AUX -> {
-                if (isNotAuxConnected.value) {
-                } else {
-                }
+                startAuxMode()
             }
             SourceEnum.BT -> {
                 if (isNotConnected.value) {
@@ -1259,7 +1266,6 @@ Service, OnCompletionListener,
 
     override fun shuffleStatusChange() {
         _isShuffleStatus.value = !isShuffleStatus.value
-        setShuffleMode()
     }
 
     override fun insertFavoriteMusic(data: String) {

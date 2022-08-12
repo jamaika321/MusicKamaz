@@ -25,7 +25,7 @@ interface MusicCache {
     fun queryFavoriteSongs(data:String) :  Either<Failure, String>
     fun getAllFavoriteSongs(): Flow<List<Track>>
     fun getAllPlayList(): Flow<List<PlayListModel>>
-    fun queryHistorySongs(id: Int): Either<None, List<HistorySongs>>
+    fun queryHistorySongs(id: Int): Either<None, HistorySongs>
     fun updatePlayList(name: String, data: List<String>)
     fun updatePlayListName(name: String, newName: String)
 
