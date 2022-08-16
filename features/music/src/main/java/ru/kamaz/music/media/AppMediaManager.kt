@@ -1,6 +1,5 @@
 package ru.kamaz.music.media
 
-import android.content.ContentUris
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -9,13 +8,11 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import android.util.Size
 import androidx.annotation.RequiresApi
 import ru.kamaz.music.R
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music_api.models.AllFolderWithMusic
 import ru.kamaz.music_api.models.CategoryMusicModel
-import ru.kamaz.music_api.models.ModelTest
 import ru.kamaz.music_api.models.Track
 import ru.sir.core.Either
 import ru.sir.core.Either.Left
@@ -23,13 +20,12 @@ import ru.sir.core.None
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import javax.inject.Inject
 
 
 class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
-    private lateinit var metaRetriver: MediaMetadataRetriever
+    private lateinit var metaRetriever: MediaMetadataRetriever
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun getMediaFilesFromPath(path: String, mode: String): Either<None, List<Track>> {
@@ -49,9 +45,9 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
         if (trackPaths is Either.Right) {
             listWithTrackData = when (mode) {
-                "all" -> metaDataRetriver(trackPaths.r.size, trackPaths.r)
-                "5" -> metaDataRetriver(5, trackPaths.r)
-                else -> metaDataRetriver(1, trackPaths.r)
+                "all" -> metaDataRetriever(trackPaths.r.size, trackPaths.r)
+                "5" -> metaDataRetriever(5, trackPaths.r)
+                else -> metaDataRetriever(1, trackPaths.r)
             }
         }
         //TODO
@@ -65,29 +61,33 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
     }
 
-    private fun metaDataRetriver(cycleNum: Int, trackPaths: List<String>): ArrayList<Track> {
+    override fun metaDataRetriever(cycleNum: Int, trackPaths: List<String>): ArrayList<Track> {
         val listWithTrackData = ArrayList<Track>()
-        metaRetriver = MediaMetadataRetriever()
+        metaRetriever = MediaMetadataRetriever()
         for (i in 0 until cycleNum) {
-            Log.i("ReviewTest_Paths", " ${trackPaths[i]}: ")
-            metaRetriver.setDataSource(trackPaths[i])
+            Log.i("ReviewTest_Last", " path : ${trackPaths[i]}")
+            metaRetriever.setDataSource(trackPaths[i])
 
             val artist =
-                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST)) ?: ("unknown")
+                metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST)) ?: ("unknown")
             val album =
-                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))
+                metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))
                     ?: ("unknown")
-            val title = metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE)) ?: ("unknown")
+            val title = metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE)) ?: ("unknown")
             val duration =
-                metaRetriver.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
+                metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
                     ?.toLong() ?: (180)
             val data = trackPaths[i]
             val id = i.toLong()
+
+
+
             val source = if (data.contains("/storage/usb")){
                     "usb"
             } else {
                 "disk"
             }
+
 
             var albumArt = File("")
 
@@ -95,7 +95,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator + title.replace("/", "") + ".png"
             )
             if (!file.exists()) {
-                var art = metaRetriver.embeddedPicture
+                var art = metaRetriever.embeddedPicture
                 if (art != null) {
                     val bitMap = BitmapFactory.decodeByteArray(art, 0, art.size)
                     albumArt = getAlbumArt(bitMap, title.replace("/",""))
@@ -137,9 +137,9 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
         if (allPath is Either.Right) {
             allTracks = when (mode) {
-                "all" -> metaDataRetriver(allPath.r.size, allPath.r)
-                "5" -> metaDataRetriver(5, allPath.r)
-                else -> metaDataRetriver(1, allPath.r)
+                "all" -> metaDataRetriever(allPath.r.size, allPath.r)
+                "5" -> metaDataRetriever(5, allPath.r)
+                else -> metaDataRetriever(1, allPath.r)
             }
         }
         return Either.Right(allTracks)

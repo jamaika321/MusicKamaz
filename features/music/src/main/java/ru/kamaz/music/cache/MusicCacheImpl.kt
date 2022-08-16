@@ -41,13 +41,8 @@ class MusicCacheImpl(private val prefsManager: SharedPrefsManager, private val d
         return Either.Right(None())
     }
 
-    override fun queryHistorySongs(id: Int): Either<None, HistorySongs> {
-        return try {
-            Either.Right(convertEntityToHistorySongs(db.historySongsDao().getLastMusic(id)))
-        } catch (e: Exception) {
-            Log.i("ReviewTest_LastMusic", "queryHistorySongs: catch ")
-            Either.Left(None())
-        }
+    override fun queryHistorySongs(id: Int): List<HistorySongs> {
+        return convertEntityToHistorySongs(db.historySongsDao().loadAll(id))
     }
 
     override fun updatePlayList(name: String, data: List<String>) {
@@ -63,7 +58,7 @@ class MusicCacheImpl(private val prefsManager: SharedPrefsManager, private val d
     }
 
     override fun insertHistorySong(song: HistorySongsEntity): Either<Failure, None> {
-        db.historySongsDao().insertAll(song)
+        db.historySongsDao().insertAll(listOf(song))
         Log.i("ReviewTest_LastMusic", "insertHistorySong:  ")
         return Either.Right(None())
     }
@@ -112,14 +107,19 @@ class MusicCacheImpl(private val prefsManager: SharedPrefsManager, private val d
         return data
     }
 
-    private fun convertEntityToHistorySongs(entity: HistorySongsEntity): HistorySongs {
-        val data = HistorySongs(
-            entity.id,
-            entity.data,
-            entity.timePlayed,
-            entity.source,
-            entity.sourceName,
-        )
+    private fun convertEntityToHistorySongs(entity: List<HistorySongsEntity>): List<HistorySongs> {
+        val data = mutableListOf<HistorySongs>()
+        entity.forEach { entity ->
+            data.add(
+                HistorySongs(
+                    entity.id,
+                    entity.data,
+                    entity.timePlayed,
+                    entity.source,
+                    entity.sourceName
+                )
+            )
+        }
         return data
     }
 

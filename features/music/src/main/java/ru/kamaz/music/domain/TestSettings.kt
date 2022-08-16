@@ -11,8 +11,8 @@ interface TestSettings {
 
     fun start(start: (Int) -> Unit)
     fun stop()
-    fun onResume()
     fun onPause()
+    fun onCreate()
 
     class Base(private val settingsUtil: TWUtil): TestSettings {
 
@@ -35,16 +35,20 @@ interface TestSettings {
                         this.removeMessages(MEssageDelay)
                         sendEmptyMessageDelayed(MEssageDelay, 150)
                     }
-                    0x020c -> {
-
+                    0xff0f -> {
+                        Log.i("ReviewTest_AUX21", "handleMessage: ")
                     }
-                    514 -> {
-                        Log.i("ReviewTest_AUX22", "handleMessage: ")
-                    }
+                    0xff0e -> Log.i("ReviewTest_AUX22", "handleMessage: ")
+                    0xff00 -> Log.i("ReviewTest_AUX23", "handleMessage: ")
+                    0xff0e -> Log.i("ReviewTest_AUX24", "handleMessage: ")
 
                     MEssageDelay -> onHandleMessage.invoke(MSGBYTE)
                 }
             }
+        }
+
+        override fun onCreate(){
+            if (settingsUtil.open(shortArrayOf(0x0205)) == 0) onResume()
         }
 
         override fun start(start: (Int) -> Unit) {
@@ -52,12 +56,13 @@ interface TestSettings {
 //            settingsUtil.start()
         }
 
-        override fun onResume(){
+        private fun onResume(){
             settingsUtil.start()
             requestService(ACTIVITY_RUSEME)
             settingsUtil.addHandler(TAG, mTWEQUtilHandler)
             requestSource(true)
             requestBrake()
+            Log.i("ReviewTest_Short", "  :  ${settingsUtil.open(shortArrayOf(0x0301))}")
         }
 
         private fun requestService(activity: Int){
@@ -76,9 +81,9 @@ interface TestSettings {
 
         private fun requestSource(lois: Boolean) {
             if (lois) {
-                settingsUtil!!.write(REQUEST_SOURCE, 1 shl 7 or (1 shl 6), 0x07)
+                settingsUtil.write(REQUEST_SOURCE2, 1 shl 7 or (1 shl 6), 0x07)
             } else {
-                settingsUtil!!.write(REQUEST_SOURCE, 1 shl 7 or (1 shl 6), 0x87)
+                settingsUtil.write(REQUEST_SOURCE2, 1 shl 7 or (1 shl 6), 0x87)
             }
         }
 

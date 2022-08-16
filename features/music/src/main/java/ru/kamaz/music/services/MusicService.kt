@@ -24,6 +24,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MAX
+import androidx.lifecycle.LifecycleCoroutineScope
 import com.eckom.xtlibrary.twproject.music.bean.MusicName
 import com.eckom.xtlibrary.twproject.music.bean.Record
 import com.eckom.xtlibrary.twproject.music.utils.TWMusic
@@ -53,6 +54,7 @@ import ru.sir.core.Either
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.extensions.launchOn
+import ru.sir.presentation.extensions.launchWhenStarted
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -339,9 +341,13 @@ Service, OnCompletionListener,
         val job = scope.launch {
             val loading = queryLastMusic.run(QueryLastMusic.Params(666))
             withContext(Dispatchers.Default) {
-                if (loading is Either.Right) {
-                    loading.r.let { track ->
-                        Log.i("ReviewTest_LasMusic", " ${track.data}: ")
+                if (loading is Either.Right && loading.r[0].data != "") {
+                    Log.i("ReviewTest_Last", "loadLastSavedMusic: ${loading.r[0].data}")
+                    loading.r[0].let { track ->
+                        tracks = mediaManager.metaDataRetriever(1, listOf(track.data))
+                        initTrack(tracks.find { it.data == track.data } ?: emptyTrack,
+                            track.data ?: "")
+                        resume()
                         when (track.source) {
                             "disk" -> {
                                 startDiskMode()
@@ -365,10 +371,8 @@ Service, OnCompletionListener,
                             }
 
                         }
-                        async { initTrack(tracks.find { it.data == track.data } ?: emptyTrack,
-                            track.data ?: "") }
-
                     }
+//                    loadTracksOnCoroutine("all")
                 } else {
                     Log.i("ReviewTest_LasMusic", " empty: ")
                     playOrPause()
@@ -559,7 +563,7 @@ Service, OnCompletionListener,
 
     private fun startAuxMode() {
         changeSource(0)
-        testSettings.onResume()
+        testSettings.onCreate()
         stopMediaPlayer()
         twManagerMusic.requestSource(false)
     }
@@ -583,6 +587,7 @@ Service, OnCompletionListener,
                 replaceAllTracks(emptyList(), false)
             }
             _sourceName.value = "disk"
+//            if (title.value.isEmpty()) nextTrack(2)
             nextTrack(2)
         }
     }
@@ -719,6 +724,7 @@ Service, OnCompletionListener,
 
 
     override fun initTrack(track: Track, data1: String) {
+        Log.i("ReviewTest_Last", "initTrack: ${track.title}, ${track.id}, $data1 ")
         tracks.find { it.data == track.data }.let {
             if (it != null) _currentTrackPosition.value = it.id.toInt()
             else _currentTrackPosition.value = 0

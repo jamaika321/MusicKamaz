@@ -13,7 +13,7 @@ import ru.kamaz.music_api.models.Track
 interface HistoryDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(users: HistorySongsEntity)
+    fun insertAll(users: List<HistorySongsEntity>)
 
     @Query("SELECT * FROM history_songs Where id = :id")
     fun loadAll(id: Int): List<HistorySongsEntity>

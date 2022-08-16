@@ -87,13 +87,8 @@ class RepositoryImpl(
     override fun queryFavoriteSongs(data: String): Either<Failure, String> =
         testDBDao.queryFavoriteSongs(data)
 
-    override fun queryHistorySongs(id: Int): Either<None, HistorySongs> {
-        val result = testDBDao.queryHistorySongs(id)
-        return if (result is Either.Right)  {
-            Either.Right(result.r)
-        } else {
-            Either.Left(None())
-        }
+    override fun queryHistorySongs(id: Int): Either<None, List<HistorySongs>> {
+        return Either.Right(testDBDao.queryHistorySongs(id))
     }
     override fun getCurrentPath(): String {
         TODO("Not yet implemented")
