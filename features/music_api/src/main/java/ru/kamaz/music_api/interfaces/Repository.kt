@@ -10,8 +10,6 @@ import java.io.File
 
 interface Repository: PathManager, SourceManager {
     fun getMusicDurationFlow(): Flow<Int>
-    fun loadDiskData(mode: String): Either<None, List<Track>>
-    fun loadUsbData(mode: String): Either<None, List<Track>>
     fun rvArtist(): Either<None, List<Track>>
     fun rvPlayList(): Flow<List<PlayListModel>>
     fun rvCategory():Either<None,List<CategoryMusicModel>>

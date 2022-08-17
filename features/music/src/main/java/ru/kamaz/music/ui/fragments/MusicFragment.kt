@@ -250,8 +250,11 @@ class MusicFragment :
         }
 
         viewModel.isMusicEmpty.launchWhenStarted(lifecycleScope) {
-            if (it) Toast.makeText(context, "Файлы не найдены", Toast.LENGTH_LONG).show()
-            binding.seek.progress = 0
+            if (it) {
+                Toast.makeText(context, "Файлы не найдены", Toast.LENGTH_LONG).show()
+                binding.pictureBucket.visibility = View.GONE
+                binding.seek.progress = 0
+            }
         }
 
 //        viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
@@ -448,10 +451,10 @@ class MusicFragment :
         binding.artist.visibility = View.VISIBLE
         binding.song.visibility = View.VISIBLE
         binding.times.visibility = View.VISIBLE
-        binding.picture.visibility = View.VISIBLE
+//        binding.picture.visibility = View.VISIBLE
         binding.pictureDevice.visibility = View.VISIBLE
         binding.seek.visibility = View.VISIBLE
-        binding.pictureBucket.visibility = View.VISIBLE
+//        binding.pictureBucket.visibility = View.VISIBLE
         //Background
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item_on)
         binding.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
@@ -489,7 +492,7 @@ class MusicFragment :
     private fun usbModeActivation() {
         updateTrackCover(viewModel.cover.value)
         //Invisible
-        binding.picture.visibility = View.VISIBLE
+//        binding.picture.visibility = View.VISIBLE
         binding.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
         //Visible
         binding.controlPanel.viewPlayPause.visibility = View.VISIBLE
@@ -507,7 +510,7 @@ class MusicFragment :
         binding.times.visibility = View.VISIBLE
         binding.pictureDevice.visibility = View.VISIBLE
         binding.seek.visibility = View.VISIBLE
-        binding.pictureBucket.visibility = View.VISIBLE
+//        binding.pictureBucket.visibility = View.VISIBLE
         //Background
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
         binding.sourceSelection.usb.setBackgroundResource(R.drawable.back_item_on)

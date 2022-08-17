@@ -341,33 +341,33 @@ Service, OnCompletionListener,
             withContext(Dispatchers.Default) {
                 if (loading is Either.Right) {
                     loading.r.let { track ->
-                        Log.i("ReviewTest_LasMusic", " ${track.data}: ")
-                        when (track.source) {
-                            "disk" -> {
-                                startDiskMode()
-                            }
-                            "usb" -> {
-                                checkUsb()
-                                if (isUSBConnected.value) startUsbMode()
-                                else startDiskMode()
-                            }
-                            "folder" -> {
-
-                            }
-                            "all" -> {
-
-                            }
-                            "playList" -> {
-
-                            }
-                            "favorite" -> {
-
-                            }
-
-                        }
-                        async { initTrack(tracks.find { it.data == track.data } ?: emptyTrack,
-                            track.data ?: "") }
-
+                        Log.i("ReviewTest_LoadMusic", " ${track.data}: ")
+//                        when (track.source) {
+//                            "disk" -> {
+//                                startDiskMode()
+//                            }
+//                            "usb" -> {
+//                                checkUsb()
+//                                if (isUSBConnected.value) startUsbMode()
+//                                else startDiskMode()
+//                            }
+//                            "folder" -> {
+//
+//                            }
+//                            "all" -> {
+//
+//                            }
+//                            "playList" -> {
+//
+//                            }
+//                            "favorite" -> {
+//
+//                            }
+//
+//                        }
+//                        async { initTrack(tracks.find { it.data == track.data } ?: emptyTrack,
+//                            track.data ?: "") }
+                        playOrPause()
                     }
                 } else {
                     Log.i("ReviewTest_LasMusic", " empty: ")
@@ -392,10 +392,12 @@ Service, OnCompletionListener,
 
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
         Log.i("USBstatus", "onUsbStatusChanged:$path ")
-        _isUSBConnected.value = isAdded
         updateTracks("all")
-        if (!isUsbModeOn.value && isAdded) {
-            startUsbMode()
+        if (!isUsbModeOn.value) {
+            checkUsb()
+            if (isUSBConnected.value) {
+                startUsbMode()
+            }
         }
 
     }
@@ -1077,7 +1079,6 @@ Service, OnCompletionListener,
             replaceAllTracks(result.r, true)
         } else {
             replaceAllTracks(emptyList(), true)
-            loadTracksOnCoroutine("all")
             _musicEmpty.value = true
         }
         if (loadMode == "5") {
@@ -1300,7 +1301,7 @@ Service, OnCompletionListener,
         CoroutineScope(Dispatchers.IO).launch {
             tracks.forEach { track ->
                 list.forEach { list ->
-                    if (track.title == list.title && track.data == list.data) {
+                    if (track.data == list.data) {
                         track.favorite = true
                     }
                 }

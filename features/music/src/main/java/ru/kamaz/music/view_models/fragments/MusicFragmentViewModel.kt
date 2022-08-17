@@ -119,9 +119,8 @@ class MusicFragmentViewModel @Inject constructor(
 
     }
 
-    fun remoteNextPrevControlButton() {
+    private fun remoteNextPrevControlButton() {
         testSettings.start {
-            Log.i("ReviewTest_AUX",  "  $it: ")
             when (it) {
                 //Законменчено переключение правой крутилкой
 //                5 -> nextTrack()

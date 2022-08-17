@@ -28,20 +28,12 @@ interface TestSettings {
         private var mTWEQUtilHandler: Handler = @SuppressLint("HandlerLeak")
         object : Handler() {
             override fun handleMessage(msg: Message) {
-                Log.i("ReviewTest_AUX222", " ${msg.what}: ${msg.arg1} : ${msg.arg2}")
                 when (msg.what) {
                     0x201 -> {
                         MSGBYTE = msg.arg2
                         this.removeMessages(MEssageDelay)
                         sendEmptyMessageDelayed(MEssageDelay, 150)
                     }
-                    0x020c -> {
-
-                    }
-                    514 -> {
-                        Log.i("ReviewTest_AUX22", "handleMessage: ")
-                    }
-
                     MEssageDelay -> onHandleMessage.invoke(MSGBYTE)
                 }
             }
@@ -76,9 +68,9 @@ interface TestSettings {
 
         private fun requestSource(lois: Boolean) {
             if (lois) {
-                settingsUtil!!.write(REQUEST_SOURCE, 1 shl 7 or (1 shl 6), 0x07)
+                settingsUtil.write(REQUEST_SOURCE2, 1 shl 7 or (1 shl 6), 0x07)
             } else {
-                settingsUtil!!.write(REQUEST_SOURCE, 1 shl 7 or (1 shl 6), 0x87)
+                settingsUtil.write(REQUEST_SOURCE2, 1 shl 7 or (1 shl 6), 0x87)
             }
         }
 
