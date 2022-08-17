@@ -5,7 +5,7 @@ import android.os.Handler
 import android.os.Message
 import android.tw.john.TWUtil
 import android.util.Log
-//ByAirat and Chinese man
+
 
 interface TestSettings {
 
