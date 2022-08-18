@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -225,10 +224,15 @@ class MainListMusicFragment
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        (view as ViewGroup).removeAllViews()
+    }
+
     override fun onPause() {
         super.onPause()
-        binding.rvAllMusic.layoutManager = null
-        binding.rvAllMusic.adapter = null
+        (view as ViewGroup).removeAllViews()
+
     }
 
     private fun searchActive() {
@@ -352,7 +356,7 @@ class MainListMusicFragment
             binding.rvAllMusic.setPadding(0, 60, 0, 0)
         } else {
             viewModel.rvScrollState.value = 0
-            binding.search.visibility = View.GONE
+            binding.search.visibility = View.INVISIBLE
             binding.rvAllMusic.setPadding(0, 30, 0, 0)
         }
 

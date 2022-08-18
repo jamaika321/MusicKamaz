@@ -8,9 +8,9 @@ import androidx.room.PrimaryKey
 data class FavoriteSongsEntity(
     @ColumnInfo(name = "track_id")
     val id: Long,
-    @PrimaryKey
     val title: String,
     val artist: String,
+    @PrimaryKey
     val data: String,
     val duration: Long,
     val album: String,

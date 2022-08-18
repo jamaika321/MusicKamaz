@@ -65,6 +65,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         val listWithTrackData = ArrayList<Track>()
         metaRetriever = MediaMetadataRetriever()
         for (i in 0 until cycleNum) {
+            if (i == trackPaths.size) break
             Log.i("ReviewTest_Last", " path : ${trackPaths[i]}")
             metaRetriever.setDataSource(trackPaths[i])
 
@@ -193,7 +194,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         root.listFiles()?.filter { extensions.contains(it.extension) }?.forEach {
             if (it != null){
                 list.add(root)
-                Log.i("ReviewTest_Get", " : ${root} ")
             }
         }
         return list

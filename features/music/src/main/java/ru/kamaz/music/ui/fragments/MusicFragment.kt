@@ -249,6 +249,10 @@ class MusicFragment :
             repeatIconChange(it)
         }
 
+        viewModel.defaultModeOn.launchWhenStarted(lifecycleScope) {
+            if (it) startDefaultMode()
+        }
+
         viewModel.isMusicEmpty.launchWhenStarted(lifecycleScope) {
             if (it) {
                 Toast.makeText(context, "Файлы не найдены", Toast.LENGTH_LONG).show()
@@ -397,6 +401,13 @@ class MusicFragment :
         }
     }
 
+    private fun startDefaultMode() {
+        playListModeActivation()
+        binding.pictureBucket.visibility = View.GONE
+        binding.pictureDevice.setImageResource(R.drawable.music_png_bg)
+        binding.song.text = getString(R.string.default_title)
+        binding.artist.visibility = View.INVISIBLE
+    }
 
     private fun playListModeActivation() {
         binding.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)

@@ -13,11 +13,6 @@ import ru.kamaz.music_api.interfaces.Repository
 class DomainModule {
 
     @Provides
-    fun provideService(): MusicService = MusicService()
-
-    @Provides
-    fun provideArtistLoadRV(repository: Repository): ArtistLoadRV = ArtistLoadRV(repository)
-    @Provides
     fun provideAllFolderWithMusic(repository: Repository): AllFolderWithMusicRV = AllFolderWithMusicRV(repository)
     @Provides
     fun provideUpdatePlayList(repository: Repository): UpdatePlayList = UpdatePlayList(repository)
@@ -27,12 +22,7 @@ class DomainModule {
     fun provideCategoryLoadRV(repository: Repository): CategoryLoadRV = CategoryLoadRV(repository)
 
     @Provides
-    fun provideGetMusicCover(repository: Repository): GetMusicCover = GetMusicCover(repository)
-
-    @Provides
     fun provideGetMusicPosition(repository: Repository): GetMusicPosition = GetMusicPosition(repository)
-    @Provides
-    fun provideGetUseCase(repository: Repository): GetFilesUseCase = GetFilesUseCaseImpl(repository)
     @Provides
     fun provideDeletePlayList(repository: Repository): DeletePlayList = DeletePlayList(repository)
 
@@ -43,8 +33,6 @@ class DomainModule {
     @Provides
     fun provideQueryLastMusic(repository: Repository): QueryLastMusic = QueryLastMusic(repository)
     @Provides
-    fun provideQueryFavoriteMusic(repository: Repository): QueryFavoriteMusic = QueryFavoriteMusic(repository)
-   @Provides
     fun provideFavoriteMusicRV(repository: Repository): FavoriteMusicRV = FavoriteMusicRV(repository)
     @Provides
     fun providePlayListRV(repository: Repository): PlayListRV = PlayListRV(repository)

@@ -25,7 +25,6 @@ class RepositoryImpl(
     private val mediaPlayer: MediaPlayer,
     private val testDBDao: MusicCache
 ) : Repository {
-    override fun rvArtist(): Either<None, List<Track>> = media.getMediaFilesFromPath("storage", "all")
     override fun rvPlayList(): Flow<List<PlayListModel>> = testDBDao.getAllPlayList()
     override fun rvCategory(): Either<None, List<CategoryMusicModel>> = media.getCategory()
     override fun rvFavorite(): Flow<List<Track>> = testDBDao.getAllFavoriteSongs()

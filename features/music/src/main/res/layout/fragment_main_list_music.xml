@@ -49,7 +49,7 @@
             android:background="@drawable/search_view_background"
             android:foreground="@drawable/search_view_background_perimeter"
             android:layoutDirection="rtl"
-            android:visibility="gone"
+            android:visibility="visible"
             android:textColorHint="@color/white"
             android:textSize="@dimen/marginTop"
             android:theme="@style/ThemeOverlay.SearchView"

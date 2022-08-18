@@ -35,6 +35,7 @@ interface MusicServiceInterface{
         fun checkUSBConnection(): StateFlow<Boolean>
         fun updateWidget():StateFlow<Boolean>
         fun btModeOn():StateFlow<Boolean>
+        fun defaultModeOn(): StateFlow<Boolean>
         fun playListModeOn(): StateFlow<String>
         fun auxModeOn():StateFlow<Boolean>
         fun diskModeOn():StateFlow<Boolean>
@@ -53,11 +54,10 @@ interface MusicServiceInterface{
         fun isShuffleOn(): StateFlow<Boolean>
         fun getMusicData(): StateFlow<String>
         fun initTrack(track: Track, data1: String)
-        fun clearTrackData()
         fun appClosed()
         fun lastSavedState()
         fun checkUsb()
-        fun initPlayListSource(track: Track, playList: PlayListSource)
+        fun initPlayListSource(playList: PlayListSource)
         fun getSource(): StateFlow<String>
     }
 

@@ -188,11 +188,11 @@ class MainListMusicViewModel @Inject constructor(
 
     fun onItemClick(track: Track, data: String, source: PlayListSource) {
         if (track.data != lastMusic.value) {
-            service.value?.initPlayListSource(track, source)
+            service.value?.initPlayListSource(source)
             service.value?.initTrack(track, data)
             service.value?.resume()
         } else {
-            service.value?.initPlayListSource(track, source)
+            service.value?.initPlayListSource(source)
             service.value?.playOrPause()
         }
     }
