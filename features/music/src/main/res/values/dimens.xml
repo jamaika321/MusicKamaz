@@ -21,5 +21,6 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     <dimen name="toggle_button_icon">40dp</dimen>
     <dimen name="alert_dialog_height">252dp</dimen>
     <dimen name="alert_dialog_width">515dp</dimen>
+    <dimen name="search_view_text_size">22sp</dimen>
 
 </resources>

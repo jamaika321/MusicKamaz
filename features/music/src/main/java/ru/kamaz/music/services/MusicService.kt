@@ -20,13 +20,9 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.MainThread
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MAX
-import com.eckom.xtlibrary.twproject.music.bean.MusicName
-import com.eckom.xtlibrary.twproject.music.bean.Record
-import com.eckom.xtlibrary.twproject.music.utils.TWMusic
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,16 +42,13 @@ import ru.kamaz.music_api.BaseConstants.ACTION_PREV
 import ru.kamaz.music_api.BaseConstants.ACTION_TOGGLE_PAUSE
 import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
 import ru.kamaz.music_api.BaseConstants.EXTRA_APP_WIDGET_NAME
-import ru.kamaz.music_api.domain.GetFilesUseCase
 import ru.kamaz.music_api.interactor.*
 import ru.kamaz.music_api.models.*
 import ru.sir.core.Either
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.extensions.launchOn
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
 import javax.inject.Inject
 
 
@@ -334,31 +327,40 @@ Service, OnCompletionListener,
             if (loading is Either.Right && loading.r.isNotEmpty()) {
                 loadAllLists()
                 loading.r[0].let { track ->
-                    tracks = mediaManager.metaDataRetriever(1, listOf(track.data))
-                    initTrack(tracks.find { it.data == track.data } ?: emptyTrack,
-                        track.data ?: "")
-                    resume()
-                    when (track.source) {
-                        "disk" -> {
-                            startDiskMode()
+                    val _loading = mediaManager.loadLastTrack(listOf(track.data))
+                    if (_loading is Either.Right) {
+                        tracks = _loading.r
+                        initTrack(tracks.find { it.data == track.data } ?: emptyTrack,
+                            track.data)
+                        resume()
+                        when (track.source) {
+                            "disk" -> {
+                                startDiskMode()
+                            }
+                            "usb" -> {
+                                checkUsb()
+                                if (isUSBConnected.value) startUsbMode()
+                                else startDiskMode()
+                            }
+                            else -> {
+                                initPlayListSource(PlayListSource(track.source, track.sourceName))
+                            }
                         }
-                        "usb" -> {
-                            checkUsb()
-                            if (isUSBConnected.value) startUsbMode()
-                            else startDiskMode()
-                        }
-                        else -> {
-                            initPlayListSource(PlayListSource(track.source, track.sourceName))
-                        }
+                    } else {
+                        defaultLoading()
                     }
                 }
             } else {
-                updateTracks("5")
-                startDiskMode()
-                if (tracks.size != 0) nextTrack(2)
-                resume()
+                defaultLoading()
             }
         }
+    }
+
+    private fun defaultLoading(){
+        updateTracks("5")
+        startDiskMode()
+        if (tracks.size != 0) nextTrack(2)
+        resume()
     }
 
     private fun loadAllLists() {

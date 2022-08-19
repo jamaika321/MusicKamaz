@@ -33,7 +33,7 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             "sdCard" -> scanMediaFilesInSdCard(mode)
             "storage" -> getAllTracks(mode)
             "all" -> getAllTracks(mode)
-            else -> Either.Left(None())
+            else -> Left(None())
         }
     }
 
@@ -54,14 +54,19 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         //Переделать количество загружаемых треков
 
         return if (listWithTrackData.isEmpty()) {
-            Either.Left(None())
-        }else{
+            Left(None())
+        } else {
             Either.Right(listWithTrackData)
         }
 
     }
 
-    override fun metaDataRetriever(cycleNum: Int, trackPaths: List<String>): ArrayList<Track> {
+    override fun loadLastTrack(trackPaths: List<String>): Either<None, ArrayList<Track>> {
+        return if (File(trackPaths[0]).exists()) Either.Right(metaDataRetriever(1, trackPaths))
+        else Left(None())
+    }
+
+    private fun metaDataRetriever(cycleNum: Int, trackPaths: List<String>): ArrayList<Track> {
         val listWithTrackData = ArrayList<Track>()
         metaRetriever = MediaMetadataRetriever()
         for (i in 0 until cycleNum) {
@@ -70,11 +75,14 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             metaRetriever.setDataSource(trackPaths[i])
 
             val artist =
-                metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST)) ?: ("unknown")
+                metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST))
+                    ?: ("unknown")
             val album =
                 metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))
                     ?: ("unknown")
-            val title = metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE)) ?: ("unknown")
+            val title =
+                metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE))
+                    ?: ("unknown")
             val duration =
                 metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
                     ?.toLong() ?: (180)
@@ -82,9 +90,8 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             val id = i.toLong()
 
 
-
-            val source = if (data.contains("/storage/usb")){
-                    "usb"
+            val source = if (data.contains("/storage/usb")) {
+                "usb"
             } else {
                 "disk"
             }
@@ -93,13 +100,17 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             var albumArt = File("")
 
             val file = File(
-                Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator + title.replace("/", "") + ".png"
+                Environment.getExternalStorageDirectory()
+                    .toString() + File.separator + "musicAlbumArt" + File.separator + title.replace(
+                    "/",
+                    ""
+                ) + ".png"
             )
             if (!file.exists()) {
-                var art = metaRetriever.embeddedPicture
+                val art = metaRetriever.embeddedPicture
                 if (art != null) {
                     val bitMap = BitmapFactory.decodeByteArray(art, 0, art.size)
-                    albumArt = getAlbumArt(bitMap, title.replace("/",""))
+                    albumArt = getAlbumArt(bitMap, title.replace("/", ""))
                 }
             } else {
                 albumArt = file
@@ -125,8 +136,8 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         return listWithTrackData
     }
 
-    override fun deleteTrackFromMemory(data: String){
-        var file = File(data)
+    override fun deleteTrackFromMemory(data: String) {
+        val file = File(data)
         file.delete()
     }
 
@@ -147,27 +158,32 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
     }
 
 
-
     private fun scanTracksPath(source: String): Either<None, List<String>> {
         val list = ArrayList<String>()
         when (source) {
             "usb" -> {
-                list.addAll(readRecursive(File("/storage/usbdisk0"), listOf("mp3", "wav")).sorted().map {
-                    it.toString()
-                })
+                list.addAll(
+                    readRecursive(File("/storage/usbdisk0"), listOf("mp3", "wav")).sorted().map {
+                        it.toString()
+                    })
             }
             "disk" -> {
-                list.addAll(readRecursive(File("/storage/emulated/0"), listOf("mp3", "wav")).sorted().map {
-                    it.toString()
-                })
-                list.addAll(readRecursive(File("/storage/usbdisk0"), listOf("mp3", "wav")).sorted().map {
-                    it.toString()
-                })
+                list.addAll(
+                    readRecursive(
+                        File("/storage/emulated/0"),
+                        listOf("mp3", "wav")
+                    ).sorted().map {
+                        it.toString()
+                    })
+                list.addAll(
+                    readRecursive(File("/storage/usbdisk0"), listOf("mp3", "wav")).sorted().map {
+                        it.toString()
+                    })
             }
         }
 
         return if (list.isEmpty()) {
-            Either.Left(None())
+            Left(None())
         } else {
             Either.Right(list)
         }
@@ -186,13 +202,13 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
     }
 
     private fun getFolderWithMusic(root: File, extensions: List<String>): List<File> {
-        var list = ArrayList<File>()
+        val list = ArrayList<File>()
         root.listFiles()?.filter { it.isDirectory }?.forEach {
             list.addAll(getFolderWithMusic(it, extensions))
         }
 
         root.listFiles()?.filter { extensions.contains(it.extension) }?.forEach {
-            if (it != null){
+            if (it != null) {
                 list.add(root)
             }
         }
@@ -228,7 +244,11 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             CategoryMusicModel(R.drawable.ic_songers, context.getString(R.string.artists), 0),
             CategoryMusicModel(R.drawable.ic_albom, context.getString(R.string.albums), 2),
             CategoryMusicModel(R.drawable.ic_play_list, context.getString(R.string.playlists), 3),
-            CategoryMusicModel(R.drawable.ic_like_for_list, context.getString(R.string.favorites), 4)
+            CategoryMusicModel(
+                R.drawable.ic_like_for_list,
+                context.getString(R.string.favorites),
+                4
+            )
         )
         array.addAll(category)
         return Either.Right(array)
@@ -237,13 +257,17 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
 
     override fun getAllFolder(): Either<None, List<AllFolderWithMusic>> {
 
-        var result = ArrayList<AllFolderWithMusic>()
+        val result = ArrayList<AllFolderWithMusic>()
 
         getFolderWithMusic(File("/storage/usbdisk0"), listOf("mp3", "wav")).forEach {
-            if (!result.contains(AllFolderWithMusic(it.name, it.toString()))) result.add(AllFolderWithMusic(it.name, it.toString()))
+            if (!result.contains(AllFolderWithMusic(it.name, it.toString()))) result.add(
+                AllFolderWithMusic(it.name, it.toString())
+            )
         }
         getFolderWithMusic(File("/storage/emulated/0"), listOf("mp3", "wav")).forEach {
-            if (!result.contains(AllFolderWithMusic(it.name, it.toString()))) result.add(AllFolderWithMusic(it.name, it.toString()))
+            if (!result.contains(AllFolderWithMusic(it.name, it.toString()))) result.add(
+                AllFolderWithMusic(it.name, it.toString())
+            )
         }
 
         return Either.Right(result)
@@ -261,13 +285,15 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         return try {
 
             file = File(
-                Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator
+                Environment.getExternalStorageDirectory()
+                    .toString() + File.separator + "musicAlbumArt" + File.separator
             )
             file.mkdirs()
 
 
             file = File(
-                Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator + fileNameToSave
+                Environment.getExternalStorageDirectory()
+                    .toString() + File.separator + "musicAlbumArt" + File.separator + fileNameToSave
             )
 
             if (!file.exists()) file.createNewFile()
@@ -289,14 +315,15 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         }
     }
 
-    override fun deleteAlbumArtDir(){
-        var file : File? = null
+    override fun deleteAlbumArtDir() {
+        var file: File?
         try {
             file = File(
-                Environment.getExternalStorageDirectory().toString() + File.separator + "musicAlbumArt" + File.separator
+                Environment.getExternalStorageDirectory()
+                    .toString() + File.separator + "musicAlbumArt" + File.separator
             )
             file.deleteRecursively()
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

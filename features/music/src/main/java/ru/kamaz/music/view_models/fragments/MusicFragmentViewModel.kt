@@ -21,7 +21,7 @@ import javax.inject.Inject
 class MusicFragmentViewModel @Inject constructor(
     application: Application,
     private val testSettings: TestSettings,
-    private val getMusicPosition: GetMusicPosition,
+    getMusicPosition: GetMusicPosition,
 ) : BaseViewModel(application), MediaPlayer.OnCompletionListener, ServiceConnection,
     MusicServiceInterface.ViewModel, MusicManagerListener {
 

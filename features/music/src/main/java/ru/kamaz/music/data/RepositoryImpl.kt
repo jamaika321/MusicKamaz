@@ -31,9 +31,6 @@ class RepositoryImpl(
     override fun rvAllFolderWithMusic(): Either<None, List<AllFolderWithMusic>> =
         media.getAllFolder()
 
-    override fun getMusicCover(albumId: Long): Either<None, String> =
-        media.getAlbumImagePath(albumId)
-
     override fun getMusicPositionFlow(): Flow<Int> = flow {
         while (true) {
             val currentPosition = mediaPlayer.currentPosition
@@ -116,26 +113,6 @@ class RepositoryImpl(
         this.timePlayed,
         this.source,
         this.sourceName
-    )
-    private fun Track.toDao() = TrackEntity(
-        this.id,
-        this.title,
-        this.artist,
-        this.data,
-        this.duration,
-        this.album,
-        this.albumArt,
-        this.playing
-    )
-    private fun TrackEntity.fromDao() = Track(
-        this.id,
-        this.title,
-        this.artist,
-        this.data,
-        this.duration,
-        this.album,
-        this.albumArt,
-        this.playing
     )
 
     private val devicePath = "/storage/usbdisk0"

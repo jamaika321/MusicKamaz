@@ -73,7 +73,7 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
         }
 
         binding.settings.setOnClickListener {
-            (parent as MainListMusicFragment).onOptionsItemClicked(_position.value, data)
+            (parent as MainListMusicFragment).onOptionsItemClicked(data)
         }
 
         binding.root.setOnClickListener {

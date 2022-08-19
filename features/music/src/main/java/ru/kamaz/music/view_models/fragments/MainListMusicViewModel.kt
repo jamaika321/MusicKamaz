@@ -210,8 +210,6 @@ class MainListMusicViewModel @Inject constructor(
                 updatePlayListName.run(UpdatePlayListName.Params(name, newName))
             }
             Toast.makeText(context, R.string.saved , Toast.LENGTH_SHORT).show()
-        } else {
-
         }
     }
 

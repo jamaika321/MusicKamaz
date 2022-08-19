@@ -35,4 +35,5 @@
     <string name="settings_close">Остаться</string>
     <string name="settings">Настройки</string>
     <string name="default_title">Не исполняется</string>
+    <string name="source">Источник</string>
 </resources>

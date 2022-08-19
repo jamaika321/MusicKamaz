@@ -3,9 +3,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/main_layout_music_item"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginTop= "@dimen/marginTop"
-    android:background="@drawable/ic_back_item"
+    android:background="@drawable/rv_item_back_perimeter"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -18,7 +17,7 @@
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_margin="2dp"
-        app:cardCornerRadius="5px"
+        app:cardCornerRadius="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">

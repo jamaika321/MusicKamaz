@@ -51,7 +51,7 @@
             android:layoutDirection="rtl"
             android:visibility="visible"
             android:textColorHint="@color/white"
-            android:textSize="@dimen/marginTop"
+            android:textSize="@dimen/search_view_text_size"
             android:theme="@style/ThemeOverlay.SearchView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

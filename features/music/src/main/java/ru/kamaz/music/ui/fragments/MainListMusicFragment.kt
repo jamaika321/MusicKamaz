@@ -224,16 +224,10 @@ class MainListMusicFragment
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        (view as ViewGroup).removeAllViews()
+    override fun onDestroyView() {
+        super.onDestroyView()
     }
 
-    override fun onPause() {
-        super.onPause()
-        (view as ViewGroup).removeAllViews()
-
-    }
 
     private fun searchActive() {
         val searchView = binding.search
@@ -284,7 +278,7 @@ class MainListMusicFragment
         viewModel.onLikeClicked(track)
     }
 
-    fun onOptionsItemClicked(position: Int, track: Track) {
+    fun onOptionsItemClicked( track: Track) {
         showOptionDialog(track)
     }
 
@@ -356,7 +350,7 @@ class MainListMusicFragment
             binding.rvAllMusic.setPadding(0, 60, 0, 0)
         } else {
             viewModel.rvScrollState.value = 0
-            binding.search.visibility = View.INVISIBLE
+            binding.search.visibility = View.GONE
             binding.rvAllMusic.setPadding(0, 30, 0, 0)
         }
 
@@ -369,15 +363,15 @@ class MainListMusicFragment
     }
 
 
-    fun getCategoryLists(category: String, playlist: List<Track>): List<Track> {
-        val categoryList: MutableList<Track> = mutableListOf()
-        playlist.forEach {
-            if (it.artist == category && !categoryList.contains(it.artist)) {
-                categoryList.add(it)
-            }
-        }
-        return categoryList
-    }
+//    fun getCategoryLists(category: String, playlist: List<Track>): List<Track> {
+//        val categoryList: MutableList<Track> = mutableListOf()
+//        playlist.forEach {
+//            if (it.artist == category && !categoryList.contains(it.artist)) {
+//                categoryList.add(it)
+//            }
+//        }
+//        return categoryList
+//    }
 
     fun onFolderClicked(data: String, name: String) {
         viewModel.fillFolderPlaylist(data)
@@ -523,7 +517,7 @@ class MainListMusicFragment
             viewModel.playLists.value.find { it.title == viewModel.activePlayListName.value }.let {
                 it?.trackDataList?.forEach { playlist ->
                     if (playlist == data.data){
-                        it?.trackDataList.remove(playlist)
+                        it.trackDataList.remove(playlist)
                     }
                 }
             }

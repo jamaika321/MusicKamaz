@@ -17,7 +17,7 @@ interface MediaManager {
     fun getAllFolder(): Either<None, List<AllFolderWithMusic>>
     fun deleteAlbumArtDir()
     fun deleteTrackFromMemory(data: String)
-    fun metaDataRetriever(cycleNum: Int, trackPaths: List<String>): ArrayList<Track>
+    fun loadLastTrack(trackPaths: List<String>): Either<None, ArrayList<Track>>
 
 
 }

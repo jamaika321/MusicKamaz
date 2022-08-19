@@ -47,10 +47,6 @@ abstract class BaseFragment<T : BaseViewModel, B : ViewBinding>(private val type
         setListeners()
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
-
     private fun initOnBackPressedCallback() {
         onBackPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
