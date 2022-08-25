@@ -1,11 +1,15 @@
 package ru.sir.presentation.base.recycler_view
 
+import android.annotation.SuppressLint
+import android.util.Log
 import android.util.SparseArray
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import kotlinx.coroutines.flow.StateFlow
@@ -20,11 +24,15 @@ class RecyclerViewAdapter<D>(private val producers: SparseArray<ViewHolderProduc
     private var _data = mutableListOf<RecyclerViewBaseDataModel>()
     init {
         data.launchWhenStarted(parent.lifecycleScope) {
+            val list : List<RecyclerViewBaseDataModel> = transform(it)
+            val diffResult = DiffUtil.calculateDiff(DiffUtilCallback(list))
             _data.clear()
-            _data.addAll(transform(it))
+            _data.addAll(list)
             notifyDataSetChanged()
+            diffResult.dispatchUpdatesTo(this)
         }
     }
+
 
     class Builder<VM : Fragment, D>(private val parent: VM, private val dataFlow: StateFlow<D>) {
         private val producers = SparseArray<ViewHolderProducer<*, *, *>>()
@@ -53,5 +61,20 @@ class RecyclerViewAdapter<D>(private val producers: SparseArray<ViewHolderProduc
 
     override fun getItemViewType(position: Int): Int {
         return _data[position].getType()
+    }
+
+    private inner class DiffUtilCallback(private val newItems: List<RecyclerViewBaseDataModel>) : DiffUtil.Callback(){
+        override fun getOldListSize(): Int = itemCount
+
+        override fun getNewListSize(): Int = newItems.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return newItems[newItemPosition].getData() == _data[oldItemPosition].getData()
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return newItems[newItemPosition] == _data[oldItemPosition]
+        }
+
     }
 }

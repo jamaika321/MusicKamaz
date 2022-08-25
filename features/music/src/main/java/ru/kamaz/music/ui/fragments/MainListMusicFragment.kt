@@ -41,6 +41,9 @@ class MainListMusicFragment
         app.getComponent<MusicComponent>().inject(this)
     }
 
+    private var binDing : FragmentMainListMusicBinding? = null
+    private val _binding get() = binDing!!
+
     private var mode = ListState.CATEGORY
 
     companion object {
@@ -65,7 +68,7 @@ class MainListMusicFragment
 
     override fun onBackPressed() {
         when (mode) {
-            ListState.PLAYLIST -> {
+            ListState.MAINPLAYLIST -> {
                 backToPlayer()
             }
             ListState.FOLDER -> {
@@ -96,13 +99,15 @@ class MainListMusicFragment
     }
 
     enum class ListState(val value: Int) {
-        PLAYLIST(0),
+        MAINPLAYLIST(0),
         CATEGORY(1),
         CATPLAYLIST(2),
         FOLDER(3),
         FOLDPLAYLIST(4),
         PLAYLISTMUSIC(5),
-        CATFAVORITES(6)
+        FAVORITEPLAYLIST(6),
+        ARTISTPLAYLIST(7),
+        ALBUMSPLAYLIST(8)
     }
 
     private fun initServiceVars() {
@@ -111,12 +116,13 @@ class MainListMusicFragment
         }
 
         viewModel.allMusic.launchWhenStarted(lifecycleScope) {
-            if (mode == ListState.PLAYLIST) categoryItemClicked(RV_ITEM)
+            if (mode == ListState.MAINPLAYLIST) categoryItemClicked(RV_ITEM)
         }
 
         viewModel.serviceTracks.launchWhenStarted(lifecycleScope) {
             viewModel.fillAllTracksList()
             viewModel.loadAllDBLists()
+            _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
         }
 
         viewModel.playLists.launchWhenStarted(lifecycleScope) {
@@ -132,7 +138,7 @@ class MainListMusicFragment
         }
 
         viewModel.favoriteSongs.launchWhenStarted(lifecycleScope) {
-            if (mode == ListState.CATFAVORITES) categoryItemClicked(RV_ITEM_MUSIC_FAVORITE)
+            if (mode == ListState.FAVORITEPLAYLIST) categoryItemClicked(RV_ITEM_MUSIC_FAVORITE)
         }
 
         viewModel.folderMusicPlaylist.launchWhenStarted(lifecycleScope) {
@@ -147,39 +153,53 @@ class MainListMusicFragment
             }
         }
 
-        binding.rvAllMusic.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        viewModel.artistsPlaylist.launchWhenStarted(lifecycleScope) {
+            if (mode == ListState.ARTISTPLAYLIST) {
+                _binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.artistsPlaylist, RV_ITEM)
+                _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
+            }
+        }
+
+        viewModel.albumsPlaylist.launchWhenStarted(lifecycleScope) {
+            if (mode == ListState.ALBUMSPLAYLIST) {
+                _binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.albumsPlaylist, RV_ITEM)
+                _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
+            }
+        }
+
+        _binding.rvAllMusic.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 viewModel.rvScrollState.value += dy
                 if (viewModel.rvScrollState.value > 5) {
-                    binding.search.visibility = View.INVISIBLE
+                    _binding.search.visibility = View.INVISIBLE
                 } else {
-                    binding.search.visibility = View.VISIBLE
+                    _binding.search.visibility = View.VISIBLE
                 }
             }
         })
     }
 
-
-    override fun initBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = FragmentMainListMusicBinding.inflate(inflater, container, false)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binDing = null
+    }
 
     override fun setListeners() {
-        binding.sourceSelection.listMusic.setOnClickListener {
+        _binding.sourceSelection.listMusic.setOnClickListener {
             categoryItemClicked(RV_ITEM)
         }
-        binding.sourceSelection.folderMusic.setOnClickListener {
+        _binding.sourceSelection.folderMusic.setOnClickListener {
             categoryItemClicked(RV_ITEM_MUSIC_FOLDER)
         }
-        binding.sourceSelection.categoryMusic.setOnClickListener {
+        _binding.sourceSelection.categoryMusic.setOnClickListener {
             categoryItemClicked(RV_ITEM_MUSIC_CATEGORY)
         }
-        binding.search.setOnClickListener(object : View.OnClickListener {
+        _binding.search.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
-                binding.search.setIconified(false)
+                _binding.search.setIconified(false)
                 searchActive()
             }
         })
@@ -224,13 +244,8 @@ class MainListMusicFragment
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
-
-
     private fun searchActive() {
-        val searchView = binding.search
+        val searchView = _binding.search
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
@@ -251,7 +266,7 @@ class MainListMusicFragment
     fun onTrackClicked(track: Track, position: Int) {
         viewModel.rvPosition.value = position
         when (mode) {
-            ListState.PLAYLIST -> {
+            ListState.MAINPLAYLIST -> {
                 viewModel.onItemClick(track, track.data, PlayListSource("all", "all"))
             }
             ListState.PLAYLISTMUSIC -> {
@@ -268,10 +283,28 @@ class MainListMusicFragment
                     PlayListSource("folder", viewModel.activeFolderName.value)
                 )
             }
-            ListState.CATFAVORITES -> {
+            ListState.FAVORITEPLAYLIST -> {
                 viewModel.onItemClick(track, track.data, PlayListSource("favorite", "Избранное"))
             }
+            ListState.ARTISTPLAYLIST -> {
+                viewModel.onItemClick(track, track.data, PlayListSource("artists", track.artist))
+            }
+            ListState.ALBUMSPLAYLIST -> {
+                viewModel.onItemClick(track, track.data, PlayListSource("albums", track.album))
+            }
         }
+    }
+
+    fun openArtistPlayList(name: String){
+        this.mode = ListState.ARTISTPLAYLIST
+        viewModel.fillArtistsPlayList(name)
+        viewModel.activeArtistName.value = name
+    }
+
+    fun openAlbumsPlayList(name: String){
+        this.mode = ListState.ALBUMSPLAYLIST
+        viewModel.fillAlbumsPlayList(name)
+        viewModel.activeAlbumName.value = name
     }
 
     fun onLikeClicked(track: Track) {
@@ -284,60 +317,60 @@ class MainListMusicFragment
 
     override fun onStop() {
         super.onStop()
-        binding.rvAllMusic.layoutManager = null
+        _binding.rvAllMusic.layoutManager = null
     }
 
     fun categoryItemClicked(id: Int) {
         when (id) {
             0 -> {//Artist
                 viewModel.getCategoryList(id)
-                binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList, id)
+                _binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
+                _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList, id)
                 this.mode = ListState.CATPLAYLIST
             }
             2 -> {//Albums
                 viewModel.getCategoryList(id)
-                binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList, id)
+                _binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
+                _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryList, id)
                 this.mode = ListState.CATPLAYLIST
             }
             3 -> {//Playlists
-                binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.listPlayList, id)
+                _binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
+                _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.listPlayList, id)
                 this.mode = ListState.CATPLAYLIST
             }
             4 -> {//Favorite
-                binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.favoriteSongs, id)
-                binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
-                this.mode = ListState.CATFAVORITES
+                _binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.favoriteSongs, id)
+                _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
+                this.mode = ListState.FAVORITEPLAYLIST
             }
             5 -> {//RV_ITEM
-                binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.allMusic, id)
-                binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
-                this.mode = ListState.PLAYLIST
+                _binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.allMusic, id)
+                _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
+                this.mode = ListState.MAINPLAYLIST
             }
             6 -> {//MusicCategory
-                binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryOfMusic, id)
+                _binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
+                _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.categoryOfMusic, id)
                 this.mode = ListState.CATEGORY
             }
             7 -> {//Folders
-                binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.foldersLists, id)
+                _binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
+                _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.foldersLists, id)
                 this.mode = ListState.FOLDER
             }
             8 -> {//PlaylistMusic
-                binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.playListMusic, id)
-                binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
+                _binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.playListMusic, id)
+                _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
                 this.mode = ListState.PLAYLISTMUSIC
             }
             9 -> {//FolderPlayLists
-                binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
-                binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.folderMusicPlaylist, id)
-                binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
+                _binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.folderMusicPlaylist, id)
+                _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
                 this.mode = ListState.FOLDPLAYLIST
             }
         }
@@ -345,13 +378,15 @@ class MainListMusicFragment
     }
 
     private fun searchViewVisibility() {
-        if (mode == ListState.PLAYLIST /*|| mode == ListState.PLAYLISTMUSIC || mode == ListState.FOLDPLAYLIST*/) {
-            binding.search.visibility = View.VISIBLE
-            binding.rvAllMusic.setPadding(0, 60, 0, 0)
+        val firstPosition = _binding.rvAllMusic.layoutManager as LinearLayoutManager
+        firstPosition.findFirstVisibleItemPosition()
+        if (mode == ListState.MAINPLAYLIST /*|| mode == ListState.PLAYLISTMUSIC || mode == ListState.FOLDPLAYLIST*/) {
+            _binding.search.visibility = View.VISIBLE
+            _binding.rvAllMusic.setPadding(0, 60, 0, 0)
         } else {
             viewModel.rvScrollState.value = 0
-            binding.search.visibility = View.GONE
-            binding.rvAllMusic.setPadding(0, 30, 0, 0)
+            _binding.search.visibility = View.GONE
+            _binding.rvAllMusic.setPadding(0, 30, 0, 0)
         }
 
     }
@@ -553,6 +588,15 @@ class MainListMusicFragment
             dialog.dismiss()
         }
         dialog.show()
+    }
+
+    override fun initBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): FragmentMainListMusicBinding {
+        binDing = FragmentMainListMusicBinding.inflate(inflater, container, false)
+        return _binding
     }
 
 

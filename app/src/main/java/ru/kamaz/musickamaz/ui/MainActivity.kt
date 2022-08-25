@@ -1,6 +1,5 @@
 package ru.kamaz.musickamaz.ui
 
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.navigation.findNavController
 import ru.kamaz.music.ui.NavAction

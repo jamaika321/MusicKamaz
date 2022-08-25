@@ -71,7 +71,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         metaRetriever = MediaMetadataRetriever()
         for (i in 0 until cycleNum) {
             if (i == trackPaths.size) break
-            Log.i("ReviewTest_Last", " path : ${trackPaths[i]}")
             metaRetriever.setDataSource(trackPaths[i])
 
             val artist =

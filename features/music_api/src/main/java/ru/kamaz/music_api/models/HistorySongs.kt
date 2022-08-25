@@ -7,5 +7,6 @@ data class HistorySongs (
     val data: String,
     val timePlayed: Long,
     val source: String,
-    val sourceName: String = ""
+    val sourceName: String = "",
+    val favorites: Boolean = false
     ): Serializable

@@ -74,7 +74,7 @@ class RepositoryImpl(
         testDBDao.deletePlayList(playList)
 
     override fun insertHistorySong(song: HistorySongs): Either<Failure, None> {
-        Log.i("ReviewTest_LastMusicRe", " ${song.toDao().data}: ")
+
         return testDBDao.insertHistorySong(song.toDao())
     }
 
@@ -112,7 +112,8 @@ class RepositoryImpl(
         this.data,
         this.timePlayed,
         this.source,
-        this.sourceName
+        this.sourceName,
+        this.favorites
     )
 
     private val devicePath = "/storage/usbdisk0"

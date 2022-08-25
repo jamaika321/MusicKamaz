@@ -28,32 +28,25 @@ interface TestSettings {
         private var mTWEQUtilHandler: Handler = @SuppressLint("HandlerLeak")
         object : Handler() {
             override fun handleMessage(msg: Message) {
-                Log.i("ReviewTest_AUX222", " ${msg.what}: ${msg.arg1} : ${msg.arg2}")
                 when (msg.what) {
                     0x201 -> {
                         MSGBYTE = msg.arg2
                         this.removeMessages(MEssageDelay)
                         sendEmptyMessageDelayed(MEssageDelay, 150)
                     }
-                    0xff0f -> {
-                        Log.i("ReviewTest_AUX21", "handleMessage: ")
-                    }
-                    0xff0e -> Log.i("ReviewTest_AUX22", "handleMessage: ")
-                    0xff00 -> Log.i("ReviewTest_AUX23", "handleMessage: ")
-                    0xff0e -> Log.i("ReviewTest_AUX24", "handleMessage: ")
-
                     MEssageDelay -> onHandleMessage.invoke(MSGBYTE)
                 }
             }
         }
 
         override fun onCreate(){
-            if (settingsUtil.open(shortArrayOf(0x0205)) == 0) onResume()
+            onResume()
         }
 
         override fun start(start: (Int) -> Unit) {
             onHandleMessage = start
-//            settingsUtil.start()
+            settingsUtil.addHandler(TAG, mTWEQUtilHandler)
+            settingsUtil.write(0x201, 0xff)
         }
 
         private fun onResume(){
@@ -62,7 +55,7 @@ interface TestSettings {
             settingsUtil.addHandler(TAG, mTWEQUtilHandler)
             requestSource(true)
             requestBrake()
-            Log.i("ReviewTest_Short", "  :  ${settingsUtil.open(shortArrayOf(0x0301))}")
+
         }
 
         private fun requestService(activity: Int){

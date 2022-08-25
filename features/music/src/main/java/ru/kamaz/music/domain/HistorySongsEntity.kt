@@ -15,5 +15,6 @@ class HistorySongsEntity (
     @ColumnInfo(name = "source")
     val source: String,
     @ColumnInfo(name = "sourceName")
-    val sourceName: String
+    val sourceName: String,
+    val favorites: Boolean
     )

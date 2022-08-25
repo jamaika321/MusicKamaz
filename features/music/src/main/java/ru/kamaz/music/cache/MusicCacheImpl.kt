@@ -59,7 +59,6 @@ class MusicCacheImpl(private val prefsManager: SharedPrefsManager, private val d
 
     override fun insertHistorySong(song: HistorySongsEntity): Either<Failure, None> {
         db.historySongsDao().insertAll(listOf(song))
-        Log.i("ReviewTest_LastMusic", "insertHistorySong:  ")
         return Either.Right(None())
     }
 
@@ -116,7 +115,8 @@ class MusicCacheImpl(private val prefsManager: SharedPrefsManager, private val d
                     entity.data,
                     entity.timePlayed,
                     entity.source,
-                    entity.sourceName
+                    entity.sourceName,
+                    entity.favorites
                 )
             )
         }
