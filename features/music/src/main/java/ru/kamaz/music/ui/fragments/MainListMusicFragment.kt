@@ -44,6 +44,8 @@ class MainListMusicFragment
     private var binDing : FragmentMainListMusicBinding? = null
     private val _binding get() = binDing!!
 
+    private val layoutManager = LinearLayoutManager(context)
+
     private var mode = ListState.CATEGORY
 
     companion object {
@@ -155,7 +157,7 @@ class MainListMusicFragment
 
         viewModel.artistsPlaylist.launchWhenStarted(lifecycleScope) {
             if (mode == ListState.ARTISTPLAYLIST) {
-                _binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                _binding.rvAllMusic.layoutManager = layoutManager
                 _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.artistsPlaylist, RV_ITEM)
                 _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
             }
@@ -163,7 +165,7 @@ class MainListMusicFragment
 
         viewModel.albumsPlaylist.launchWhenStarted(lifecycleScope) {
             if (mode == ListState.ALBUMSPLAYLIST) {
-                _binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                _binding.rvAllMusic.layoutManager = layoutManager
                 _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.albumsPlaylist, RV_ITEM)
                 _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
             }
@@ -172,11 +174,10 @@ class MainListMusicFragment
         _binding.rvAllMusic.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                viewModel.rvScrollState.value += dy
-                if (viewModel.rvScrollState.value > 5) {
-                    _binding.search.visibility = View.INVISIBLE
+                if (layoutManager.findFirstVisibleItemPosition() == 0) {
+                    searchViewVisibility(true)
                 } else {
-                    _binding.search.visibility = View.VISIBLE
+                    searchViewVisibility(false)
                 }
             }
         })
@@ -340,15 +341,13 @@ class MainListMusicFragment
                 this.mode = ListState.CATPLAYLIST
             }
             4 -> {//Favorite
-                _binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                _binding.rvAllMusic.layoutManager = layoutManager
                 _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.favoriteSongs, id)
-                _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
                 this.mode = ListState.FAVORITEPLAYLIST
             }
             5 -> {//RV_ITEM
-                _binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                _binding.rvAllMusic.layoutManager = layoutManager
                 _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.allMusic, id)
-                _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
                 this.mode = ListState.MAINPLAYLIST
             }
             6 -> {//MusicCategory
@@ -362,29 +361,24 @@ class MainListMusicFragment
                 this.mode = ListState.FOLDER
             }
             8 -> {//PlaylistMusic
-                _binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                _binding.rvAllMusic.layoutManager = layoutManager
                 _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.playListMusic, id)
-                _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
                 this.mode = ListState.PLAYLISTMUSIC
             }
             9 -> {//FolderPlayLists
-                _binding.rvAllMusic.layoutManager = LinearLayoutManager(context)
+                _binding.rvAllMusic.layoutManager = layoutManager
                 _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.folderMusicPlaylist, id)
-                _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
                 this.mode = ListState.FOLDPLAYLIST
             }
         }
-        searchViewVisibility()
+        searchViewVisibility(true)
     }
 
-    private fun searchViewVisibility() {
-        val firstPosition = _binding.rvAllMusic.layoutManager as LinearLayoutManager
-        firstPosition.findFirstVisibleItemPosition()
-        if (mode == ListState.MAINPLAYLIST /*|| mode == ListState.PLAYLISTMUSIC || mode == ListState.FOLDPLAYLIST*/) {
+    private fun searchViewVisibility(visible: Boolean) {
+        if (mode == ListState.MAINPLAYLIST && visible/*|| mode == ListState.PLAYLISTMUSIC || mode == ListState.FOLDPLAYLIST*/) {
             _binding.search.visibility = View.VISIBLE
             _binding.rvAllMusic.setPadding(0, 60, 0, 0)
         } else {
-            viewModel.rvScrollState.value = 0
             _binding.search.visibility = View.GONE
             _binding.rvAllMusic.setPadding(0, 30, 0, 0)
         }

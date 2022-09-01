@@ -303,22 +303,20 @@ Service, OnCompletionListener,
         }
 
         artist.launchOn(lifecycleScope) {
-            Log.i("Test_Widget", " art: $it")
             widgettest.updateTestArtist(this, it)
         }
 
         title.launchOn(lifecycleScope) {
-            Log.i("Test_Widget", " tit: $it")
+            Log.i("Test_Widget", "title : $it")
             widgettest.updateTestTitle(this, it)
+            widgettest
         }
 
         duration.launchOn(lifecycleScope) {
-            Log.i("Test_Widget", " dur: $it")
-            widgettest.updateTestDuration(this, it)
+//            widgettest.updateTestDuration(this, it)
         }
 
         isPlaying.launchOn(lifecycleScope) {
-            Log.i("Test_Widget", " isp: $it")
             widgettest.updatePlayPauseImg(this, it)
         }
 
@@ -370,7 +368,7 @@ Service, OnCompletionListener,
     private fun loadAllLists() {
         CoroutineScope(Dispatchers.IO).launch {
             loadTracksOnCoroutine("all")
-            delay(5000)
+            delay(10000)//TODO
             getAllFavoriteSongs.run(None()).collect {
                 favoriteTracks.value = it
                 Log.i("Test_Favorites", "  :${it} ")
@@ -388,7 +386,6 @@ Service, OnCompletionListener,
     }
 
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
-        Log.i("USBstatus", "onUsbStatusChanged:$path ")
         _isUSBConnected.value = isAdded
         loadAllLists()
         if (!isUsbModeOn.value && isAdded) {
@@ -399,13 +396,11 @@ Service, OnCompletionListener,
 
     override fun onDeviceConnected() {
         _isNotConnected.value = false
-        Log.i("DeviceConnection", "Устройство подключено")
     }
 
 
     override fun onDeviceDisconnected() {
         _isNotConnected.value = true
-        Log.i("DeviceConnection", "Устройство отключено")
 //        startDiskMode()
     }
 
@@ -492,7 +487,13 @@ Service, OnCompletionListener,
                 replaceAllTracks(emptyList(), false)
             }
             _sourceName.value = "disk"
-//            nextTrack(2)
+            try {
+                initTrack(tracks[currentTrackPosition.value],
+                tracks[currentTrackPosition.value].data)
+                resume()
+            } catch (e: Exception){
+                e.printStackTrace()
+            }
         }
     }
 
@@ -503,7 +504,13 @@ Service, OnCompletionListener,
                 replaceAllTracks(emptyList(), false)
             }
             _sourceName.value = "usb"
-//            nextTrack(2)
+            try {
+//                initTrack(tracks[currentTrackPosition.value],
+//                    tracks[currentTrackPosition.value].data)
+                resume()
+            } catch (e: Exception){
+                e.printStackTrace()
+            }
         }
     }
 
@@ -918,13 +925,13 @@ Service, OnCompletionListener,
             }
         }
 
-        if (intent != null) {
-            when (intent.action) {
-                ACTION_TOGGLE_PAUSE -> playOrPause()
-                ACTION_NEXT -> nextTrack(0)
-                ACTION_PREV -> previousTrack()
-            }
-        }
+//        if (intent != null) {
+//            when (intent.action) {
+//                ACTION_TOGGLE_PAUSE -> playOrPause()
+//                ACTION_NEXT -> nextTrack(0)
+//                ACTION_PREV -> previousTrack()
+//            }
+//        }
         return START_STICKY
 
 

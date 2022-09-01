@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import android.util.Log
 import android.widget.Toast
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -171,7 +170,6 @@ class MainListMusicViewModel @Inject constructor(
     // TrackList
 
     val rvPosition = MutableStateFlow(0)
-    val rvScrollState = MutableStateFlow(0)
 
     private val _lastMusic = MutableStateFlow("")
     val lastMusic = _lastMusic
@@ -187,12 +185,15 @@ class MainListMusicViewModel @Inject constructor(
         mediaManager.deleteTrackFromMemory(data)
     }
 
+    val staticFavoriteSongs = ArrayList<Track>(emptyList())
+
     private fun getFavoriteTracks() {
-        val favoriteSongs = ArrayList<Track>()
-        serviceTracks.value.forEach { track ->
-            if (track.favorite) favoriteSongs.add(track)
+        if (staticFavoriteSongs.isEmpty()) {
+            serviceTracks.value.forEach { track ->
+                if (track.favorite) staticFavoriteSongs.add(track)
+            }
         }
-        _favoriteSongs.value = favoriteSongs.findPlayingMusic(lastMusic.value).toRecyclerViewItemOfList(RV_ITEM)
+        _favoriteSongs.value = staticFavoriteSongs.findPlayingMusic(lastMusic.value).toRecyclerViewItemOfList(RV_ITEM)
     }
 
     fun fillAllTracksList() {
@@ -408,8 +409,9 @@ class MainListMusicViewModel @Inject constructor(
         return newList
     }
 
+    val trackList = ArrayList<Track>(emptyList())
+
     fun fillFolderPlaylist(data: String) {
-        val trackList = ArrayList<Track>()
         serviceTracks.value.forEach {
             if (it.data.contains(data + File.separator, ignoreCase = true)) {
                 trackList.add(it)
