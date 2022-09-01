@@ -115,6 +115,8 @@ class MusicFragmentViewModel @Inject constructor(
     var musicPosition: StateFlow<Int> =
         getMusicPosition().stateIn(viewModelScope, SharingStarted.Lazily, 0)
 
+    val playListScrolling = MutableStateFlow(false)
+
 
     override fun init() {
         val intent = Intent(context, MusicService::class.java)
@@ -126,13 +128,16 @@ class MusicFragmentViewModel @Inject constructor(
     private fun remoteNextPrevControlButton() {
         testSettings.start {
             when (it) {
-                //Законменчено переключение правой крутилкой
-//                5 -> nextTrack()
-//                6 -> previousTrack()
+                5 -> playListScrolling.value = true
+                6 -> playListScrolling.value = true
                 19 -> nextTrack()
                 21 -> previousTrack()
             }
         }
+    }
+
+    fun openMainListFragment(){
+
     }
 
 

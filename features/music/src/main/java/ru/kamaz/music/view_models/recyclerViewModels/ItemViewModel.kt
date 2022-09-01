@@ -1,5 +1,6 @@
 package ru.kamaz.music.view_models.recyclerViewModels
 
+import android.graphics.Color
 import android.media.MediaPlayer
 import android.net.Uri
 import android.view.View
@@ -21,6 +22,7 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
     private val image = MutableStateFlow("")
     private val playing = MutableStateFlow(false)
     private val favorite = MutableStateFlow(false)
+    private val scrollPosition = MutableStateFlow(false)
     private val _position = MutableStateFlow(0)
     private lateinit var data: Track
 
@@ -31,6 +33,7 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
         image.value = data.albumArt
         playing.value = data.playing
         favorite.value = data.favorite
+        scrollPosition.value = data.scrollPosition
         _position.value = position
     }
 
@@ -38,6 +41,10 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
     lateinit var mediaPlayer : MediaPlayer
 
     override fun initVars() {
+        scrollPosition.launchWhenStarted(parent.lifecycleScope){
+            if (it) binding.foregroundImage.visibility = View.VISIBLE
+            else binding.foregroundImage.visibility = View.GONE
+        }
         artist.launchWhenStarted(parent.lifecycleScope){
             binding.artistName.text=it
         }

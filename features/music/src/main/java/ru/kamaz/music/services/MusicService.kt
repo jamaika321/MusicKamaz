@@ -48,6 +48,7 @@ import ru.sir.core.Either
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.extensions.launchOn
+import ru.sir.presentation.extensions.launchWhenStarted
 import java.io.File
 import javax.inject.Inject
 
@@ -116,6 +117,8 @@ Service, OnCompletionListener,
     private var playLists = MutableStateFlow<List<PlayListModel>>(emptyList())
 
     private var foldersList = MutableStateFlow<List<AllFolderWithMusic>>(emptyList())
+
+    private var favoriteTracks = MutableStateFlow<List<Track>>(emptyList())
 
     private var files = mutableListOf<File>()
 
@@ -304,11 +307,13 @@ Service, OnCompletionListener,
         }
 
         title.launchOn(lifecycleScope) {
+            Log.i("Test_Widget", "title : $it")
             widgettest.updateTestTitle(this, it)
+            widgettest
         }
 
         duration.launchOn(lifecycleScope) {
-            widgettest.updateTestDuration(this, it)
+//            widgettest.updateTestDuration(this, it)
         }
 
         isPlaying.launchOn(lifecycleScope) {
@@ -332,20 +337,18 @@ Service, OnCompletionListener,
                         tracks = _loading.r
                         initTrack(tracks.find { it.data == track.data } ?: emptyTrack,
                             track.data)
-                        resume()
                         when (track.source) {
                             "disk" -> {
                                 startDiskMode()
                             }
                             "usb" -> {
-                                checkUsb()
-                                if (isUSBConnected.value) startUsbMode()
-                                else startDiskMode()
+                                startUsbMode()
                             }
                             else -> {
                                 initPlayListSource(PlayListSource(track.source, track.sourceName))
                             }
                         }
+                        playOrPause()
                     } else {
                         defaultLoading()
                     }
@@ -356,21 +359,19 @@ Service, OnCompletionListener,
         }
     }
 
-    private fun defaultLoading(){
+    private fun defaultLoading() {
         updateTracks("5")
         startDiskMode()
         if (tracks.size != 0) nextTrack(2)
-        resume()
     }
 
     private fun loadAllLists() {
         CoroutineScope(Dispatchers.IO).launch {
-            withContext(Dispatchers.IO) { loadTracksOnCoroutine("all") }
-            rvAllFolderWithMusic(None()) { it.either({}, ::fillFoldersList) }
-            rvPlayList.run(None()).collect {
-                playLists.value = it
-            }
+            loadTracksOnCoroutine("all")
+            delay(10000)//TODO
             getAllFavoriteSongs.run(None()).collect {
+                favoriteTracks.value = it
+                Log.i("Test_Favorites", "  :${it} ")
                 changeFavoriteStatus(it)
             }
         }
@@ -385,7 +386,6 @@ Service, OnCompletionListener,
     }
 
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
-        Log.i("USBstatus", "onUsbStatusChanged:$path ")
         _isUSBConnected.value = isAdded
         loadAllLists()
         if (!isUsbModeOn.value && isAdded) {
@@ -396,26 +396,22 @@ Service, OnCompletionListener,
 
     override fun onDeviceConnected() {
         _isNotConnected.value = false
-        Log.i("DeviceConnection", "Устройство подключено")
     }
 
 
     override fun onDeviceDisconnected() {
         _isNotConnected.value = true
-        Log.i("DeviceConnection", "Устройство отключено")
 //        startDiskMode()
     }
 
     inner class MyBinder : Binder() {
         fun getService(): MusicServiceInterface.Service {
-            Log.i("ReviewTest_Binder", "MyBinder")
 //            loadLastSavedMusic()
             return this@MusicService
         }
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        Log.i("ReviewTest_Binder", "onBind: ")
         return binder
     }
 
@@ -491,7 +487,13 @@ Service, OnCompletionListener,
                 replaceAllTracks(emptyList(), false)
             }
             _sourceName.value = "disk"
-//            nextTrack(2)
+            try {
+                initTrack(tracks[currentTrackPosition.value],
+                tracks[currentTrackPosition.value].data)
+                resume()
+            } catch (e: Exception){
+                e.printStackTrace()
+            }
         }
     }
 
@@ -502,7 +504,13 @@ Service, OnCompletionListener,
                 replaceAllTracks(emptyList(), false)
             }
             _sourceName.value = "usb"
-//            nextTrack(2)
+            try {
+//                initTrack(tracks[currentTrackPosition.value],
+//                    tracks[currentTrackPosition.value].data)
+                resume()
+            } catch (e: Exception){
+                e.printStackTrace()
+            }
         }
     }
 
@@ -581,7 +589,6 @@ Service, OnCompletionListener,
     }
 
     override fun appClosed() {
-        Log.i("ReviewTest_Closed", "appClosed: ")
         stopMediaPlayer()
         twManager.stopMonitoring(applicationContext)
         mediaManager.deleteAlbumArtDir()
@@ -918,13 +925,13 @@ Service, OnCompletionListener,
             }
         }
 
-        if (intent != null) {
-            when (intent.action) {
-                ACTION_TOGGLE_PAUSE -> playOrPause()
-                ACTION_NEXT -> nextTrack(0)
-                ACTION_PREV -> previousTrack()
-            }
-        }
+//        if (intent != null) {
+//            when (intent.action) {
+//                ACTION_TOGGLE_PAUSE -> playOrPause()
+//                ACTION_NEXT -> nextTrack(0)
+//                ACTION_PREV -> previousTrack()
+//            }
+//        }
         return START_STICKY
 
 
@@ -967,9 +974,9 @@ Service, OnCompletionListener,
         val result = mediaManager.getMediaFilesFromPath("all", loadMode)
         if (result is Either.Right && result.r.isNotEmpty()) {
             replaceAllTracks(result.r, true)
-            Log.i("ReviewTest_Update", " : ${result.r.size} ")
+            Log.i("Test_Update", " : ${result.r.size} ")
+            _musicEmpty.value = false
         } else {
-            Log.i("ReviewTest_Update", " : empty ")
             _musicEmpty.value = true
             startDefaultMode()
         }
@@ -1023,6 +1030,11 @@ Service, OnCompletionListener,
                     startDiskMode()
                 }
             }
+        } else {
+            CoroutineScope(Dispatchers.IO).launch {
+                rvAllFolderWithMusic(None()) { it.either({}, ::fillFoldersList) }
+                rvPlayList.run(None()).collect { playLists.value = it }
+            }
         }
     }
 
@@ -1044,6 +1056,7 @@ Service, OnCompletionListener,
     }
 
     override fun initPlayListSource(playList: PlayListSource) {
+        Log.i("Test_InitAll", "  :${playList.type} == ${playList.name} ")
         sourceSelection(SourceEnum.PLAYLIST)
         playListMode.value = playList.type
         selectPlayListMode(playList)
@@ -1055,6 +1068,30 @@ Service, OnCompletionListener,
             "folder" -> getFolderTracks(playList)
             "playList" -> getPlayListTracks(playList)
             "favorite" -> getFavoritePlayList(playList)
+            "artists" -> getArtistPlayList(playList)
+            "albums" -> getArtistPlayList(playList)
+        }
+    }
+
+    private fun getArtistPlayList(playList: PlayListSource) {
+        tracks.clear()
+        _sourceName.value = playList.name
+        var id = 0
+        allTracks.value.forEach {
+            when (playList.type) {
+                "artists" -> {
+                    if (it.artist == playList.name) {
+                        fillTracks(id.toLong(), it)
+                        id++
+                    }
+                }
+                "albums" -> {
+                    if (it.album == playList.name) {
+                        fillTracks(id.toLong(), it)
+                        id++
+                    }
+                }
+            }
         }
     }
 
@@ -1066,8 +1103,7 @@ Service, OnCompletionListener,
             if (data.dir == folder.name)
                 allTracks.value.forEach {
                     if (it.data.contains(
-                            data.data + File.separator + it.title.replace(" ", "_")
-                                .replace(",", "_").replace("-", "_").replace("'", "_")
+                            data.data + File.separator
                         )
                     ) {
                         fillTracks(id.toLong(), it)
@@ -1096,7 +1132,6 @@ Service, OnCompletionListener,
         _sourceName.value = playList.name
         var id = 0
         allTracks.value.forEach {
-            Log.i("ReviewTest_favorite", " : ${it.title} = ${it.favorite.toString()} ")
             if (it.favorite) {
                 fillTracks(id.toLong(), it)
                 id++
@@ -1145,6 +1180,18 @@ Service, OnCompletionListener,
     }
 
     override fun insertFavoriteMusic(data: String) {
+        allTracks.value.find { it.data == data }.let {
+            if (it != null) {
+                if (it.favorite) {
+                    deleteFavoriteMusic(it)
+                    it.favorite = false
+                } else {
+                    insertFavoriteToDB(it)
+                    it.favorite = true
+                }
+                _isFavorite.value = !isFavorite.value
+            }
+        }
         allTracks.value.forEach {
             if (it.data == data) {
                 if (it.favorite) {
@@ -1153,7 +1200,6 @@ Service, OnCompletionListener,
                     insertFavoriteToDB(it)
                 }
                 it.favorite = !it.favorite
-                _isFavorite.value = !isFavorite.value
             }
         }
     }
@@ -1173,19 +1219,20 @@ Service, OnCompletionListener,
     }
 
     private fun changeFavoriteStatus(list: List<Track>) {
-        CoroutineScope(Dispatchers.IO).launch {
-            tracks.forEach { track ->
-                list.forEach { list ->
-                    if (track.title == list.title && track.data == list.data) {
-                        track.favorite = true
-                    }
+        Log.i("Test_Fav", " : ${list} ")
+        tracks.forEach { track ->
+            list.forEach { list ->
+                if (track.title == list.title && track.data == list.data) {
+                    Log.i("Test_Fav", " : ${track.id} ")
+                    track.favorite = true
                 }
             }
-            allTracks.value.forEach { track ->
-                list.forEach { list ->
-                    if (track.data == list.data) {
-                        track.favorite = true
-                    }
+        }
+        allTracks.value.forEach { track ->
+            list.forEach { list ->
+                if (track.data == list.data) {
+                    Log.i("Test_Fav", " : ${track.id} ")
+                    track.favorite = true
                 }
             }
         }
@@ -1201,9 +1248,9 @@ Service, OnCompletionListener,
             data.value,
             mediaPlayer.currentPosition.toLong(),
             playListMode.value,
-            sourceName.value
+            sourceName.value,
+            isFavorite.value
         )
-        Log.i("ReviewTest_InsertLast", "${music.data} ")
         CoroutineScope(Dispatchers.IO).launch {
             insertLastMusic(InsertLastMusic.Params(music))
         }

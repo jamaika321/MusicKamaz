@@ -5,6 +5,7 @@ import androidx.lifecycle.lifecycleScope
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.kamaz.music.databinding.AlbumItemsBinding
+import ru.kamaz.music.ui.fragments.MainListMusicFragment
 import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
@@ -35,7 +36,7 @@ class ItemAlbumsViewModel: RecyclerViewBaseItem<Track, AlbumItemsBinding>(){
 
 
         binding.root.setOnClickListener {
-
+            (parent as MainListMusicFragment).openAlbumsPlayList(data.album)
         }
     }
 

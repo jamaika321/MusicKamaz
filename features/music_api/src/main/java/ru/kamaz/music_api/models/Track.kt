@@ -12,7 +12,8 @@ data class Track(
     val albumArt: String,
     var playing: Boolean = false,
     var favorite: Boolean = false,
-    var source: String = "disk"
+    var source: String = "disk",
+    var scrollPosition: Boolean = false
 ) : Serializable {
     companion object {
         fun convertDuration(value: Long): String {

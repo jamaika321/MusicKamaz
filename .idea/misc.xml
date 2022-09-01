@@ -3,12 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/app/src/main/res/layout/activity_main.xml" value="0.3009833262077811" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/mediator/src/main/res/drawable/ic_back_for_main_category.xml" value="0.337" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/mediator/src/main/res/drawable/ic_back_item.xml" value="0.337" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/mediator/src/main/res/drawable/ic_back_search.xml" value="0.3675" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/mediator/src/main/res/drawable/ic_button_settings.xml" value="0.3675" />
+        <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/mediator/src/main/res/drawable/ic_ic_circle_play_1.xml" value="0.3675" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/mediator/src/main/res/drawable/ic_music_white.xml" value="0.337" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/mediator/src/main/res/drawable/ic_next_switch.xml" value="0.337" />
+        <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/mediator/src/main/res/drawable/ic_play_on_circle.xml" value="0.3675" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/mediator/src/main/res/drawable/ic_plus.xml" value="0.332" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/mediator/src/main/res/drawable/ic_prev_on_circle.xml" value="0.337" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/mediator/src/main/res/drawable/ic_seekbar_thumb.xml" value="0.3675" />
@@ -124,7 +127,7 @@
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/playlist_rename_alert_dialog.xml" value="0.5" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/rename_alert_dialog.xml" value="0.25" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/test_text_item.xml" value="0.36666666666666664" />
-        <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/test_widget.xml" value="0.15433946130825138" />
+        <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/test_widget.xml" value="0.25" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/layout/track_option_alert.xml" value="0.5" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/menu/context_menu_playlist.xml" value="0.3009833262077811" />
         <entry key="..\:/Users/Roi/StudioProjects/MusicKamaz/features/music/src/main/res/menu/menu_navigator.xml" value="0.36666666666666664" />

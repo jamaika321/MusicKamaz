@@ -32,9 +32,6 @@ android {
         jvmTarget = '1.8'
     }
 
-    dataBinding {
-        enabled = true
-    }
     viewBinding {
         enabled = true
     }
@@ -58,6 +55,8 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0"
+//    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.5.1"
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation constraintLayout
     implementation dagger

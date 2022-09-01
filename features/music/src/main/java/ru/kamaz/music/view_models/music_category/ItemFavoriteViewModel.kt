@@ -41,7 +41,6 @@ class ItemFavoriteViewModel : RecyclerViewBaseItem<Track, FavoriteItemBinding>()
         title.value = data.title
         artist.value = data.artist
         image.value = data.albumArt
-        Log.i("ReviewTest_binddata", " favorite: $title  -  $artist ")
 
     }
 }

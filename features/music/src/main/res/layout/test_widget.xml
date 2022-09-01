@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:autoSizeTextType="uniform"
             android:text="title"
-            android:textSize="26sp"
+            android:textSize="14sp"
             android:textColor="@color/white">
         </TextView>
         <TextView
