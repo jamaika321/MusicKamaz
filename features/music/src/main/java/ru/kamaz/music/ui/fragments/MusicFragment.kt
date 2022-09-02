@@ -285,16 +285,20 @@ class MusicFragment :
 //            }
 //        }
 
+        viewModel.allTracksChanged.launchWhenStarted(lifecycleScope) {
+            viewModel.replaceTracks()
+        }
+
         viewModel.isShuffleOn.launchWhenStarted(lifecycleScope) {
             randomSongStatus(it)
         }
-        viewModel.isNotConnectedUsb.launchWhenStarted(lifecycleScope) {
-            if (it) {
-                usbModeActivation()
-            } else {
-                if (this.binDing != null) diskModeActivation()
-            }
-        }
+//        viewModel.isNotConnectedUsb.launchWhenStarted(lifecycleScope) {
+//            if (it) {
+//                usbModeActivation()
+//            } else {
+//                if (this.binDing != null) diskModeActivation()
+//            }
+//        }
         viewModel.isFavoriteMusic.launchWhenStarted(lifecycleScope) {
             likeStatus(it)
         }
