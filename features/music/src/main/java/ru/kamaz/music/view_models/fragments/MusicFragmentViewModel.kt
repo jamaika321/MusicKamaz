@@ -15,6 +15,7 @@ import ru.kamaz.music.domain.TestSettings
 import ru.kamaz.music.services.MusicService
 import ru.kamaz.music.services.MusicServiceInterface
 import ru.kamaz.music_api.interactor.GetMusicPosition
+import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.BaseViewModel
 import javax.inject.Inject
 
@@ -57,10 +58,6 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.getSource() ?: MutableStateFlow("Unknown")
     }
 
-    val isNotConnected: StateFlow<Boolean> by lazy {
-        service.value?.checkDeviceConnection() ?: MutableStateFlow(true)
-    }
-
     val isFavoriteMusic: StateFlow<Boolean> by lazy {
         service.value?.isFavoriteMusic() ?: MutableStateFlow(true)
     }
@@ -75,6 +72,10 @@ class MusicFragmentViewModel @Inject constructor(
 
     val defaultModeOn: StateFlow<Boolean> by lazy {
         service.value?.defaultModeOn() ?: MutableStateFlow(false)
+    }
+
+    val allTracksChanged: StateFlow<List<Track>> by lazy {
+        service.value?.getAllTracks() ?: MutableStateFlow(emptyList())
     }
 
     val lastMusic: StateFlow<String> by lazy {
@@ -140,6 +141,9 @@ class MusicFragmentViewModel @Inject constructor(
 
     }
 
+    fun replaceTracks() {
+        service.value?.replaceAllTracks(emptyList(), false)
+    }
 
     fun shuffleStatusChange() {
         service.value?.shuffleStatusChange()
@@ -162,7 +166,7 @@ class MusicFragmentViewModel @Inject constructor(
     }
 
     fun isSaveLastMusic() {
-        service.value?.insertLastMusic()
+        service.value?.insertLastMusic(666)
     }
 
     fun fillSelectedTrack() {

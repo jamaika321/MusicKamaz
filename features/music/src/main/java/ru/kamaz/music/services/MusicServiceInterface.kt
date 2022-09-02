@@ -30,10 +30,9 @@ interface MusicServiceInterface{
         fun getMusicName(): StateFlow<String>
         fun getArtistName(): StateFlow<String>
         fun getMusicDuration(): StateFlow<Int>
-        fun checkDeviceConnection(): StateFlow<Boolean>
         fun lastMusic(): StateFlow<String>
         fun checkUSBConnection(): StateFlow<Boolean>
-        fun updateWidget():StateFlow<Boolean>
+        fun replaceAllTracks(trackList: List<Track>, replace: Boolean)
         fun btModeOn():StateFlow<Boolean>
         fun defaultModeOn(): StateFlow<Boolean>
         fun playListModeOn(): StateFlow<String>
@@ -47,7 +46,7 @@ interface MusicServiceInterface{
         fun isFavoriteMusic():StateFlow<Boolean>
         fun insertFavoriteMusic(data: String)
         fun shuffleStatusChange()
-        fun insertLastMusic()
+        fun insertLastMusic(id: Int)
         fun getRepeat(): StateFlow<Int>
         fun changeRepeatMode()
         fun fillSelectedTrack()

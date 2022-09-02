@@ -349,6 +349,7 @@ class MainListMusicFragment
                 _binding.rvAllMusic.layoutManager = layoutManager
                 _binding.rvAllMusic.adapter = recyclerViewAdapter(viewModel.allMusic, id)
                 this.mode = ListState.MAINPLAYLIST
+                _binding.rvAllMusic.scrollToPosition(viewModel.rvPosition.value)
             }
             6 -> {//MusicCategory
                 _binding.rvAllMusic.layoutManager = GridLayoutManager(context, 5)
