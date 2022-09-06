@@ -39,6 +39,7 @@ import ru.kamaz.music_api.interactor.InsertPlayList
 import ru.kamaz.music_api.interactor.PlayListRV
 import ru.kamaz.music_api.interactor.UpdatePlayList
 import ru.kamaz.music_api.models.PlayListModel
+import ru.kamaz.music_api.models.Track
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseActivity
 import ru.sir.presentation.base.BaseApplication
@@ -74,12 +75,20 @@ class DialogAddTrack : DialogFragment(), ServiceConnection, MusicServiceInterfac
     private var notFLowList: ArrayList<PlayListModel> =
         arrayListOf(PlayListModel(0L, "", "",  arrayListOf("")))
     private var selectedPlayList = ""
-    private val musicData: StateFlow<String> by lazy {
-        service.value?.getMusicData() ?: MutableStateFlow("Unknown")
+    private val emptyTrack = Track(
+        0L, "Unknown", "Unknown", "",
+        0, "Unknown", "",
+        source = "source"
+    )
+    private val track: StateFlow<Track> by lazy {
+        service.value?.getTrackInfo() ?: MutableStateFlow(emptyTrack)
     }
-    private val musicName: StateFlow<String> by lazy {
-        service.value?.getMusicName() ?: MutableStateFlow("Uwn")
-    }
+//    private val musicData: StateFlow<String> by lazy {
+//        service.value?.getMusicData() ?: MutableStateFlow("Unknown")
+//    }
+//    private val musicName: StateFlow<String> by lazy {
+//        service.value?.getMusicName() ?: MutableStateFlow("Uwn")
+//    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val intent = Intent(context, MusicService::class.java)
@@ -100,8 +109,8 @@ class DialogAddTrack : DialogFragment(), ServiceConnection, MusicServiceInterfac
     }
 
     private fun initServiceVars(){
-        musicName.launchWhenStarted(lifecycleScope) {
-            _binding.tvMusicTitle.text = it
+        track.launchWhenStarted(lifecycleScope) {
+            _binding.tvMusicTitle.text = it.title
         }
     }
 
@@ -168,13 +177,13 @@ class DialogAddTrack : DialogFragment(), ServiceConnection, MusicServiceInterfac
         notFLowList.forEach {
             if (it.title == selectedPlayList) {
                 it.trackDataList.forEach { data ->
-                    if (data == musicData.value){
+                    if (data == track.value.data){
                         coincidence = true
                         return@forEach
                     }
                 }
-                if (musicData.value != "" && !coincidence) {
-                    it.trackDataList.add(musicData.value)
+                if (track.value.data != "" && !coincidence) {
+                    it.trackDataList.add(track.value.data)
                     CoroutineScope(Dispatchers.IO).launch {
                         updatePlayList.run(
                             UpdatePlayList.Params(

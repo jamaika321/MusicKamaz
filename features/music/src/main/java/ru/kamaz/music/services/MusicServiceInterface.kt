@@ -27,9 +27,6 @@ interface MusicServiceInterface{
         fun getAllTracks(): StateFlow<List<Track>>
         fun getPlayLists(): StateFlow<List<PlayListModel>>
         fun getFoldersList(): StateFlow<List<AllFolderWithMusic>>
-        fun getMusicName(): StateFlow<String>
-        fun getArtistName(): StateFlow<String>
-        fun getMusicDuration(): StateFlow<Int>
         fun lastMusic(): StateFlow<String>
         fun checkUSBConnection(): StateFlow<Boolean>
         fun replaceAllTracks(trackList: List<Track>, replace: Boolean)
@@ -42,8 +39,6 @@ interface MusicServiceInterface{
         fun howModeNow():Int
         fun dialogFragment():StateFlow<Boolean>
         fun musicEmpty():StateFlow<Boolean>
-        fun coverId(): StateFlow<String>
-        fun isFavoriteMusic():StateFlow<Boolean>
         fun insertFavoriteMusic(data: String)
         fun shuffleStatusChange()
         fun insertLastMusic(id: Int)
@@ -51,13 +46,19 @@ interface MusicServiceInterface{
         fun changeRepeatMode()
         fun fillSelectedTrack()
         fun isShuffleOn(): StateFlow<Boolean>
-        fun getMusicData(): StateFlow<String>
         fun initTrack(track: Track, data1: String)
         fun appClosed()
         fun lastSavedState()
         fun checkUsb()
         fun initPlayListSource(playList: PlayListSource)
         fun getSource(): StateFlow<String>
+        fun getTrackInfo(): StateFlow<Track>
+//        fun coverId(): StateFlow<String>
+//        fun isFavoriteMusic():StateFlow<Boolean>
+//        fun getMusicData(): StateFlow<String>
+//        fun getMusicName(): StateFlow<String>
+//        fun getArtistName(): StateFlow<String>
+//        fun getMusicDuration(): StateFlow<Int>
     }
 
     interface ViewModel{
