@@ -429,6 +429,7 @@ class MusicFragment :
     }
 
     private fun btModeActivation() {
+        binDing.textUsb.text = ""
         //Invisible
         binDing.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
         binDing.controlPanel.repeat.visibility = View.INVISIBLE
