@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -149,8 +150,13 @@ class MainListMusicFragment
 
         viewModel.usbConnected.launchWhenStarted(lifecycleScope) {
             if (mode == ListState.FOLDPLAYLIST) {
+                Log.i("Test_Folder", " : onBackPressed ")
                 viewModel.foldersList.value.find { it.dir == viewModel.activeFolderName.value }.let {
-                    if (it == null) onBackPressed()
+                    if (it == null) {
+                        onBackPressed()
+                        Log.i("Test_Folder", " : onBackPressed ")
+                        categoryItemClicked(RV_ITEM_MUSIC_FOLDER)
+                    }
                 }
             }
         }

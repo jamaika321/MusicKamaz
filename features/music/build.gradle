@@ -57,7 +57,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0"
 //    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
     implementation "androidx.lifecycle:lifecycle-common-java8:2.5.1"
-    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.picasso:picasso:2.8'
     implementation constraintLayout
     implementation dagger
     kapt daggerCompiler
@@ -67,7 +67,7 @@ dependencies {
     api twManagerCore
     implementation xtlibrary
     implementation project(path: ':entities:core')
-    implementation 'jp.wasabeef:picasso-transformations:2.2.1'
+    implementation 'jp.wasabeef:picasso-transformations:2.4.0'
 
 
 

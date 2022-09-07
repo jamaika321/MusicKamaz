@@ -28,7 +28,7 @@ class ItemAlbumsViewModel: RecyclerViewBaseItem<Track, AlbumItemsBinding>(){
         }
         image.launchWhenStarted(parent.lifecycleScope){
             if (it.isNotEmpty()) {
-                Picasso.with(parent.context)
+                Picasso.get()
                     .load(Uri.fromFile(File(it.trim())))
                     .into(binding.imageCategory)
             }

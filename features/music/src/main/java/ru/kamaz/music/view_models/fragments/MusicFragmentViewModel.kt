@@ -145,10 +145,6 @@ class MusicFragmentViewModel @Inject constructor(
         }
     }
 
-    fun openMainListFragment(){
-
-    }
-
     fun replaceTracks() {
         service.value?.replaceAllTracks(emptyList(), false)
     }

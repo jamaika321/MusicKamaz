@@ -312,6 +312,7 @@ Service, OnCompletionListener,
                 queryLastMusic.run(QueryLastMusic.Params(id))
             }
             if (loading is Either.Right && loading.r.isNotEmpty()) {
+                Log.i("Test_LoadLast", "loading.isNotEmpty")
                 loadAllLists()
                 loading.r[0].let { track ->
                     val _loading = mediaManager.loadLastTrack(listOf(track.data))
@@ -319,7 +320,6 @@ Service, OnCompletionListener,
                         tracks = _loading.r
                         initTrack(tracks.find { it.data == track.data } ?: emptyTrack,
                             track.data)
-                        Log.i("Test_Playlist", " : ${track.source} ")
                         when (track.source) {
                             "disk" -> {
                                 startDiskMode()
@@ -333,18 +333,26 @@ Service, OnCompletionListener,
                             }
                         }
                     } else {
-                        defaultLoading()
+                        defaultLoading(id)
                     }
                 }
             } else {
-                defaultLoading()
+                defaultLoading(id)
             }
         }
     }
 
-    private fun defaultLoading() {
-        updateTracks("5")
-        startDiskMode()
+    private fun defaultLoading(id: Int) {
+        when (id) {
+            666 -> {
+                updateTracks("all","5")
+                startDiskMode()
+            }
+            777 -> {
+                updateTracks("sdCard","5")
+                startUsbMode()
+            }
+        }
         if (tracks.size != 0) nextTrack(2)
     }
 
@@ -368,8 +376,11 @@ Service, OnCompletionListener,
     }
 
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
+        Log.i("Test_UsbPath", " $path ")
         checkUsb()
-        loadAllLists()
+        if (isUSBConnected.value && !isUsbModeOn.value){
+            loadLastSavedMusic(777)
+        }
     }
 
     override fun onDeviceConnected() {
@@ -468,19 +479,19 @@ Service, OnCompletionListener,
             if (allTracks.value.isNotEmpty()) {
                 replaceAllTracks(emptyList(), false)
             }
-            _sourceName.value = "disk"
             resume()
         }
     }
 
     private fun startUsbMode() {
-        if (!isUsbModeOn.value && isUSBConnected.value) {
+        Log.i("Test_StartUsb", "tracyBundy")
+        if (!isUsbModeOn.value) {
             Log.i("Test_StartUsb", "tracks.size: ${tracks.size}")
             changeSource(3)
             if (allTracks.value.isNotEmpty()) {
                 replaceAllTracks(emptyList(), false)
             }
-            _sourceName.value = "usb"
+            initTrack(tracks[0], tracks[0].data)
             resume()
         }
     }
@@ -704,7 +715,6 @@ Service, OnCompletionListener,
 
     override fun resume() {
         if (!musicEmpty.value) {
-            Log.i("Test_Resume", "resume: ")
             mediaPlayer.start()
             _isPlaying.value = true
         }
@@ -932,8 +942,8 @@ Service, OnCompletionListener,
         return channelId
     }
 
-    override fun updateTracks(loadMode: String) {
-        val result = mediaManager.getMediaFilesFromPath("all", loadMode)
+    override fun updateTracks(path: String, loadMode: String) {
+        val result = mediaManager.getMediaFilesFromPath(path, loadMode)
         if (result is Either.Right && result.r.isNotEmpty()) {
             replaceAllTracks(result.r, true)
             Log.i("Test_Update", " allTracks.size: ${result.r.size} ")
@@ -950,13 +960,12 @@ Service, OnCompletionListener,
     private fun loadTracksOnCoroutine(loadMode: String) {
         val scope = CoroutineScope(Job() + Dispatchers.IO)
         val job = scope.launch {
-            updateTracks(loadMode)
+            updateTracks("all", loadMode)
         }
         job.start()
     }
 
     override fun replaceAllTracks(trackList: List<Track>, replace: Boolean) {
-        Log.i("Test_Replace", "replace : $replace ")
         if (replace) {
             allTracks.value = trackList
         } else {
@@ -1013,7 +1022,6 @@ Service, OnCompletionListener,
                 }
             }
         }
-
     }
 
     private fun fillTracks(id: Long, it: Track) {
@@ -1118,11 +1126,14 @@ Service, OnCompletionListener,
                     getToastConnectBtDevice(true)
                 }
             }
-            SourceEnum.DISK -> startDiskMode()
+            SourceEnum.DISK -> {
+                startDiskMode()
+                nextTrack(2)
+            }
             SourceEnum.USB -> {
                 checkUsb()
-                if (_isUSBConnected.value) {
-                    startUsbMode()
+                if (isUSBConnected.value) {
+                    onUsbStatusChanged("", true)
                 } else {
                     Toast.makeText(this, "Файлы не найдены.", Toast.LENGTH_SHORT).show()
                 }
@@ -1205,7 +1216,7 @@ Service, OnCompletionListener,
 
     override fun insertLastMusic(id: Int) {
         val music = HistorySongs(
-            trackInfo.value.id.toInt(),
+            id,
             trackInfo.value.data,
             mediaPlayer.currentPosition.toLong(),
             playListMode.value,

@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.icu.number.NumberFormatter.with
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -36,6 +37,7 @@ import ru.sir.presentation.base.BaseFragment
 import ru.sir.presentation.extensions.launchWhenStarted
 import ru.sir.presentation.navigation.UiAction
 import java.io.File
+import java.lang.ref.SoftReference
 
 
 class MusicFragment :
@@ -44,7 +46,6 @@ class MusicFragment :
     override fun inject(app: BaseApplication) {
         app.getComponent<MusicComponent>().inject(this)
     }
-
     private var _binding: FragmentPlayerBinding? = null
     private val binDing get() = _binding!!
 
@@ -240,10 +241,6 @@ class MusicFragment :
             likeStatus(it.favorite)
         }
 
-        viewModel.sourceName.launchWhenStarted(lifecycleScope) {
-            binDing.textUsb.text = it
-        }
-
 //        viewModel.title.launchWhenStarted(lifecycleScope) {
 //            this.binDing.song.text = it
 //        }
@@ -271,7 +268,9 @@ class MusicFragment :
         }
 
         viewModel.defaultModeOn.launchWhenStarted(lifecycleScope) {
-            if (it) startDefaultMode()
+            if (it) {
+                startDefaultMode()
+            }
         }
 
         viewModel.isMusicEmpty.launchWhenStarted(lifecycleScope) {
@@ -309,6 +308,9 @@ class MusicFragment :
             if (!viewModel.isBtModeOn.value && !viewModel.isUsbModeOn.value && !viewModel.isDiskModeOn.value && !viewModel.isAuxModeOn.value) {
                 playListModeActivation()
             }
+        }
+        viewModel.sourceName.launchWhenStarted(lifecycleScope) {
+            binDing.textUsb.text = it
         }
         viewModel.isAuxModeOn.launchWhenStarted(lifecycleScope) {
             if (it) auxModeActivation()
@@ -366,10 +368,10 @@ class MusicFragment :
 
     private fun updateTrackCover(coverPath: String) {
         if (coverPath != "") {
-            Picasso.with(context)
+            Picasso.get()
                 .load(Uri.fromFile(File(coverPath.trim())))
                 .into(binDing.picture)
-            Picasso.with(context)
+            Picasso.get()
                 .load(Uri.fromFile(File(coverPath.trim())))
                 .transform(BlurTransformation(context, 50, 10))
                 .resize(1024, 555)
@@ -456,6 +458,7 @@ class MusicFragment :
     }
 
     private fun diskModeActivation() {
+        binding.textUsb.text = "disk"
         updateTrackCover(viewModel.trackInfo.value.albumArt)
         //Invisible
         binDing.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
@@ -512,6 +515,7 @@ class MusicFragment :
     }
 
     private fun usbModeActivation() {
+        binding.textUsb.text = "usb"
         updateTrackCover(viewModel.trackInfo.value.albumArt)
         //Invisible
 //        binding.picture.visibility = View.VISIBLE
