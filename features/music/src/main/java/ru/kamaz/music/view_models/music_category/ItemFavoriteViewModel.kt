@@ -25,7 +25,7 @@ class ItemFavoriteViewModel : RecyclerViewBaseItem<Track, FavoriteItemBinding>()
         }
         image.launchWhenStarted(parent.lifecycleScope){
             if (it.isNotEmpty()) {
-                Picasso.with(parent.context)
+                Picasso.get()
                     .load(Uri.fromFile(File(it.trim())))
                     .into(binding.imageCategory)
             }

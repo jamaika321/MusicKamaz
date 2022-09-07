@@ -185,9 +185,8 @@ class MainListMusicViewModel @Inject constructor(
         mediaManager.deleteTrackFromMemory(data)
     }
 
-    val staticFavoriteSongs = ArrayList<Track>(emptyList())
-
     private fun getFavoriteTracks() {
+        val staticFavoriteSongs = ArrayList<Track>(emptyList())
         if (staticFavoriteSongs.isEmpty()) {
             serviceTracks.value.forEach { track ->
                 if (track.favorite) staticFavoriteSongs.add(track)
@@ -409,9 +408,8 @@ class MainListMusicViewModel @Inject constructor(
         return newList
     }
 
-    val trackList = ArrayList<Track>(emptyList())
-
     fun fillFolderPlaylist(data: String) {
+        val trackList = ArrayList<Track>(emptyList())
         serviceTracks.value.forEach {
             if (it.data.contains(data + File.separator, ignoreCase = true)) {
                 trackList.add(it)
@@ -422,7 +420,7 @@ class MainListMusicViewModel @Inject constructor(
 
     ///////////////////////////////////////////
     ///////////////////////////////////////////
-    //////////////////////////////////////////
+    ///////////////////////////////////////////
 
     fun searchMusic(music: String) {
         _allMusic.value = filterRecyclerList(music, serviceTracks.value).toRecyclerViewItemOfList(

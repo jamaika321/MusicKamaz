@@ -14,6 +14,7 @@ import ru.kamaz.music_api.models.Track
 import ru.sir.presentation.base.recycler_view.RecyclerViewBaseItem
 import ru.sir.presentation.extensions.launchWhenStarted
 import java.io.File
+import java.lang.ref.SoftReference
 import javax.inject.Inject
 
 class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
@@ -53,7 +54,7 @@ class ItemViewModel: RecyclerViewBaseItem<Track, TestTextItemBinding>(){
         }
         image.launchWhenStarted(parent.lifecycleScope){
             if (it != "") {
-                Picasso.with(parent.context)
+                Picasso.get()
                     .load(Uri.fromFile(File(image.value)))
                     .into(binding.image)
             } else {

@@ -31,5 +31,10 @@
       <option name="name" value="maven2" />
       <option name="url" value="http://192.168.1.46:8081/repository/MusicRes/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven" />
+      <option name="name" value="maven" />
+      <option name="url" value="http://212.24.40.158:8081/repository/maven-public/" />
+    </remote-repository>
   </component>
 </project>

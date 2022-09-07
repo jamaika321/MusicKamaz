@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.icu.number.NumberFormatter.with
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -36,6 +37,7 @@ import ru.sir.presentation.base.BaseFragment
 import ru.sir.presentation.extensions.launchWhenStarted
 import ru.sir.presentation.navigation.UiAction
 import java.io.File
+import java.lang.ref.SoftReference
 
 
 class MusicFragment :
@@ -44,7 +46,6 @@ class MusicFragment :
     override fun inject(app: BaseApplication) {
         app.getComponent<MusicComponent>().inject(this)
     }
-
     private var _binding: FragmentPlayerBinding? = null
     private val binDing get() = _binding!!
 
@@ -73,55 +74,55 @@ class MusicFragment :
     }
 
     override fun setListeners() {
-        this.binDing.next.setOnClickListener {
+        binDing.next.setOnClickListener {
             viewModel.nextTrack()
             addEvent2()
         }
 
         GestureDetector.SimpleOnGestureListener()
 
-        this.binDing.controlPanel.playPause
+        binDing.controlPanel.playPause
             .setOnClickListener {
                 viewModel.playOrPause()
             }
-        this.binDing.controlPanel.rotate.setOnClickListener {
+        binDing.controlPanel.rotate.setOnClickListener {
             viewModel.shuffleStatusChange()
         }
-        this.binDing.prev.setOnClickListener {
+        binDing.prev.setOnClickListener {
             viewModel.previousTrack()
             addEvent()
         }
-        this.binDing.openListFragment.setOnClickListener {
+        binDing.openListFragment.setOnClickListener {
             openMainListMusicFragment()
         }
-        this.binDing.changeSourceBtn.setOnClickListener {
+        binDing.changeSourceBtn.setOnClickListener {
             changeSourceViewButtons()
         }
-        this.binDing.sourceSelection.btnBt.setOnClickListener {
+        binDing.sourceSelection.btnBt.setOnClickListener {
             changeSourceViewButtons()
             viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
         }
-        this.binDing.sourceSelection.disk.setOnClickListener {
+        binDing.sourceSelection.disk.setOnClickListener {
             changeSourceViewButtons()
             viewModel.vmSourceSelection(MusicService.SourceEnum.DISK)
         }
-        this.binDing.sourceSelection.aux.setOnClickListener {
+        binDing.sourceSelection.aux.setOnClickListener {
             changeSourceViewButtons()
             viewModel.vmSourceSelection(MusicService.SourceEnum.AUX)
         }
 
-        this.binDing.sourceSelection.usb.setOnClickListener {
+        binDing.sourceSelection.usb.setOnClickListener {
             changeSourceViewButtons()
             viewModel.vmSourceSelection(MusicService.SourceEnum.USB)
         }
-        this.binDing.controlPanel.like.setOnClickListener {
-            viewModel.isSaveFavoriteMusic(viewModel.data.value)
+        binDing.controlPanel.like.setOnClickListener {
+            viewModel.isSaveFavoriteMusic(viewModel.trackInfo.value.data)
         }
-        this.binDing.controlPanel.repeat.setOnClickListener {
+        binDing.controlPanel.repeat.setOnClickListener {
             viewModel.repeatChange()
 
         }
-        this.binDing.controlPanel.addToFolder.setOnClickListener {
+        binDing.controlPanel.addToFolder.setOnClickListener {
             viewModel.fillSelectedTrack()
             navigator.navigateTo(
                 UiAction(
@@ -194,8 +195,8 @@ class MusicFragment :
     }
 
     private fun changeSourceViewButtons() {
-        changeSource(this.binDing.controlPanel.viewPlayPause)
-        changeSource(this.binDing.sourceSelection.viewChangeSource)
+        changeSource(binDing.controlPanel.viewPlayPause)
+        changeSource(binDing.sourceSelection.viewChangeSource)
     }
 
     private fun changeSource(view: View) {
@@ -216,53 +217,67 @@ class MusicFragment :
     private fun initServiceVars() {
         viewModel.isPlay.launchWhenStarted(lifecycleScope) { isPlaying ->
             if (isPlaying) {
-                this.binDing.controlPanel.playPause.setImageResource(R.drawable.pause_twix)
-                this.binDing.controlPanel.playPause.setPadding(35, 35, 35, 35)
+                binDing.controlPanel.playPause.setImageResource(R.drawable.pause_twix)
+                binDing.controlPanel.playPause.setPadding(35, 35, 35, 35)
             } else {
-                this.binDing.controlPanel.playPause.setImageResource(R.drawable.play_triangle)
-                this.binDing.controlPanel.playPause.setPadding(37, 35, 33, 35)
+                binDing.controlPanel.playPause.setImageResource(R.drawable.play_triangle)
+                binDing.controlPanel.playPause.setPadding(37, 35, 33, 35)
             }
         }
 
-        viewModel.sourceName.launchWhenStarted(lifecycleScope) {
-            this.binDing.textUsb.text = it
-        }
-
-        viewModel.title.launchWhenStarted(lifecycleScope) {
-            this.binDing.song.text = it
-        }
-
-        viewModel.artist.launchWhenStarted(lifecycleScope) {
-            this.binDing.artist.text = it
-        }
-
-        viewModel.cover.launchWhenStarted(lifecycleScope) { updateTrackCover(it) }
-
-        viewModel.duration.launchWhenStarted(lifecycleScope) {
-            if (it != 0) {
+        viewModel.trackInfo.launchWhenStarted(lifecycleScope) {
+            binDing.artist.text = it.artist
+            binDing.song.text = it.title
+            updateTrackCover(it.albumArt)
+            if (it.duration != 0L) {
                 viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
                     val currentPosition = if (it < 0) 0 else it
-                    this.binDing.seek.progress = currentPosition
-                    this.binDing.startTime.text = Track.convertDuration(currentPosition.toLong())
+                    binDing.seek.progress = currentPosition
+                    binDing.startTime.text = Track.convertDuration(currentPosition.toLong())
                 }
-                this.binDing.seek.max = it
-                this.binDing.endTime.text = Track.convertDuration(it.toLong())
+                binDing.seek.max = it.duration.toInt()
+                binDing.endTime.text = Track.convertDuration(it.duration)
             }
+            likeStatus(it.favorite)
         }
+
+//        viewModel.title.launchWhenStarted(lifecycleScope) {
+//            this.binDing.song.text = it
+//        }
+//
+//        viewModel.artist.launchWhenStarted(lifecycleScope) {
+//            this.binDing.artist.text = it
+//        }
+//
+//        viewModel.cover.launchWhenStarted(lifecycleScope) { updateTrackCover(it) }
+
+//        viewModel.duration.launchWhenStarted(lifecycleScope) {
+//            if (it != 0) {
+//                viewModel.musicPosition.launchWhenStarted(lifecycleScope) {
+//                    val currentPosition = if (it < 0) 0 else it
+//                    this.binDing.seek.progress = currentPosition
+//                    this.binDing.startTime.text = Track.convertDuration(currentPosition.toLong())
+//                }
+//                this.binDing.seek.max = it
+//                this.binDing.endTime.text = Track.convertDuration(it.toLong())
+//            }
+//        }
 
         viewModel.repeatHowModeNow.launchWhenStarted(lifecycleScope) {
             repeatIconChange(it)
         }
 
         viewModel.defaultModeOn.launchWhenStarted(lifecycleScope) {
-            if (it) startDefaultMode()
+            if (it) {
+                startDefaultMode()
+            }
         }
 
         viewModel.isMusicEmpty.launchWhenStarted(lifecycleScope) {
             if (it) {
                 Toast.makeText(context, "Файлы не найдены", Toast.LENGTH_LONG).show()
-                this.binDing.pictureBucket.visibility = View.GONE
-                this.binDing.seek.progress = 0
+                binDing.pictureBucket.visibility = View.GONE
+                binDing.seek.progress = 0
             }
         }
 
@@ -276,32 +291,16 @@ class MusicFragment :
             if (it) openMainListMusicFragment()
         }
 
-//        viewModel.isNotConnected.launchWhenStarted(lifecycleScope) {
-//            if (it) {
-//                if (this.binDing != null) diskModeActivation()
-//            } else {
-//                viewModel.vmSourceSelection(MusicService.SourceEnum.BT)
-//                btModeActivation()
-//            }
-//        }
-
         viewModel.allTracksChanged.launchWhenStarted(lifecycleScope) {
-            viewModel.replaceTracks()
+            if (it.isNotEmpty()) viewModel.replaceTracks()
         }
 
         viewModel.isShuffleOn.launchWhenStarted(lifecycleScope) {
             randomSongStatus(it)
         }
-//        viewModel.isNotConnectedUsb.launchWhenStarted(lifecycleScope) {
-//            if (it) {
-//                usbModeActivation()
-//            } else {
-//                if (this.binDing != null) diskModeActivation()
-//            }
+//        viewModel.isFavoriteMusic.launchWhenStarted(lifecycleScope) {
+//            likeStatus(it)
 //        }
-        viewModel.isFavoriteMusic.launchWhenStarted(lifecycleScope) {
-            likeStatus(it)
-        }
         viewModel.isBtModeOn.launchWhenStarted(lifecycleScope) {
             if (it) btModeActivation()
         }
@@ -309,6 +308,9 @@ class MusicFragment :
             if (!viewModel.isBtModeOn.value && !viewModel.isUsbModeOn.value && !viewModel.isDiskModeOn.value && !viewModel.isAuxModeOn.value) {
                 playListModeActivation()
             }
+        }
+        viewModel.sourceName.launchWhenStarted(lifecycleScope) {
+            binDing.textUsb.text = it
         }
         viewModel.isAuxModeOn.launchWhenStarted(lifecycleScope) {
             if (it) auxModeActivation()
@@ -325,35 +327,35 @@ class MusicFragment :
         viewModel.isPlayListModeOn.launchWhenStarted(lifecycleScope) {
             when (it) {
                 "disk" -> {
-                    this.binDing.textUsb.setPadding(0, 0, 0, 0)
-                    this.binDing.sourceImage.visibility = View.INVISIBLE
+                    binDing.textUsb.setPadding(0, 0, 0, 0)
+                    binDing.sourceImage.visibility = View.INVISIBLE
                 }
                 "usb" -> {
-                    this.binDing.textUsb.setPadding(0, 0, 0, 0)
-                    this.binDing.sourceImage.visibility = View.INVISIBLE
+                    binDing.textUsb.setPadding(0, 0, 0, 0)
+                    binDing.sourceImage.visibility = View.INVISIBLE
                 }
                 "bt" -> {
-                    this.binDing.textUsb.setPadding(0, 0, 0, 0)
-                    this.binDing.sourceImage.visibility = View.INVISIBLE
+                    binDing.textUsb.setPadding(0, 0, 0, 0)
+                    binDing.sourceImage.visibility = View.INVISIBLE
                 }
                 "folder" -> {
-                    this.binDing.textUsb.setPadding(35, 0, 0, 0)
-                    this.binDing.sourceImage.visibility = View.VISIBLE
-                    this.binDing.sourceImage.setImageResource(R.drawable.source_folder)
+                    binDing.textUsb.setPadding(35, 0, 0, 0)
+                    binDing.sourceImage.visibility = View.VISIBLE
+                    binDing.sourceImage.setImageResource(R.drawable.source_folder)
                 }
                 "playList" -> {
-                    this.binDing.textUsb.setPadding(35, 0, 0, 0)
-                    this.binDing.sourceImage.visibility = View.VISIBLE
-                    this.binDing.sourceImage.setImageResource(R.drawable.source_playlist)
+                    binDing.textUsb.setPadding(35, 0, 0, 0)
+                    binDing.sourceImage.visibility = View.VISIBLE
+                    binDing.sourceImage.setImageResource(R.drawable.source_playlist)
                 }
                 "favorite" -> {
-                    this.binDing.textUsb.setPadding(35, 0, 0, 0)
-                    this.binDing.sourceImage.visibility = View.VISIBLE
-                    this.binDing.sourceImage.setImageResource(R.drawable.source_favorite)
+                    binDing.textUsb.setPadding(35, 0, 0, 0)
+                    binDing.sourceImage.visibility = View.VISIBLE
+                    binDing.sourceImage.setImageResource(R.drawable.source_favorite)
                 }
                 else -> {
-                    this.binDing.textUsb.setPadding(0, 0, 0, 0)
-                    this.binDing.sourceImage.visibility = View.INVISIBLE
+                    binDing.textUsb.setPadding(0, 0, 0, 0)
+                    binDing.sourceImage.visibility = View.INVISIBLE
                 }
             }
         }
@@ -366,17 +368,17 @@ class MusicFragment :
 
     private fun updateTrackCover(coverPath: String) {
         if (coverPath != "") {
-            Picasso.with(context)
+            Picasso.get()
                 .load(Uri.fromFile(File(coverPath.trim())))
-                .into(this.binDing.picture)
-            Picasso.with(context)
+                .into(binDing.picture)
+            Picasso.get()
                 .load(Uri.fromFile(File(coverPath.trim())))
                 .transform(BlurTransformation(context, 50, 10))
                 .resize(1024, 555)
-                .into(this.binDing.pictureDevice)
-            this.binDing.pictureBucket.visibility = View.VISIBLE
+                .into(binDing.pictureDevice)
+            binDing.pictureBucket.visibility = View.VISIBLE
         } else {
-            this.binDing.pictureBucket.visibility = View.INVISIBLE
+            binDing.pictureBucket.visibility = View.INVISIBLE
             if (!viewModel.isBtModeOn.value) this.binDing.pictureDevice.setImageResource(R.drawable.music_png_bg)
         }
     }
@@ -385,13 +387,13 @@ class MusicFragment :
     private fun repeatIconChange(repeat: Int) {
         when (repeat) {
             2 -> {
-                this.binDing.controlPanel.repeat.setImageResource(R.drawable.repeat_mode_all)
-                this.binDing.controlPanel.repeat.setPadding(22, 22, 22, 22)
+                binDing.controlPanel.repeat.setImageResource(R.drawable.repeat_mode_all)
+                binDing.controlPanel.repeat.setPadding(22, 22, 22, 22)
             }
 
             1 -> {
-                this.binDing.controlPanel.repeat.setImageResource(R.drawable.repeate_mode_single)
-                this.binDing.controlPanel.repeat.setPadding(22, 14, 20, 22)
+                binDing.controlPanel.repeat.setImageResource(R.drawable.repeate_mode_single)
+                binDing.controlPanel.repeat.setPadding(22, 14, 20, 22)
             }
 
         }
@@ -399,144 +401,147 @@ class MusicFragment :
     }
 
     private fun randomSongStatus(random: Boolean) {
-        if (random) this.binDing.controlPanel.rotate.setImageResource(R.drawable.shuffle_mode_true)
-        else this.binDing.controlPanel.rotate.setImageResource(R.drawable.shuffle_mode_false)
+        if (random) binDing.controlPanel.rotate.setImageResource(R.drawable.shuffle_mode_true)
+        else binDing.controlPanel.rotate.setImageResource(R.drawable.shuffle_mode_false)
     }
 
     private fun likeStatus(like: Boolean) {
         if (like) {
-            this.binDing.controlPanel.like.setImageResource(R.drawable.like_true)
+            binDing.controlPanel.like.setImageResource(R.drawable.like_true)
         } else {
-            this.binDing.controlPanel.like.setImageResource(R.drawable.like_false)
+            binDing.controlPanel.like.setImageResource(R.drawable.like_false)
         }
     }
 
     private fun startDefaultMode() {
         playListModeActivation()
-        this.binDing.pictureBucket.visibility = View.GONE
-        this.binDing.pictureDevice.setImageResource(R.drawable.music_png_bg)
-        this.binDing.song.text = getString(R.string.default_title)
-        this.binDing.artist.visibility = View.INVISIBLE
+        binDing.pictureBucket.visibility = View.GONE
+        binDing.pictureDevice.setImageResource(R.drawable.music_png_bg)
+        binDing.song.text = getString(R.string.default_title)
+        binDing.artist.visibility = View.INVISIBLE
     }
 
     private fun playListModeActivation() {
-        this.binDing.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
-        this.binDing.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
-        this.binDing.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
-        this.binDing.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
     }
 
     private fun btModeActivation() {
         //Invisible
-        this.binDing.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
-        this.binDing.controlPanel.repeat.visibility = View.INVISIBLE
-        this.binDing.controlPanel.rotate.visibility = View.INVISIBLE
-        this.binDing.controlPanel.like.visibility = View.INVISIBLE
-        this.binDing.controlPanel.addToFolder.visibility = View.INVISIBLE
-        this.binDing.openListFragment.visibility = View.INVISIBLE
-        this.binDing.seekLayout.visibility = View.INVISIBLE
-        this.binDing.times.visibility = View.INVISIBLE
+        binDing.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
+        binDing.controlPanel.repeat.visibility = View.INVISIBLE
+        binDing.controlPanel.rotate.visibility = View.INVISIBLE
+        binDing.controlPanel.like.visibility = View.INVISIBLE
+        binDing.controlPanel.addToFolder.visibility = View.INVISIBLE
+        binDing.openListFragment.visibility = View.INVISIBLE
+        binDing.seekLayout.visibility = View.INVISIBLE
+        binDing.times.visibility = View.INVISIBLE
+        binDing.pictureBucket.visibility = View.INVISIBLE
         //Visible
-        this.binDing.controlPanel.viewPlayPause.visibility = View.VISIBLE
-        this.binDing.controlPanel.playPause.visibility = View.VISIBLE
-        this.binDing.nextPrev.visibility = View.VISIBLE
-        this.binDing.artist.visibility = View.VISIBLE
-        this.binDing.song.visibility = View.VISIBLE
-        this.binDing.pictureDevice.visibility = View.VISIBLE
+        binDing.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        binDing.controlPanel.playPause.visibility = View.VISIBLE
+        binDing.nextPrev.visibility = View.VISIBLE
+        binDing.artist.visibility = View.VISIBLE
+        binDing.song.visibility = View.VISIBLE
+        binDing.pictureDevice.visibility = View.VISIBLE
         //Background
-        this.binDing.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
-        this.binDing.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
-        this.binDing.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item_on)
-        this.binDing.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        this.binDing.pictureDevice.setImageResource(R.drawable.bluetooth_back)
-        this.binDing.musicButtons.setBackgroundResource(R.color.test2)
-        this.binDing.artist.setBackgroundResource(R.color.test2)
+        binDing.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item_on)
+        binDing.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
+        binDing.pictureDevice.setImageResource(R.drawable.bluetooth_back)
+        binDing.musicButtons.setBackgroundResource(R.color.test2)
+        binDing.artist.setBackgroundResource(R.color.test2)
 
     }
 
     private fun diskModeActivation() {
-        updateTrackCover(viewModel.cover.value)
+        binding.textUsb.text = "disk"
+        updateTrackCover(viewModel.trackInfo.value.albumArt)
         //Invisible
-        this.binDing.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
+        binDing.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
         //Visible
-        this.binDing.controlPanel.viewPlayPause.visibility = View.VISIBLE
-        this.binDing.controlPanel.addToFolder.visibility = View.VISIBLE
-        this.binDing.controlPanel.repeat.visibility = View.VISIBLE
-        this.binDing.controlPanel.rotate.visibility = View.VISIBLE
-        this.binDing.controlPanel.like.visibility = View.VISIBLE
-        this.binDing.controlPanel.playPause.visibility = View.VISIBLE
-        this.binDing.openListFragment.visibility = View.VISIBLE
-        this.binDing.controlPanel.addToFolder.visibility = View.VISIBLE
-        this.binDing.seekLayout.visibility = View.VISIBLE
-        this.binDing.nextPrev.visibility = View.VISIBLE
-        this.binDing.artist.visibility = View.VISIBLE
-        this.binDing.song.visibility = View.VISIBLE
-        this.binDing.times.visibility = View.VISIBLE
+        binDing.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        binDing.controlPanel.addToFolder.visibility = View.VISIBLE
+        binDing.controlPanel.repeat.visibility = View.VISIBLE
+        binDing.controlPanel.rotate.visibility = View.VISIBLE
+        binDing.controlPanel.like.visibility = View.VISIBLE
+        binDing.controlPanel.playPause.visibility = View.VISIBLE
+        binDing.openListFragment.visibility = View.VISIBLE
+        binDing.controlPanel.addToFolder.visibility = View.VISIBLE
+        binDing.seekLayout.visibility = View.VISIBLE
+        binDing.nextPrev.visibility = View.VISIBLE
+        binDing.artist.visibility = View.VISIBLE
+        binDing.song.visibility = View.VISIBLE
+        binDing.times.visibility = View.VISIBLE
 //        binding.picture.visibility = View.VISIBLE
-        this.binDing.pictureDevice.visibility = View.VISIBLE
-        this.binDing.seek.visibility = View.VISIBLE
+        binDing.pictureDevice.visibility = View.VISIBLE
+        binDing.seek.visibility = View.VISIBLE
 //        binding.pictureBucket.visibility = View.VISIBLE
         //Background
-        this.binDing.sourceSelection.disk.setBackgroundResource(R.drawable.back_item_on)
-        this.binDing.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
-        this.binDing.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
-        this.binDing.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.disk.setBackgroundResource(R.drawable.back_item_on)
+        binDing.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
     }
 
     private fun auxModeActivation() {
         //Visible
-        this.binDing.picture.visibility = View.VISIBLE
-        this.binDing.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        binDing.picture.visibility = View.VISIBLE
+        binDing.controlPanel.viewPlayPause.visibility = View.VISIBLE
         //Invisible
-        this.binDing.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
-        this.binDing.controlPanel.repeat.visibility = View.INVISIBLE
-        this.binDing.controlPanel.rotate.visibility = View.INVISIBLE
-        this.binDing.controlPanel.like.visibility = View.INVISIBLE
-        this.binDing.controlPanel.playPause.visibility = View.INVISIBLE
-        this.binDing.openListFragment.visibility = View.INVISIBLE
-        this.binDing.controlPanel.addToFolder.visibility = View.INVISIBLE
-        this.binDing.seek.visibility = View.INVISIBLE
-        this.binDing.nextPrev.visibility = View.INVISIBLE
-        this.binDing.artist.visibility = View.INVISIBLE
-        this.binDing.song.visibility = View.INVISIBLE
-        this.binDing.times.visibility = View.INVISIBLE
-        this.binDing.pictureBucket.visibility = View.INVISIBLE
+        binDing.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
+        binDing.controlPanel.repeat.visibility = View.INVISIBLE
+        binDing.controlPanel.rotate.visibility = View.INVISIBLE
+        binDing.controlPanel.like.visibility = View.INVISIBLE
+        binDing.controlPanel.playPause.visibility = View.INVISIBLE
+        binDing.openListFragment.visibility = View.INVISIBLE
+        binDing.controlPanel.addToFolder.visibility = View.INVISIBLE
+        binDing.seek.visibility = View.INVISIBLE
+        binDing.nextPrev.visibility = View.INVISIBLE
+        binDing.artist.visibility = View.INVISIBLE
+        binDing.song.visibility = View.INVISIBLE
+        binDing.times.visibility = View.INVISIBLE
+        binDing.pictureBucket.visibility = View.INVISIBLE
         //Background
-        this.binDing.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
-        this.binDing.sourceSelection.aux.setBackgroundResource(R.drawable.back_item_on)
-        this.binDing.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
-        this.binDing.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
-        this.binDing.pictureDevice.setImageResource(R.drawable.auxx)
+        binDing.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.aux.setBackgroundResource(R.drawable.back_item_on)
+        binDing.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.usb.setBackgroundResource(R.drawable.back_item)
+        binDing.pictureDevice.setImageResource(R.drawable.auxx)
 
     }
 
     private fun usbModeActivation() {
-        updateTrackCover(viewModel.cover.value)
+        binding.textUsb.text = "usb"
+        updateTrackCover(viewModel.trackInfo.value.albumArt)
         //Invisible
 //        binding.picture.visibility = View.VISIBLE
-        this.binDing.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
+        binDing.sourceSelection.viewChangeSource.visibility = View.INVISIBLE
         //Visible
-        this.binDing.controlPanel.viewPlayPause.visibility = View.VISIBLE
-        this.binDing.controlPanel.addToFolder.visibility = View.VISIBLE
-        this.binDing.controlPanel.repeat.visibility = View.VISIBLE
-        this.binDing.controlPanel.rotate.visibility = View.VISIBLE
-        this.binDing.controlPanel.like.visibility = View.VISIBLE
-        this.binDing.controlPanel.playPause.visibility = View.VISIBLE
-        this.binDing.openListFragment.visibility = View.VISIBLE
-        this.binDing.controlPanel.addToFolder.visibility = View.VISIBLE
-        this.binDing.seekLayout.visibility = View.VISIBLE
-        this.binDing.nextPrev.visibility = View.VISIBLE
-        this.binDing.artist.visibility = View.VISIBLE
-        this.binDing.song.visibility = View.VISIBLE
-        this.binDing.times.visibility = View.VISIBLE
-        this.binDing.pictureDevice.visibility = View.VISIBLE
-        this.binDing.seek.visibility = View.VISIBLE
+        binDing.controlPanel.viewPlayPause.visibility = View.VISIBLE
+        binDing.controlPanel.addToFolder.visibility = View.VISIBLE
+        binDing.controlPanel.repeat.visibility = View.VISIBLE
+        binDing.controlPanel.rotate.visibility = View.VISIBLE
+        binDing.controlPanel.like.visibility = View.VISIBLE
+        binDing.controlPanel.playPause.visibility = View.VISIBLE
+        binDing.openListFragment.visibility = View.VISIBLE
+        binDing.controlPanel.addToFolder.visibility = View.VISIBLE
+        binDing.seekLayout.visibility = View.VISIBLE
+        binDing.nextPrev.visibility = View.VISIBLE
+        binDing.artist.visibility = View.VISIBLE
+        binDing.song.visibility = View.VISIBLE
+        binDing.times.visibility = View.VISIBLE
+        binDing.pictureDevice.visibility = View.VISIBLE
+        binDing.seek.visibility = View.VISIBLE
 //        binding.pictureBucket.visibility = View.VISIBLE
         //Background
-        this.binDing.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
-        this.binDing.sourceSelection.usb.setBackgroundResource(R.drawable.back_item_on)
-        this.binDing.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
-        this.binDing.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.disk.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.usb.setBackgroundResource(R.drawable.back_item_on)
+        binDing.sourceSelection.aux.setBackgroundResource(R.drawable.back_item)
+        binDing.sourceSelection.btnBt.setBackgroundResource(R.drawable.back_item)
 //        binding.pictureDevice.setImageResource(R.drawable.music_png_bg)
     }
 

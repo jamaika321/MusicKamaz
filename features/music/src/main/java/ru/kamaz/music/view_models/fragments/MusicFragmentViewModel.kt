@@ -26,28 +26,32 @@ class MusicFragmentViewModel @Inject constructor(
 ) : BaseViewModel(application), MediaPlayer.OnCompletionListener, ServiceConnection,
     MusicServiceInterface.ViewModel, MusicManagerListener {
 
-    val artist: StateFlow<String> by lazy {
-        service.value?.getArtistName() ?: MutableStateFlow("Unknown")
-    }
+//    val artist: StateFlow<String> by lazy {
+//        service.value?.getArtistName() ?: MutableStateFlow("Unknown")
+//    }
 
     val isPlay: StateFlow<Boolean> by lazy {
         service.value?.isPlay() ?: MutableStateFlow(false)
     }
 
-    val data: StateFlow<String> by lazy {
-        service.value?.getMusicData() ?: MutableStateFlow("")
-    }
+//    val data: StateFlow<String> by lazy {
+//        service.value?.getMusicData() ?: MutableStateFlow("")
+//    }
 
     val repeatHowModeNow: StateFlow<Int> by lazy {
         service.value?.getRepeat() ?: MutableStateFlow(2)
     }
 
-    val title: StateFlow<String> by lazy {
-        service.value?.getMusicName() ?: MutableStateFlow("Unknown")
-    }
+//    val title: StateFlow<String> by lazy {
+//        service.value?.getMusicName() ?: MutableStateFlow("Unknown")
+//    }
 
-    val duration: StateFlow<Int> by lazy {
-        service.value?.getMusicDuration() ?: MutableStateFlow(0)
+//    val duration: StateFlow<Int> by lazy {
+//        service.value?.getMusicDuration() ?: MutableStateFlow(0)
+//    }
+
+    val trackInfo: StateFlow<Track> by lazy {
+        service.value?.getTrackInfo() ?: MutableStateFlow(emptyTrack)
     }
 
     val isShuffleOn: StateFlow<Boolean> by lazy {
@@ -58,13 +62,13 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.getSource() ?: MutableStateFlow("Unknown")
     }
 
-    val isFavoriteMusic: StateFlow<Boolean> by lazy {
-        service.value?.isFavoriteMusic() ?: MutableStateFlow(true)
-    }
+//    val isFavoriteMusic: StateFlow<Boolean> by lazy {
+//        service.value?.isFavoriteMusic() ?: MutableStateFlow(true)
+//    }
 
-    val isNotConnectedUsb: StateFlow<Boolean> by lazy {
-        service.value?.checkUSBConnection() ?: MutableStateFlow(false)
-    }
+//    val isNotConnectedUsb: StateFlow<Boolean> by lazy {
+//        service.value?.checkUSBConnection() ?: MutableStateFlow(false)
+//    }
 
     val isAuxModeOn: StateFlow<Boolean> by lazy {
         service.value?.auxModeOn() ?: MutableStateFlow(false)
@@ -106,9 +110,9 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.musicEmpty() ?: MutableStateFlow(false)
     }
 
-    val cover: StateFlow<String> by lazy {
-        service.value?.coverId() ?: MutableStateFlow("")
-    }
+//    val cover: StateFlow<String> by lazy {
+//        service.value?.coverId() ?: MutableStateFlow("")
+//    }
 
     private val _service = MutableStateFlow<MusicServiceInterface.Service?>(null)
     val service = _service.asStateFlow()
@@ -117,7 +121,11 @@ class MusicFragmentViewModel @Inject constructor(
         getMusicPosition().stateIn(viewModelScope, SharingStarted.Lazily, 0)
 
     val playListScrolling = MutableStateFlow(false)
-
+    private val emptyTrack = Track(
+        0L, "Unknown", "Unknown", "",
+        0, "Unknown", "",
+        source = "source"
+    )
 
     override fun init() {
         val intent = Intent(context, MusicService::class.java)
@@ -135,10 +143,6 @@ class MusicFragmentViewModel @Inject constructor(
                 21 -> previousTrack()
             }
         }
-    }
-
-    fun openMainListFragment(){
-
     }
 
     fun replaceTracks() {

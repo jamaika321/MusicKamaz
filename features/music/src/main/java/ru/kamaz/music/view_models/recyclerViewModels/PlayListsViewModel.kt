@@ -53,7 +53,7 @@ class PlayListsViewModel : RecyclerViewBaseItem<PlayListModel, PlaylistItemBindi
                 binding.imageCategory.setImageResource(R.drawable.add_track_plus)
                 binding.imageCategory.setPadding(60, 60, 60, 60)
             } else if (it.isNotEmpty()) {
-                Picasso.with(parent.context)
+                Picasso.get()
                     .load(Uri.fromFile(File(image.value.trim())))
                     .into(binding.imageCategory)
             } else {
