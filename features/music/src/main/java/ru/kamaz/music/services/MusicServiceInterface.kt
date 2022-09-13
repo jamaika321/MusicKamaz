@@ -54,7 +54,7 @@ interface MusicServiceInterface{
         fun getSource(): StateFlow<String>
         fun getTrackInfo(): StateFlow<Track>
 //        fun coverId(): StateFlow<String>
-//        fun isFavoriteMusic():StateFlow<Boolean>
+        fun isFavoriteMusic():StateFlow<Boolean>
 //        fun getMusicData(): StateFlow<String>
 //        fun getMusicName(): StateFlow<String>
 //        fun getArtistName(): StateFlow<String>

@@ -28,6 +28,7 @@ interface TestSettings {
         private var mTWEQUtilHandler: Handler = @SuppressLint("HandlerLeak")
         object : Handler() {
             override fun handleMessage(msg: Message) {
+                Log.i("Test_Handle", "handleMessage: ${msg.what} ${msg.arg1} ${msg.arg2}")
                 when (msg.what) {
                     0x201 -> {
                         MSGBYTE = msg.arg2

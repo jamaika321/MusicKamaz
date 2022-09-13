@@ -6,39 +6,37 @@
     android:orientation="vertical"
     android:padding="2dp"
     android:layout_marginStart="30dp"
-    android:layout_marginEnd="30dp"
-    >
+    android:layout_marginEnd="30dp">
 
     <LinearLayout
         android:id="@+id/ll_back"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="0.5"
         android:orientation="vertical"
         android:background="@drawable/ic_bg_folder_widget"
         android:gravity="bottom">
 
+
+
         <TextView
-            android:layout_margin="10dp"
-            android:id="@+id/widget_title"
+            android:layout_marginStart="10dp"
+            android:id="@+id/widget_music_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:autoSizeTextType="uniform"
-            android:text="title"
-            android:textSize="14sp"
-            android:textColor="@color/white">
-        </TextView>
+            style="@style/TitleMusic"
+            android:text="@string/unknown"/>
         <TextView
-            android:layout_margin="10dp"
-            android:id="@+id/widget_artist"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="10dp"
+            android:id="@+id/widget_artist_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:autoSizeTextType="uniform"
-            android:text="artist"
-            android:textColor="@color/white">
-        </TextView>
+            style="@style/ArtistMusic"
+            android:text="@string/unknown"/>
 
     </LinearLayout>
+
     <include
         layout="@layout/buttons_line"
         android:layout_width="match_parent"

@@ -9,4 +9,5 @@ object BaseConstants {
     const val EXTRA_APP_WIDGET_NAME = "ru.kamaz.musickamaz"
     const val META_CHANGED = ".metachanged"
     const val PLAY_STATE_CHANGED = ".playstatechanged"
+    const val CHANGE_SOURCE = "com.tw.music.action.source"
 }

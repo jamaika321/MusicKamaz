@@ -18,16 +18,16 @@ import android.net.ConnectivityManager
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.support.v4.media.MediaDescriptionCompat
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MAX
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.biozzlab.twmanager.managers.BluetoothManager
@@ -35,11 +35,12 @@ import ru.biozzlab.twmanager.managers.MusicManager
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.domain.TestSettings
+import ru.kamaz.music.notification.BasicNotification
+import ru.kamaz.music.notification.NotificationChannelFactory
+import ru.kamaz.music.notification.NotificationFactory
+import ru.kamaz.music.notification.SkeletalNotification
 import ru.kamaz.music.receiver.BrReceiver
 import ru.kamaz.music.ui.TestWidget
-import ru.kamaz.music_api.BaseConstants.ACTION_NEXT
-import ru.kamaz.music_api.BaseConstants.ACTION_PREV
-import ru.kamaz.music_api.BaseConstants.ACTION_TOGGLE_PAUSE
 import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
 import ru.kamaz.music_api.BaseConstants.EXTRA_APP_WIDGET_NAME
 import ru.kamaz.music_api.interactor.*
@@ -48,7 +49,6 @@ import ru.sir.core.Either
 import ru.sir.core.None
 import ru.sir.presentation.base.BaseApplication
 import ru.sir.presentation.extensions.launchOn
-import ru.sir.presentation.extensions.launchWhenStarted
 import java.io.File
 import javax.inject.Inject
 
@@ -87,6 +87,12 @@ Service, OnCompletionListener,
     @Inject
     lateinit var rvAllFolderWithMusic: AllFolderWithMusicRV
 
+    @Inject
+    lateinit var notificationChannelFactory: NotificationChannelFactory
+
+    @Inject
+    lateinit var notificationFactory: NotificationFactory
+
     private val twManager = BluetoothManager()
 
     private val twManagerMusic = MusicManager()
@@ -108,12 +114,16 @@ Service, OnCompletionListener,
     lateinit var myViewModel: MusicServiceInterface.ViewModel
 
     private var tracks = mutableListOf<Track>()
+
     //Все треки
     private var allTracks = MutableStateFlow<List<Track>>(emptyList())
+
     //Плейлисты
     private var playLists = MutableStateFlow<List<PlayListModel>>(emptyList())
+
     //Папки
     private var foldersList = MutableStateFlow<List<AllFolderWithMusic>>(emptyList())
+
     //Избранное
     private var favoriteTracks = MutableStateFlow<List<Track>>(emptyList())
 
@@ -184,7 +194,7 @@ Service, OnCompletionListener,
 
     private val mIntentReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            Log.i("recever", "onReceive: recever")
+            Log.i("Test_Receiver", "onReceive: recever")
             val action = intent.action
             val cmd = intent.getStringExtra("cmd")
             if (CMDPREV == cmd || ACTIONPREV == action) {
@@ -248,7 +258,7 @@ Service, OnCompletionListener,
 //    override fun getMusicName(): StateFlow<String> = title
 //    override fun getArtistName(): StateFlow<String> = artist
 //    override fun getMusicDuration(): StateFlow<Int> = duration
-//    override fun isFavoriteMusic(): StateFlow<Boolean> = isFavorite
+    override fun isFavoriteMusic(): StateFlow<Boolean> = isFavorite
 //    override fun getMusicData(): StateFlow<String> = data
 
     override fun init() {
@@ -261,6 +271,7 @@ Service, OnCompletionListener,
     }
 
     val WHERE_MY_CAT_ACTION = "ru.kamaz.musickamaz"
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
         (application as BaseApplication).getComponent<MusicComponent>().inject(this)
@@ -285,13 +296,16 @@ Service, OnCompletionListener,
             twManager.requestConnectionInfo()
         }
 
+        cover.launchOn(lifecycleScope) {
+            widgettest.updateTestImage(this, it)
+        }
+
         artist.launchOn(lifecycleScope) {
             widgettest.updateTestArtist(this, it)
         }
 
         title.launchOn(lifecycleScope) {
             widgettest.updateTestTitle(this, it)
-            widgettest
         }
 
         duration.launchOn(lifecycleScope) {
@@ -302,8 +316,11 @@ Service, OnCompletionListener,
             widgettest.updatePlayPauseImg(this, it)
         }
 
-        compilationMusic()
+        completionListener()
         loadLastSavedMusic(666)
+        changeSourceFromEQButton()
+        notificationChannelFactory.init(this)
+        notificationFactory.showNotification(1, BasicNotification("dsds", "sdsds", "wewew", 1))
     }
 
     private fun loadLastSavedMusic(id: Int) {
@@ -345,11 +362,11 @@ Service, OnCompletionListener,
     private fun defaultLoading(id: Int) {
         when (id) {
             666 -> {
-                updateTracks("all","5")
+                updateTracks("all", "5")
                 startDiskMode()
             }
             777 -> {
-                updateTracks("sdCard","5")
+                updateTracks("sdCard", "5")
                 startUsbMode()
             }
         }
@@ -378,7 +395,7 @@ Service, OnCompletionListener,
     override fun onUsbStatusChanged(path: String, isAdded: Boolean) {
         Log.i("Test_UsbPath", " $path ")
         checkUsb()
-        if (isUSBConnected.value && !isUsbModeOn.value){
+        if (isUSBConnected.value && !isUsbModeOn.value) {
             loadLastSavedMusic(777)
         }
     }
@@ -450,8 +467,8 @@ Service, OnCompletionListener,
                 0, "Unknown", "",
                 source = "source"
             )
-//            _title.value = name
-//            _artist.value = artist
+            _title.value = name
+            _artist.value = artist
         }
     }
 
@@ -603,7 +620,7 @@ Service, OnCompletionListener,
             else _currentTrackPosition.value = 0
         }
         trackInfo.value = track
-        _isFavorite.value = track.favorite
+//        _isFavorite.value = track.favorite
         _lastMusic.value = track.data
         _title.value = track.title
         _artist.value = track.artist
@@ -631,7 +648,7 @@ Service, OnCompletionListener,
                         }
                         try {
                             prepare()
-                        } catch (e: Exception){
+                        } catch (e: Exception) {
                             e.printStackTrace()
                         }
                     }
@@ -652,7 +669,7 @@ Service, OnCompletionListener,
                     }
                     try {
                         prepare()
-                    } catch (e: Exception){
+                    } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
@@ -760,7 +777,7 @@ Service, OnCompletionListener,
         }
     }
 
-    private fun compilationMusic() {
+    private fun completionListener() {
         mediaPlayer.setOnCompletionListener {
             checkUsb()
             if (isUSBConnected.value && isUsbModeOn.value ||
@@ -790,44 +807,44 @@ Service, OnCompletionListener,
     }
 
     override fun nextTrack(auto: Int) {
-        if (!musicEmpty.value)
-            when (mode) {
-                SourceEnum.DISK -> {
-                    repeatModeListener(auto)
-                }
-                SourceEnum.BT -> {
-                    twManager.playerNext()
-                }
-                SourceEnum.AUX -> {
-                    TODO()
-                }
-                SourceEnum.USB -> {
-                    repeatModeListener(auto)
-                }
-                SourceEnum.PLAYLIST -> {
-                    repeatModeListener(auto)
-                }
+        when (mode) {
+            SourceEnum.DISK -> {
+                repeatModeListener(auto)
             }
+            SourceEnum.BT -> {
+                twManager.playerNext()
+            }
+            SourceEnum.AUX -> {
+                TODO()
+            }
+            SourceEnum.USB -> {
+                repeatModeListener(auto)
+            }
+            SourceEnum.PLAYLIST -> {
+                repeatModeListener(auto)
+            }
+        }
     }
 
     private fun repeatModeListener(auto: Int) {
-        when (auto) {
-            0 -> {
-                funRepeatAll()
-            }
-            1 -> {
-                when (repeatMode) {
-                    RepeatMusicEnum.REPEAT_ONE_SONG -> {
-                        funPlayOneSong()
-                    }
-                    RepeatMusicEnum.REPEAT_ALL -> {
-                        funRepeatAll()
+        if (!musicEmpty.value) {
+            when (auto) {
+                0 -> {
+                    funRepeatAll()
+                }
+                1 -> {
+                    when (repeatMode) {
+                        RepeatMusicEnum.REPEAT_ONE_SONG -> {
+                            funPlayOneSong()
+                        }
+                        RepeatMusicEnum.REPEAT_ALL -> {
+                            funRepeatAll()
+                        }
                     }
                 }
+                2 -> restartPlaylist()
             }
-            2 -> restartPlaylist()
         }
-
     }
 
     private fun funRepeatAll() {
@@ -896,17 +913,7 @@ Service, OnCompletionListener,
                 playOrPause()
             }
         }
-
-//        if (intent != null) {
-//            when (intent.action) {
-//                ACTION_TOGGLE_PAUSE -> playOrPause()
-//                ACTION_NEXT -> nextTrack(0)
-//                ACTION_PREV -> previousTrack()
-//            }
-//        }
         return START_STICKY
-
-
     }
 
     private fun startForeground() {
@@ -986,7 +993,7 @@ Service, OnCompletionListener,
                         }
                     }
                     SourceEnum.PLAYLIST -> {
-                        when (playListMode.value){
+                        when (playListMode.value) {
                             "folder" -> getFolderTracks()
                             "playList" -> getPlayListTracks()
                             "favorite" -> getFavoritePlayList()
@@ -1004,6 +1011,7 @@ Service, OnCompletionListener,
                 when (mode) {
                     SourceEnum.DISK -> {
                         startUsbMode()
+                        Toast.makeText(this, "Файлы не найдены.", Toast.LENGTH_SHORT).show()
                     }
                     else -> {
                         _isUSBConnected.value = false
@@ -1012,7 +1020,7 @@ Service, OnCompletionListener,
                 }
             } else {
                 tracks.find { it.data == data.value }.let {
-                    if (it != null){
+                    if (it != null) {
                         _currentTrackPosition.value = it.id.toInt()
                     }
                 }
@@ -1120,7 +1128,7 @@ Service, OnCompletionListener,
                 startAuxMode()
             }
             SourceEnum.BT -> {
-                if (!isNotConnected.value){
+                if (!isNotConnected.value) {
                     startBtMode()
                 } else {
                     getToastConnectBtDevice(true)
@@ -1164,7 +1172,7 @@ Service, OnCompletionListener,
                     it.favorite = true
                 }
                 trackInfo.value.favorite = !trackInfo.value.favorite
-//                _isFavorite.value = !isFavorite.value
+                _isFavorite.value = !isFavorite.value
             }
         }
         allTracks.value.forEach {
@@ -1240,6 +1248,25 @@ Service, OnCompletionListener,
 
     override fun onCompletion(mp: MediaPlayer?) {
 
+    }
+
+    private fun changeSourceFromEQButton(){
+        testSettings.start {
+            when (it) {
+                66 -> {
+                    when (mode) {
+                        SourceEnum.AUX -> sourceSelection(SourceEnum.BT)
+                        SourceEnum.BT -> sourceSelection(SourceEnum.DISK)
+                        SourceEnum.DISK -> {
+                            checkUsb()
+                            if (isUSBConnected.value) sourceSelection(SourceEnum.USB)
+//                            else //TODO
+                        }
+//                        SourceEnum.USB -> //TODO
+                    }
+                }
+            }
+        }
     }
 
 

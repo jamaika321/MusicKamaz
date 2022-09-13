@@ -298,9 +298,9 @@ class MusicFragment :
         viewModel.isShuffleOn.launchWhenStarted(lifecycleScope) {
             randomSongStatus(it)
         }
-//        viewModel.isFavoriteMusic.launchWhenStarted(lifecycleScope) {
-//            likeStatus(it)
-//        }
+        viewModel.isFavoriteMusic.launchWhenStarted(lifecycleScope) {
+            likeStatus(it)
+        }
         viewModel.isBtModeOn.launchWhenStarted(lifecycleScope) {
             if (it) btModeActivation()
         }

@@ -62,9 +62,9 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.getSource() ?: MutableStateFlow("Unknown")
     }
 
-//    val isFavoriteMusic: StateFlow<Boolean> by lazy {
-//        service.value?.isFavoriteMusic() ?: MutableStateFlow(true)
-//    }
+    val isFavoriteMusic: StateFlow<Boolean> by lazy {
+        service.value?.isFavoriteMusic() ?: MutableStateFlow(true)
+    }
 
 //    val isNotConnectedUsb: StateFlow<Boolean> by lazy {
 //        service.value?.checkUSBConnection() ?: MutableStateFlow(false)
@@ -137,8 +137,6 @@ class MusicFragmentViewModel @Inject constructor(
     private fun remoteNextPrevControlButton() {
         testSettings.start {
             when (it) {
-                5 -> playListScrolling.value = true
-                6 -> playListScrolling.value = true
                 19 -> nextTrack()
                 21 -> previousTrack()
             }

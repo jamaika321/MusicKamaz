@@ -7,7 +7,7 @@ buildscript {
                 username "developer"
                 password "b4B1qBzL"
             }
-            url "http://212.24.40.158:8081/repository/maven-public/"
+            url "https://repo-dev.itis-kamaz.ru/repository/maven-public/"
             allowInsecureProtocol = true
         }
 
@@ -29,7 +29,7 @@ allprojects {
                 username "developer"
                 password "b4B1qBzL"
             }
-            url "http://212.24.40.158:8081/repository/maven-public/"
+            url "https://repo-dev.itis-kamaz.ru/repository/maven-public/"
             allowInsecureProtocol = true
         }
 

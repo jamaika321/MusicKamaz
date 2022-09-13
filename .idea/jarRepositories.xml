@@ -36,5 +36,10 @@
       <option name="name" value="maven" />
       <option name="url" value="http://212.24.40.158:8081/repository/maven-public/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven" />
+      <option name="name" value="maven" />
+      <option name="url" value="https://repo-dev.itis-kamaz.ru/repository/maven-public/" />
+    </remote-repository>
   </component>
 </project>
