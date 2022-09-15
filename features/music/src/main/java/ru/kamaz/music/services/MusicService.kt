@@ -18,16 +18,16 @@ import android.net.ConnectivityManager
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.support.v4.media.MediaDescriptionCompat
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MAX
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.biozzlab.twmanager.managers.BluetoothManager
@@ -35,10 +35,6 @@ import ru.biozzlab.twmanager.managers.MusicManager
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.domain.TestSettings
-import ru.kamaz.music.notification.BasicNotification
-import ru.kamaz.music.notification.NotificationChannelFactory
-import ru.kamaz.music.notification.NotificationFactory
-import ru.kamaz.music.notification.SkeletalNotification
 import ru.kamaz.music.receiver.BrReceiver
 import ru.kamaz.music.ui.TestWidget
 import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
@@ -86,12 +82,6 @@ Service, OnCompletionListener,
 
     @Inject
     lateinit var rvAllFolderWithMusic: AllFolderWithMusicRV
-
-    @Inject
-    lateinit var notificationChannelFactory: NotificationChannelFactory
-
-    @Inject
-    lateinit var notificationFactory: NotificationFactory
 
     private val twManager = BluetoothManager()
 
@@ -319,8 +309,6 @@ Service, OnCompletionListener,
         completionListener()
         loadLastSavedMusic(666)
         changeSourceFromEQButton()
-        notificationChannelFactory.init(this)
-        notificationFactory.showNotification(1, BasicNotification("dsds", "sdsds", "wewew", 1))
     }
 
     private fun loadLastSavedMusic(id: Int) {
