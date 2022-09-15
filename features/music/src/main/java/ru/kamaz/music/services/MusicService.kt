@@ -53,6 +53,8 @@ class MusicService : Service(), MusicServiceInterface.
 Service, OnCompletionListener,
     MusicManagerListener, BluetoothManagerListener {
 
+    private lateinit var tileMusicManager: TileMusicManager
+
     @Inject
     lateinit var mediaPlayer: MediaPlayer
 
@@ -272,6 +274,8 @@ Service, OnCompletionListener,
         startMusicListener()
         initLifecycleScope()
 
+        tileMusicManager = TileMusicManager(applicationContext)
+
         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION).apply {
             addAction(ACTIONPP)
             addAction(ACTIONCMD)
@@ -292,10 +296,12 @@ Service, OnCompletionListener,
 
         artist.launchOn(lifecycleScope) {
             widgettest.updateTestArtist(this, it)
+            tileMusicManager.sendArtist(it)
         }
 
         title.launchOn(lifecycleScope) {
             widgettest.updateTestTitle(this, it)
+            tileMusicManager.sendTitle(it)
         }
 
         duration.launchOn(lifecycleScope) {
@@ -304,6 +310,7 @@ Service, OnCompletionListener,
 
         isPlaying.launchOn(lifecycleScope) {
             widgettest.updatePlayPauseImg(this, it)
+            tileMusicManager.sendIsPlaying(it)
         }
 
         completionListener()
@@ -524,6 +531,9 @@ Service, OnCompletionListener,
         _isBtModeOn.tryEmit(false)
         _isPlaylistModeOn.tryEmit(false)
         _isDefaultModeOn.tryEmit(false)
+
+        tileMusicManager.sendSourceMusicType(sourceEnum)
+
         when (sourceEnum) {
             //AUX
             0 -> {
