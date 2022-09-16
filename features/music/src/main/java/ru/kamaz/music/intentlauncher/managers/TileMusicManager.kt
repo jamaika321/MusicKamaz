@@ -1,4 +1,4 @@
-package ru.kamaz.music.services
+package ru.kamaz.music.intentlauncher.managers
 
 import android.content.ComponentName
 import android.content.Context

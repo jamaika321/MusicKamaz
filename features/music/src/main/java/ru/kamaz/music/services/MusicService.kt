@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Resources
 import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.MediaPlayer
@@ -35,6 +36,8 @@ import ru.biozzlab.twmanager.managers.MusicManager
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.domain.TestSettings
+import ru.kamaz.music.intentlauncher.managers.TileMusicManager
+import ru.kamaz.music.intentlauncher.receivers.TileListenerReceiver
 import ru.kamaz.music.receiver.BrReceiver
 import ru.kamaz.music.ui.TestWidget
 import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
@@ -275,6 +278,9 @@ Service, OnCompletionListener,
         initLifecycleScope()
 
         tileMusicManager = TileMusicManager(applicationContext)
+        TileListenerReceiver.prevMusic = { previousTrack() }
+        TileListenerReceiver.nextMusic = { nextTrack(1) }
+        TileListenerReceiver.playPauseMusic = { playOrPause() }
 
         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION).apply {
             addAction(ACTIONPP)
@@ -382,6 +388,9 @@ Service, OnCompletionListener,
     override fun onDestroy() {
         super.onDestroy()
         unsubscribeLifecycleScope()
+        TileListenerReceiver.prevMusic = {  }
+        TileListenerReceiver.nextMusic = {  }
+        TileListenerReceiver.playPauseMusic = {  }
     }
 
     override fun onSdStatusChanged(path: String, isAdded: Boolean) {
