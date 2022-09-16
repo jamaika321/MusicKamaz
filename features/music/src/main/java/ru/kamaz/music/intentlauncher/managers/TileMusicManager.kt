@@ -6,6 +6,20 @@ import android.content.Intent
 
 class TileMusicManager(private val context: Context) {
 
+    companion object {
+        private fun createIntent(action: String) = Intent().also {
+            it.component = ComponentName(
+                "ru.kamaz.launcher",
+                "ru.kamaz.media.presentation.screens.music.receiver.MusicListenerReceiver"
+            )
+            it.action = action
+        }
+
+        fun sendMusicOn(context: Context) =
+            context.sendBroadcast(createIntent("ACTION_MUSIC_ON"))
+    }
+
+
     fun sendTitle(title: String) {
         context.sendBroadcast(createIntent("ACTION_TITLE_MUSIC").apply {
             putExtra("title", title)
@@ -28,13 +42,5 @@ class TileMusicManager(private val context: Context) {
         context.sendBroadcast(createIntent("ACTION_SOURCE_MUSIC").apply {
             putExtra("source", type)
         })
-    }
-
-    private fun createIntent(action: String) = Intent().also {
-        it.component = ComponentName(
-            "ru.kamaz.launcher",
-            "ru.kamaz.media.presentation.screens.music.receiver.MusicListenerReceiver"
-        )
-        it.action = action
     }
 }
