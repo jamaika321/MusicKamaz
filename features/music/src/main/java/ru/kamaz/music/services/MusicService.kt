@@ -298,6 +298,7 @@ Service, OnCompletionListener,
 
         cover.launchOn(lifecycleScope) {
             widgettest.updateTestImage(this, it)
+            tileMusicManager.sendAlbumImagePath(it)
         }
 
         artist.launchOn(lifecycleScope) {

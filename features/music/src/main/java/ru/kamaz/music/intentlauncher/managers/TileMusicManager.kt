@@ -43,4 +43,10 @@ class TileMusicManager(private val context: Context) {
             putExtra("source", type)
         })
     }
+
+    fun sendAlbumImagePath(path: String) {
+        context.sendBroadcast(createIntent("ACTION_IMAGE_PATH_MUSIC").apply {
+            putExtra("image", path)
+        })
+    }
 }
