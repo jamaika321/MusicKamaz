@@ -10,7 +10,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.Resources
 import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.MediaPlayer
@@ -25,10 +24,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MAX
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.biozzlab.twmanager.managers.BluetoothManager
@@ -87,6 +83,9 @@ Service, OnCompletionListener,
 
     @Inject
     lateinit var rvAllFolderWithMusic: AllFolderWithMusicRV
+
+    @Inject
+    lateinit var getMusicPosition: GetMusicPosition
 
     private val twManager = BluetoothManager()
 
@@ -296,6 +295,16 @@ Service, OnCompletionListener,
             twManager.requestConnectionInfo()
         }
 
+        getMusicPosition()
+            .stateIn(lifecycleScope, SharingStarted.Lazily, 0)
+            .launchOn(lifecycleScope) {
+                tileMusicManager.sendDuration(duration.value)
+                tileMusicManager.sendProgress(it)
+                tileMusicManager.sendArtist(artist.value)
+                tileMusicManager.sendTitle(title.value)
+                tileMusicManager.sendIsPlaying(isPlaying.value)
+            }
+
         cover.launchOn(lifecycleScope) {
             widgettest.updateTestImage(this, it)
             tileMusicManager.sendAlbumImagePath(it)
@@ -303,12 +312,10 @@ Service, OnCompletionListener,
 
         artist.launchOn(lifecycleScope) {
             widgettest.updateTestArtist(this, it)
-            tileMusicManager.sendArtist(it)
         }
 
         title.launchOn(lifecycleScope) {
             widgettest.updateTestTitle(this, it)
-            tileMusicManager.sendTitle(it)
         }
 
         duration.launchOn(lifecycleScope) {
@@ -317,7 +324,6 @@ Service, OnCompletionListener,
 
         isPlaying.launchOn(lifecycleScope) {
             widgettest.updatePlayPauseImg(this, it)
-            tileMusicManager.sendIsPlaying(it)
         }
 
         completionListener()

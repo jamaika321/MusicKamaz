@@ -19,6 +19,17 @@ class TileMusicManager(private val context: Context) {
             context.sendBroadcast(createIntent("ACTION_MUSIC_ON"))
     }
 
+    fun sendDuration(duration: Int) {
+        context.sendBroadcast(createIntent("ACTION_DURATION_MUSIC").apply {
+            putExtra("duration", duration)
+        })
+    }
+
+    fun sendProgress(progress: Int){
+        context.sendBroadcast(createIntent("ACTION_PROGRESS_MUSIC").apply {
+            putExtra("progress", progress)
+        })
+    }
 
     fun sendTitle(title: String) {
         context.sendBroadcast(createIntent("ACTION_TITLE_MUSIC").apply {

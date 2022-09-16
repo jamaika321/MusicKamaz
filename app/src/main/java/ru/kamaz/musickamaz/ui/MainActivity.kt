@@ -33,8 +33,8 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    override fun onActivityCreated() {
-        checkPermission()
+    override fun onResume() {
+        super.onResume()
         TileMusicManager.sendMusicOn(this)
     }
 
