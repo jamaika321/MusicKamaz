@@ -999,7 +999,6 @@ Service, OnCompletionListener,
                 when (mode) {
                     SourceEnum.DISK -> {
                         startUsbMode()
-                        Toast.makeText(this, "Файлы не найдены.", Toast.LENGTH_SHORT).show()
                     }
                     else -> {
                         _isUSBConnected.value = false
