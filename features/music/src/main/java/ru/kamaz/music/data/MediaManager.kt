@@ -13,7 +13,6 @@ interface MediaManager {
 
     fun getMediaFilesFromPath(path: String, mode: String): Either<None, List<Track>>
     fun getAlbumImagePath(albumID: Long): Either<None, String>
-    fun getCategory():Either<None, List<CategoryMusicModel>>
     fun getAllFolder(): Either<None, List<AllFolderWithMusic>>
     fun deleteAlbumArtDir()
     fun deleteTrackFromMemory(data: String)

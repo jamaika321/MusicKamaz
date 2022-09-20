@@ -235,24 +235,6 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         return if (albumPath == null) Left(None()) else Either.Right(albumPath)
     }
 
-    override fun getCategory(): Either<None, List<CategoryMusicModel>> {
-
-        val array = ArrayList<CategoryMusicModel>()
-
-        val category = listOf(
-            CategoryMusicModel(R.drawable.ic_songers, context.getString(R.string.artists), 0),
-            CategoryMusicModel(R.drawable.ic_albom, context.getString(R.string.albums), 2),
-            CategoryMusicModel(R.drawable.ic_play_list, context.getString(R.string.playlists), 3),
-            CategoryMusicModel(
-                R.drawable.ic_like_for_list,
-                context.getString(R.string.favorites),
-                4
-            )
-        )
-        array.addAll(category)
-        return Either.Right(array)
-    }
-
 
     override fun getAllFolder(): Either<None, List<AllFolderWithMusic>> {
 

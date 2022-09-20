@@ -317,7 +317,6 @@ Service, OnCompletionListener,
                 queryLastMusic.run(QueryLastMusic.Params(id))
             }
             if (loading is Either.Right && loading.r.isNotEmpty()) {
-                Log.i("Test_LoadLast", "loading.isNotEmpty")
                 loadAllLists()
                 loading.r[0].let { track ->
                     val _loading = mediaManager.loadLastTrack(listOf(track.data))
@@ -364,7 +363,8 @@ Service, OnCompletionListener,
     private fun loadAllLists() {
         CoroutineScope(Dispatchers.IO).launch {
             loadTracksOnCoroutine("5")
-            delay(10000)//TODO
+            delay(10000)
+            //TODO
             getAllFavoriteSongs.run(None()).collect {
                 favoriteTracks.value = it
                 changeFavoriteStatus(it)
