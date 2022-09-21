@@ -36,4 +36,7 @@
     <string name="settings">Настройки</string>
     <string name="default_title">Не исполняется</string>
     <string name="source">Источник</string>
+    <string name="all_tracks">Все треки</string>
+    <string name="disk_tracks">Треки с DISK</string>
+    <string name="usb_tracks">Треки с USB</string>
 </resources>

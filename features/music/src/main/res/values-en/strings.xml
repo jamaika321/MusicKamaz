@@ -37,4 +37,7 @@
     <string name="settings">Settings</string>
     <string name="default_title">Not performed</string>
     <string name="source">Source</string>
+    <string name="all_tracks">All tracks</string>
+    <string name="disk_tracks">DISK tracks</string>
+    <string name="usb_tracks">USB tracks</string>
 </resources>

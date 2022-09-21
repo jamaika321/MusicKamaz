@@ -1,7 +1,6 @@
 package ru.kamaz.music.ui.producers
 object ItemType {
-     const val RV_ITEM_MUSIC_ARTIST = 0
-     const val RV_ITEM_MUSIC_GENRES = 1
+     const val RV_ITEM_MUSIC_ARTIST = 1
      const val RV_ITEM_MUSIC_ALBUMS = 2
      const val RV_ITEM_MUSIC_PLAYLIST = 3
      const val RV_ITEM_MUSIC_FAVORITE = 4

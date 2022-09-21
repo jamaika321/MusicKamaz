@@ -574,14 +574,18 @@ class MusicFragment :
     }
 
     private fun openBluetoothSettings() {
-        val intent = Intent(Intent.ACTION_MAIN, null)
-        val componentName =
-            ComponentName("ru.bis.settings", "ru.bis.settings.presentation.StartActivity")
-        intent.addCategory(Intent.CATEGORY_LAUNCHER)
-        intent.component = componentName
-        intent.putExtra("BluetoothSettings", true)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-        startActivity(intent)
+//        val intent = Intent(Intent.ACTION_MAIN, null)
+//        val componentName =
+//            ComponentName("ru.bis.settings", "ru.bis.settings.presentation.StartActivity")
+//        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+//        intent.component = componentName
+//        intent.putExtra("BluetoothSettings", true)
+//        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+//        startActivity(intent)
+        requireContext().packageManager.getLaunchIntentForPackage("ru.bis.settings")?.let { settings ->
+            settings.putExtra("isBluetooth", true)
+            startActivity(settings)
+        }
     }
 
     override fun initBinding(
