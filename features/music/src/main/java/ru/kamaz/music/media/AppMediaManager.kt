@@ -73,15 +73,15 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             if (i == trackPaths.size) break
             metaRetriever.setDataSource(trackPaths[i])
 
-            val artist =
-                metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST))
-                    ?: ("unknown")
-            val album =
-                metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))
-                    ?: ("unknown")
             val title =
                 metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE))
-                    ?: ("unknown")
+                    ?: (trackPaths[i].replaceBeforeLast("/", "").replace("/", ""))
+            val artist =
+                metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST))
+                    ?: (R.string.unknown)
+            val album =
+                metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))
+                    ?: (R.string.unknown)
             val duration =
                 metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
                     ?.toLong() ?: (180)
@@ -121,13 +121,13 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 Track(
                     id,
                     title,
-                    artist,
+                    artist.toString(),
                     data,
                     duration,
-                    album,
+                    album.toString(),
                     albumArt.toString(),
-                    false,
-                    false,
+                    playing = false,
+                    favorite = false,
                     source
                 )
             )
