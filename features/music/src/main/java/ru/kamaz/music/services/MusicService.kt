@@ -24,10 +24,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MAX
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import ru.biozzlab.twmanager.domain.interfaces.BluetoothManagerListener
 import ru.biozzlab.twmanager.domain.interfaces.MusicManagerListener
 import ru.biozzlab.twmanager.managers.BluetoothManager
@@ -35,6 +32,8 @@ import ru.biozzlab.twmanager.managers.MusicManager
 import ru.kamaz.music.data.MediaManager
 import ru.kamaz.music.di.components.MusicComponent
 import ru.kamaz.music.domain.TestSettings
+import ru.kamaz.music.intentlauncher.managers.TileMusicManager
+import ru.kamaz.music.intentlauncher.receivers.TileListenerReceiver
 import ru.kamaz.music.receiver.BrReceiver
 import ru.kamaz.music.ui.TestWidget
 import ru.kamaz.music_api.BaseConstants.APP_WIDGET_UPDATE
@@ -52,6 +51,8 @@ import javax.inject.Inject
 class MusicService : Service(), MusicServiceInterface.
 Service, OnCompletionListener,
     MusicManagerListener, BluetoothManagerListener {
+
+    private lateinit var tileMusicManager: TileMusicManager
 
     @Inject
     lateinit var mediaPlayer: MediaPlayer
@@ -82,6 +83,9 @@ Service, OnCompletionListener,
 
     @Inject
     lateinit var rvAllFolderWithMusic: AllFolderWithMusicRV
+
+    @Inject
+    lateinit var getMusicPosition: GetMusicPosition
 
     private val twManager = BluetoothManager()
 
@@ -272,6 +276,11 @@ Service, OnCompletionListener,
         startMusicListener()
         initLifecycleScope()
 
+        tileMusicManager = TileMusicManager(applicationContext)
+        TileListenerReceiver.prevMusic = { previousTrack() }
+        TileListenerReceiver.nextMusic = { nextTrack(1) }
+        TileListenerReceiver.playPauseMusic = { playOrPause() }
+
         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION).apply {
             addAction(ACTIONPP)
             addAction(ACTIONCMD)
@@ -286,8 +295,19 @@ Service, OnCompletionListener,
             twManager.requestConnectionInfo()
         }
 
+        getMusicPosition()
+            .stateIn(lifecycleScope, SharingStarted.Lazily, 0)
+            .launchOn(lifecycleScope) {
+                tileMusicManager.sendDuration(duration.value)
+                tileMusicManager.sendProgress(it)
+                tileMusicManager.sendArtist(artist.value)
+                tileMusicManager.sendTitle(title.value)
+                tileMusicManager.sendIsPlaying(isPlaying.value)
+            }
+
         cover.launchOn(lifecycleScope) {
             widgettest.updateTestImage(this, it)
+            tileMusicManager.sendAlbumImagePath(it)
         }
 
         artist.launchOn(lifecycleScope) {
@@ -375,6 +395,9 @@ Service, OnCompletionListener,
     override fun onDestroy() {
         super.onDestroy()
         unsubscribeLifecycleScope()
+        TileListenerReceiver.prevMusic = {  }
+        TileListenerReceiver.nextMusic = {  }
+        TileListenerReceiver.playPauseMusic = {  }
     }
 
     override fun onSdStatusChanged(path: String, isAdded: Boolean) {
@@ -524,6 +547,9 @@ Service, OnCompletionListener,
         _isBtModeOn.tryEmit(false)
         _isPlaylistModeOn.tryEmit(false)
         _isDefaultModeOn.tryEmit(false)
+
+        tileMusicManager.sendSourceMusicType(sourceEnum)
+
         when (sourceEnum) {
             //AUX
             0 -> {
