@@ -2,8 +2,6 @@ package ru.kamaz.musickamaz.ui
 
 import androidx.core.app.ActivityCompat
 import androidx.navigation.findNavController
-import ru.kamaz.music.intentlauncher.managers.TileMusicManager
-import ru.kamaz.music.intentlauncher.receivers.TileListenerReceiver
 import ru.kamaz.music.ui.NavAction
 import ru.kamaz.music.ui.PermissionUtils
 import ru.kamaz.musickamaz.R
@@ -33,9 +31,8 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        TileMusicManager.sendMusicOn(this)
+    override fun onActivityCreated() {
+        checkPermission()
     }
 
     private fun checkPermission() {

@@ -32,7 +32,7 @@ class MusicCategoryViewModel :RecyclerViewBaseItem<CategoryMusicModel, MainCateg
     override fun bindData(data: CategoryMusicModel, position: Int) {
         this.data = data
         img.value= data.img
-        category.value= data.title
+        category.value= data.category
 
     }
 }

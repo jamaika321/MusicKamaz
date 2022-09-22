@@ -73,15 +73,15 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
             if (i == trackPaths.size) break
             metaRetriever.setDataSource(trackPaths[i])
 
-            val title =
-                metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE))
-                    ?: (trackPaths[i].replaceBeforeLast("/", "").replace("/", ""))
             val artist =
                 metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ARTIST))
-                    ?: (R.string.unknown)
+                    ?: ("unknown")
             val album =
                 metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_ALBUM))
-                    ?: (R.string.unknown)
+                    ?: ("unknown")
+            val title =
+                metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_TITLE))
+                    ?: ("unknown")
             val duration =
                 metaRetriever.extractMetadata((MediaMetadataRetriever.METADATA_KEY_DURATION))
                     ?.toLong() ?: (180)
@@ -121,13 +121,13 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
                 Track(
                     id,
                     title,
-                    artist.toString(),
+                    artist,
                     data,
                     duration,
-                    album.toString(),
+                    album,
                     albumArt.toString(),
-                    playing = false,
-                    favorite = false,
+                    false,
+                    false,
                     source
                 )
             )
@@ -233,6 +233,24 @@ class AppMediaManager @Inject constructor(val context: Context) : MediaManager {
         cursor?.close()
 
         return if (albumPath == null) Left(None()) else Either.Right(albumPath)
+    }
+
+    override fun getCategory(): Either<None, List<CategoryMusicModel>> {
+
+        val array = ArrayList<CategoryMusicModel>()
+
+        val category = listOf(
+            CategoryMusicModel(R.drawable.ic_songers, context.getString(R.string.artists), 0),
+            CategoryMusicModel(R.drawable.ic_albom, context.getString(R.string.albums), 2),
+            CategoryMusicModel(R.drawable.ic_play_list, context.getString(R.string.playlists), 3),
+            CategoryMusicModel(
+                R.drawable.ic_like_for_list,
+                context.getString(R.string.favorites),
+                4
+            )
+        )
+        array.addAll(category)
+        return Either.Right(array)
     }
 
 

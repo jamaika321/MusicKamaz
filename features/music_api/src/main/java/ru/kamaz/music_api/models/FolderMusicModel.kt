@@ -1,7 +1,7 @@
 package ru.kamaz.music_api.models
 
 data class FolderMusicModel(
-    val id: Int,
+    val id: Long,
     val title: String,
     val artist: String,
     val data: String,

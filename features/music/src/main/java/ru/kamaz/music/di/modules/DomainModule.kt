@@ -18,6 +18,8 @@ class DomainModule {
     fun provideUpdatePlayList(repository: Repository): UpdatePlayList = UpdatePlayList(repository)
     @Provides
     fun provideUpdatePlayListName(repository: Repository): UpdatePlayListName = UpdatePlayListName(repository)
+    @Provides
+    fun provideCategoryLoadRV(repository: Repository): CategoryLoadRV = CategoryLoadRV(repository)
 
     @Provides
     fun provideGetMusicPosition(repository: Repository): GetMusicPosition = GetMusicPosition(repository)

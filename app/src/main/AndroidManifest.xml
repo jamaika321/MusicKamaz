@@ -66,16 +66,6 @@
                 <action android:name="com.tw.music.action.pp" />
             </intent-filter>
         </receiver>
-
-        <receiver android:name="ru.kamaz.music.intentlauncher.receivers.TileListenerReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="ACTION_PREV_MUSIC" />
-                <action android:name="ACTION_NEXT_MUSIC" />
-                <action android:name="ACTION_PLAY_PAUSE_MUSIC" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>
