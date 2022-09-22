@@ -272,13 +272,13 @@ class MainListMusicViewModel @Inject constructor(
 
     fun loadCategoryItems(): List<RecyclerViewBaseDataModel> {
         return listOf(
-            CategoryMusicModel(R.drawable.pause_twix, context.getString(R.string.all_tracks),0),
-            CategoryMusicModel(R.drawable.ic_songers, context.getString(R.string.artists),1),
-            CategoryMusicModel(R.drawable.ic_albom, context.getString(R.string.albums),2),
-            CategoryMusicModel(R.drawable.ic_play_list, context.getString(R.string.playlists),3),
+            CategoryMusicModel(R.drawable.all_tracks_icon, context.getString(R.string.all_tracks),0),
+            CategoryMusicModel(R.drawable.artist_list_icon, context.getString(R.string.artists),1),
+            CategoryMusicModel(R.drawable.album_list_icon, context.getString(R.string.albums),2),
+            CategoryMusicModel(R.drawable.playlist_list_icon, context.getString(R.string.playlists),3),
             CategoryMusicModel(R.drawable.ic_like_for_list, context.getString(R.string.favorites),4),
-            CategoryMusicModel(R.drawable.play_triangle, context.getString(R.string.disk_tracks),5),
-            CategoryMusicModel(R.drawable.add_playlist_back_item, context.getString(R.string.usb_tracks),6)
+            CategoryMusicModel(R.drawable.disk_list_icon, context.getString(R.string.disk_tracks),5),
+            CategoryMusicModel(R.drawable.usb_list_icon, context.getString(R.string.usb_tracks),6)
         ).toRecyclerViewItemsCategory()
     }
 

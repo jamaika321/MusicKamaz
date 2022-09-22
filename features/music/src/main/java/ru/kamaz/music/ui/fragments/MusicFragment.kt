@@ -241,6 +241,11 @@ class MusicFragment :
             likeStatus(it.favorite)
         }
 
+        viewModel.isUsbConnected.launchWhenStarted(lifecycleScope) {
+            if (it) binding.sourceSelection.usbBlurring.visibility = View.INVISIBLE
+            else binding.sourceSelection.usbBlurring.visibility = View.VISIBLE
+        }
+
 //        viewModel.title.launchWhenStarted(lifecycleScope) {
 //            this.binDing.song.text = it
 //        }

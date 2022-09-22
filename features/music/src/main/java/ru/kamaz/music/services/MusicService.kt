@@ -353,7 +353,7 @@ Service, OnCompletionListener,
                             }
                             else -> {
                                 initPlayListSource(PlayListSource(track.source, track.sourceName))
-                                resume()
+//                                resume()
                             }
                         }
                     } else {
@@ -507,7 +507,7 @@ Service, OnCompletionListener,
             if (allTracks.value.isNotEmpty()) {
                 replaceAllTracks(emptyList(), false)
             }
-            resume()
+//            resume()
         }
     }
 
@@ -520,7 +520,7 @@ Service, OnCompletionListener,
                 replaceAllTracks(emptyList(), false)
             }
             initTrack(tracks[0], tracks[0].data)
-            resume()
+//            resume()
         }
     }
 
@@ -692,6 +692,7 @@ Service, OnCompletionListener,
                 mediaPlayer.stop()
             }
         }
+        resume()
     }
 
     private fun stopMediaPlayer() {
@@ -787,7 +788,7 @@ Service, OnCompletionListener,
                 tracks[currentTrackPosition.value],
                 tracks[currentTrackPosition.value].data
             )
-            if (isPlaying.value) resume()
+//            if (isPlaying.value) resume()
         }
     }
 
@@ -880,7 +881,7 @@ Service, OnCompletionListener,
             tracks[currentTrackPosition.value].data
         )
         if (isPlaying.value) {
-            resume()
+//            resume()
         }
     }
 
@@ -1180,22 +1181,15 @@ Service, OnCompletionListener,
             if (it != null) {
                 if (it.favorite) {
                     deleteFavoriteMusic(it)
-                    it.favorite = false
                 } else {
                     insertFavoriteToDB(it)
-                    it.favorite = true
                 }
                 trackInfo.value.favorite = !trackInfo.value.favorite
                 _isFavorite.value = !isFavorite.value
             }
         }
-        allTracks.value.forEach {
+        tracks.forEach {
             if (it.data == data) {
-                if (it.favorite) {
-                    deleteFavoriteMusic(it)
-                } else {
-                    insertFavoriteToDB(it)
-                }
                 it.favorite = !it.favorite
             }
         }
@@ -1207,12 +1201,6 @@ Service, OnCompletionListener,
 
     private fun deleteFavoriteMusic(track: Track) {
         deleteFavoriteMusic(DeleteFavoriteMusic.Params(track))
-        allTracks.value.find { it.data == track.data }.let {
-            if (it != null) it.favorite = false
-        }
-        tracks.find { it.data == track.data }.let {
-            if (it != null) it.favorite = false
-        }
     }
 
     private fun changeFavoriteStatus(list: List<Track>) {

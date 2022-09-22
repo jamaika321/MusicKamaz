@@ -66,9 +66,9 @@ class MusicFragmentViewModel @Inject constructor(
         service.value?.isFavoriteMusic() ?: MutableStateFlow(true)
     }
 
-//    val isNotConnectedUsb: StateFlow<Boolean> by lazy {
-//        service.value?.checkUSBConnection() ?: MutableStateFlow(false)
-//    }
+    val isUsbConnected: StateFlow<Boolean> by lazy {
+        service.value?.checkUSBConnection() ?: MutableStateFlow(false)
+    }
 
     val isAuxModeOn: StateFlow<Boolean> by lazy {
         service.value?.auxModeOn() ?: MutableStateFlow(false)

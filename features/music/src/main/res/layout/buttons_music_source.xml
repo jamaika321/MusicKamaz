@@ -14,7 +14,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_bt"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf=" parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:text="AUX"
         android:layout_marginStart="@dimen/marginTop"
         android:layout_marginEnd="@dimen/marginTop"
@@ -53,6 +53,17 @@
         android:layout_marginStart="@dimen/marginTop"
         android:layout_marginEnd="@dimen/marginTop"
         android:text="USB"
+         />
+
+    <TextView
+        android:id="@+id/usb_blurring"
+        style="@style/source_buttons"
+        android:background="@drawable/usb_button_blurring"
+        app:layout_constraintBottom_toBottomOf="@id/usb"
+        app:layout_constraintEnd_toEndOf="@id/usb"
+        app:layout_constraintStart_toStartOf="@id/usb"
+        app:layout_constraintTop_toTopOf="@id/usb"
+        android:visibility="invisible"
          />
 
 
